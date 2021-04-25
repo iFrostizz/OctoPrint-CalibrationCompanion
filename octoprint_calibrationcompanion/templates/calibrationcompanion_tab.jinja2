@@ -1,0 +1,1303 @@
+<h1>Calibration Companion</h1>
+
+<div>This plugin was made by me, iFrostizz. It worked for me and I can't guarantee the 100% reliability so please be careful
+    when handling it, and always stay next to your printer.
+</div><br>
+
+<!-- Button to trigger modal -->
+<div id="go-button"><a href="#myModal" role="button" class="btn" data-toggle="modal">Let's go !</a></div><br>
+
+<!-- Modal -->
+<div id="myModal" class="modal large hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 id="myModalLabel">Calibration process</h4>
+    </div>
+    <div class="modal-body">
+        <ul class="nav nav-pills nav-fill" id="first-ul">
+            <li class="active"><a href="#setup" data-toggle="tab">Setup</a></li>
+            <li><a href="#profiles" data-toggle="tab">Profiles</a></li>
+            <li><a href="#pid" data-toggle="tab">Pid Autotune</a></li>
+            <li><a href="#layer" data-toggle="tab">First Layer</a></li>
+            <!--<li><a href="#baseline" data-toggle="tab">Baseline Print</a></li>-->
+            <li><a href="#extruder" data-toggle="tab">E-steps Calibration</a></li>
+            <li><a href="#flow" data-toggle="tab">Slicer Flow Calibration</a></li>
+            <li><a href="#current" data-toggle="tab">Stepper Motor Driver</a></li>
+            <li><a href="#retraction" data-toggle="tab">Retraction Tuning</a></li>
+            <li><a href="#temperature" data-toggle="tab">Temperature Tuning</a></li>
+            <li><a href="#acceleration" data-toggle="tab">Acceleration Tuning</a></li>
+            <!--<li><a href="#linear" data-toggle="tab">Linear Advance</a></li>-->
+        </ul>
+
+        <div class="tab-content">
+            <!--Setup-->
+            <div class="tab-pane active" id="setup">
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="printerName">Printer Name</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="printerName" data-bind="value: printer_name">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="filamentUsed">Filament Used</label>
+                        <div class="controls">
+                            <select class="midsizeTextbox" id="filamentUsed" data-bind="value: filament_used">
+                                <option value="PLA">PLA</option>
+                                <option value="ABS">ABS</option>
+                                <option value="PETG">PETG</option>
+                                <option value="TPU">TPU</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="filamentDiameter">Filament Diameter</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="filamentDiameter" data-bind="value: filament_diameter" placeholder="(mm)">
+                                <span class="add-on">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!--<div class="control-group warning">
+                  <label class="control-label" for="inputWarning">Input with warning</label>
+                  <div class="controls">
+                    <input type="text" id="inputWarning">
+                    <span class="help-inline">Something may have gone wrong</span>
+                  </div>
+                </div>-->
+
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="bedSizeX">Bed Size X</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="bedSizeX" placeholder="X (mm) >=100" data-bind="textInput: bed_size_x">
+                                <span class="add-on">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="bedSizeY">Bed Size Y</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="bedSizeY" placeholder="Y (mm) >=100" data-bind="textInput: bed_size_y">
+                                <span class="add-on">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="bedSizeZ">Bed Size Z</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="bedSizeZ" placeholder="Z (mm) >=100" data-bind="textInput: bed_size_z">
+                                <span class="add-on">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="nozzleSize">Nozzle size</label>
+                        <div class="controls">
+                            <select class="midsizeTextbox" id="nozzleSize" data-bind="value: nozzle_size">
+                                <option value="0.4">0.4</option>
+                                <option value="0.6">0.6</option>
+                                <option value="0.8">0.8</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="relativePositioning">Relative Positioning</label>
+                        <div class="controls">
+                            <input type="checkbox" id="relativePositioning" data-bind="checked: relative_positioning">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="originCheck">Delta printer (0,0 at centre)</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="checkbox" id="originCheck" data-bind="checked: origin_check">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!--Profiles Tab-->
+            <div class="tab-pane" id="profiles">
+                <form class="form-inline">
+                    <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
+                        <div class="control-group">
+                            <label class="control-label" for="profile-selection">Profile selection</label>
+                            <div class="controls">
+                                <div class="input-append">
+                                    <select class="form-control" id="profile-selection" data-bind="value: profile_selection">
+                                        <option value=""></option>
+                                        <option value="profile1">Profile 1</option>
+                                        <option value="profile2">Profile 2</option>
+                                        <option value="profile3">Profile 3</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary" id="load-profile">Load</button>
+                                    <button type="button" class="btn btn-primary" id="save-profile">Save</button>
+                                    <button type="button" class="btn btn-primary" id="reset-profile">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                </form><br><br><br><br>
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Temperature</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-nozzle-profile">1<sup>st</sup> layer nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-nozzle-profile">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-nozzle-profile">Regular nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-nozzle-profile">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-bed-profile">Bed Temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-bed-profile">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div><br>
+
+                    <span id="regular-form-title"><h4><b>Fan</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-speed-profile">Fan at</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="fan-speed-profile">
+                                <span class="add-on">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-layer-profile">At layer</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="fan-layer-profile">
+                        </div>
+                    </div><br>
+
+                    <span id="regular-form-title"><h4><b>Printing speed</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-speed-profile">First layer speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-speed-profile">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-speed-profile">Regular speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-speed-profile">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="travel-speed-profile">Travel speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="travel-speed-profile">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<span id="regular-form-title"><h4><b>Gcode</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="start-gcode-profile">Start Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="start-gcode-profile" class="textarea" placeholder="This will be inserted before the print started..." rows="4" cols="50"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="end-gcode-profile">End Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="end-gcode-profile" class="textarea" placeholder="This will be inserted after the print has finished..." rows="4" cols="50"></textarea>
+                            </div>
+                        </div>
+                    </div>-->
+                </form>
+
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Retraction</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-dist-profile">Retraction distance</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="retraction-dist-profile">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-speed-profile">Retraction speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="retraction-speed-profile">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div><br>
+                    <span id="regular-form-title"><h4><b>Extra</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="flow-profile">Flow</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="flow-profile">
+                                <span class="add-on">%</span>
+                            </div>
+                        </div>
+                    </div><br>
+                    <span id="regular-form-title"><h4><b>ABL</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="abl-method-profile">ABL method</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <select class="form-control" id="abl-method-profile">
+                                    <option value="no-abl">No ABL</option>
+                                    <option value="G29">G29</option>
+                                    <option value="M420 S1">M420 S1</option>
+                                    <option value="M420 L0 S1">M420 L0 S1</option>
+                                    <option value="M420 L1 S1">M420 L1 S1</option>
+                                    <option value="M420 L2 S1">M420 L2 S1</option>
+                                    <option value="M420 L3 S1">M420 L3 S1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div><br>
+                </form><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                <form class="form-inline" id="gcode-centered-profile">
+                    <span id="regular-form-title"><h4><b>Gcode</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="start-gcode-profile">Start Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="start-gcode-profile" class="textarea" placeholder="This will be inserted before the print started..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="end-gcode-profile">End Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="end-gcode-profile" class="textarea" placeholder="This will be inserted after the print has finished..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!--PID Tab-->
+            <div class="tab-pane" id="pid">
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="nozzlePidTemp">Nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="nozzlePidTemp" data-bind="value: nozzle_pid_temp">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="bedPidTemp">Bed temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="bedPidTemp" placeholder="T (°C)" data-bind="value: bed_pid_temp">
+                                <span class="add-on">°C</span>
+                            </div>
+                            <a id="aboutBedPid" href="#" data-toggle="tooltip" data-placement="right" title="leave empty if not enabled"></a>
+                        </div>
+                    </div>
+                </form>
+                <br><br><br><br>
+                <div class="btn-group" data-toggle="buttons-radio">
+                    <button type="button" class="btn btn-primary" data-bind="click:function(){fan_trigger_on();}">Fans on</button>
+                    <button type="button" class="btn btn-primary" data-bind="click:function(){fan_trigger_off();}">Fans off</button>
+                </div>
+            </div>
+
+            <!--First Layer Tab-->
+            <div class="tab-pane" id="layer">
+                <form class="form-inline">
+                    <form class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label" for="extra-margin">Extra Margin From Edge</label>
+                            <div class="controls">
+                                <div class="input-append">
+                                    <input type="text" class="midsizeTextbox" id="extra-margin" data-bind="value: extra_margin">
+                                    <span class="add-on">mm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form><br><br>
+
+                    <form class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label" for="knob">No ABL</label>
+                            <div class="controls">
+                                <button type="button" class="btn btn-primary" id="knob">Start Bed Levelling Routine</button>
+                            </div>
+                        </div>
+                    </form>
+                </form><br><br>
+
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label" for="resetProcedure">ABL</label>
+                        <div class="controls">
+                            <button type="button" class="btn btn-primary" id="resetProcedure" data-bind="disable: controlViewModel.isPrinting()">Reset Procedure</button>
+                            <button type="button" class="btn btn-primary" id="step1" data-bind="disable: controlViewModel.isPrinting()">Step 1</button>
+                            <button type="button" class="btn btn-primary" id="step2" data-bind="disable: controlViewModel.isPrinting()">Step 2</button>
+                            <button type="button" class="btn btn-primary" id="step3" data-bind="disable: controlViewModel.isPrinting()">Step 3</button>
+                            <button type="button" class="btn btn-primary" id="step4" data-bind="disable: controlViewModel.isPrinting()">Step 4</button>
+                            <button type="button" class="btn btn-primary" id="plusz" data-bind="disable: controlViewModel.isPrinting()"><i class="fa fa-arrow-up">0.1</i></button>
+                            <button type="button" class="btn btn-primary" id="minusz" data-bind="disable: controlViewModel.isPrinting()"><i class="fa fa-arrow-down">-0.1</i></button>
+                        </div>
+                    </div>
+                </form><br><br><br><br><br><br><br><br><br>
+                <form class="form-inline">
+                    <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
+                        <div class="control-group">
+                            <label class="control-label" for="profile-selection-square">Profile selection</label>
+                            <div class="controls">
+                                <div class="input-append">
+                                    <select class="form-control" id="profile-selection-square" data-bind="value: profile_selection_square">
+                                        <option value=""></option>
+                                        <option value="profile1">Profile 1</option>
+                                        <option value="profile2">Profile 2</option>
+                                        <option value="profile3">Profile 3</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary" id="load-profile-square">Load</button>
+                                </div>
+                            </div>
+                        </div>
+                </form><br><br><br><br>
+
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Temperature</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-nozzle-square">Nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-nozzle-square" data-bind="value: regular_nozzle_square">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-bed-square">Bed Temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-bed-square" data-bind="value: regular_bed_square">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div><br>
+
+                    <span id="regular-form-title"><h4><b>Fan</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-speed-square">Fan at</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="fan-speed-square" data-bind="value: fan_speed_square">
+                                <span class="add-on">%</span>
+                            </div>
+                        </div>
+                    </div><br>
+
+                    <span id="regular-form-title"><h4><b>Printing speed</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-speed-square">Regular speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-speed-square" data-bind="value: regular_speed_square">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="travel-speed-square">Travel speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="travel-speed-square" data-bind="value: travel_speed_square">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div><br>
+                </form><br>
+
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Retraction</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-dist-square">Retraction distance</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="retraction-dist-square" data-bind="value: retraction_dist_square">
+                                <span class="add-on">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-speed-square">Retraction speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="retraction-speed-square" data-bind="value: retraction_speed_square">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span id="regular-form-title"><h4><b>Extra</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="flow-square">Flow</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="flow-square" data-bind="value: flow_square">
+                                <span class="add-on">%</span>
+                            </div>
+                        </div>
+                    </div><br>
+                    <span id="regular-form-title"><h4><b>ABL</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="abl-method-square">ABL method</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <select class="form-control" id="abl-method-square" data-bind="value: abl_method_square">
+                                    <option value="no-abl">No ABL</option>
+                                    <option value="G29">G29</option>
+                                    <option value="M420 S1">M420 S1</option>
+                                    <option value="M420 L0 S1">M420 L0 S1</option>
+                                    <option value="M420 L1 S1">M420 L1 S1</option>
+                                    <option value="M420 L2 S1">M420 L2 S1</option>
+                                    <option value="M420 L3 S1">M420 L3 S1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div><br>
+                </form><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+                <form class="form-inline" id="gcode-centered-square">
+                    <span id="regular-form-title"><h4><b>Gcode</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="start-gcode-square">Start Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="start-gcode-square" class="textarea" data-bind="value: start_gcode_square" placeholder="This will be inserted before the print started..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="end-gcode-square">End Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="end-gcode-square" class="textarea" data-bind="value: end_gcode_square" placeholder="This will be inserted after the print has finished..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form class="form-horizontal" id="print-squares-button">
+                    <span id="regular-form-title"><h4><b>Print</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="calibration-square">Print Squares</label>
+                        <div class="controls">
+                            <button id="calibration-square" class="btn btn-primary">Print squares</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!--Baseline Print Tab-->
+            <!--<div class="tab-pane" id="baseline">
+                <button class="btn btn-primary" id="baseline-cube">Print baseline cube</button>Work in progress... &ensp;<i class="fa fa-bed" aria-hidden="true"></i>
+            </div>-->
+            <!--Extruder Calibration Tab-->
+            <div class="tab-pane" id="extruder">
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Temperature</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="filament-path-distance">Filament path distance</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="filament-path-distance" data-bind="textInput: filament_path_distance">
+                                <span class="add-on">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="actual-estep">Actual Estep Value</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="actual-estep" data-bind="textInput: actual_estep_value" disabled>
+                            <button class="btn btn-primary" data-bind="click:function(){get_esteps();}">Get Estep value</button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="reverse-extruder">Retract filament instead</label>
+                        <div class="controls">
+                                <input type="checkbox" class="checkbox" id="reverse-extruder">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="measured-distance">Final measured distance</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="measured-distance" data-bind="textInput: measured_distance">
+                                <span class="add-on">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="final-estep">Final Estep Value</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="final-estep" data-bind="textInput: final_estep_value" disabled>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="final-estep">Apply Final Esteps</label>
+                        <div class="controls">
+                            <button class="btn btn-primary" data-bind="click:function(){apply_final_estep();}">Apply Final Esteps</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!--Flow Calibration Tab-->
+            <div class="tab-pane" id="flow">
+                <form class="form-inline">
+                    <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="profile-selection-flow">Profile selection</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <select class="form-control" id="profile-selection-flow" data-bind="value: profile_selection_flow">
+                                    <option value=""></option>
+                                    <option value="profile1">Profile 1</option>
+                                    <option value="profile2">Profile 2</option>
+                                    <option value="profile3">Profile 3</option>
+                                </select>
+                                <button type="button" class="btn btn-primary" id="load-profile-flow">Load</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <br><br><br><br>
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Temperature</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-nozzle-flow">1<sup>st</sup> layer nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-nozzle-flow" data-bind="value: first_layer_nozzle_flow">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-nozzle-flow">Regular nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-nozzle-flow" data-bind="value: regular_nozzle_flow">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-bed-flow">Bed Temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-bed-flow" data-bind="value: regular_bed_flow">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div><br>
+
+                    <span id="regular-form-title"><h4><b>Fan</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-speed-flow">Fan at</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="fan-speed-flow" data-bind="value: fan_speed_flow">
+                                <span class="add-on">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-layer-flow">At layer</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="fan-layer-flow" data-bind="value: fan_layer_flow">
+                        </div>
+                    </div>
+                </form><br>
+
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Printing speed</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-speed-flow">First layer speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-speed-flow" data-bind="value: first_layer_speed_flow">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-speed-flow">Regular speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-speed-flow" data-bind="value: regular_speed_flow">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="travel-speed-flow">Travel speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="travel-speed-flow" data-bind="value: travel_speed_flow">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div><br>
+                    <span id="regular-form-title"><h4><b>Retraction</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-dist-flow">Retraction distance</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="retraction-dist-flow" data-bind="value: retraction_dist_flow">
+                                <span class="add-on">mm</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-speed-flow">Retraction speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="retraction-speed-flow" data-bind="value: retraction_speed_flow">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div><br>
+                    <span id="regular-form-title"><h4><b>ABL</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="abl-method-flow">ABL method</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <select class="form-control" id="abl-method-flow" data-bind="value: abl_method_flow">
+                                    <option value="no-abl">No ABL</option>
+                                    <option value="G29">G29</option>
+                                    <option value="M420 S1">M420 S1</option>
+                                    <option value="M420 L0 S1">M420 L0 S1</option>
+                                    <option value="M420 L1 S1">M420 L1 S1</option>
+                                    <option value="M420 L2 S1">M420 L2 S1</option>
+                                    <option value="M420 L3 S1">M420 L3 S1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+                <form class="form-inline" id="gcode-centered-flow">
+                    <span id="regular-form-title"><h4><b>Gcode</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="start-gcode-flow">Start Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="start-gcode-flow" class="textarea" data-bind="value: start_gcode_flow" placeholder="This will be inserted before the print started..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="end-gcode-flow">End Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="end-gcode-flow" class="textarea" data-bind="value: end_gcode_flow" placeholder="This will be inserted after the print has finished..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Print</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="flow-cube">Print flow cube</label>
+                        <div class="controls">
+                            <button id="flow-cube" class="btn btn-primary">Print flow cube</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!--Driver Vref calibration tab-->
+            <div class="tab-pane" id="current">
+                <button class="btn" id="plus-button-driver" data-bind="click:function(){addDriver();}"><i class="fa fa-plus"></i></button>
+                <button class="btn" id="minus-button-driver" data-bind="click:function(){removeDriver();}"><i class="fa fa-minus"></i></button>
+                <b>&emsp;&nbsp;Driver type&emsp;&emsp;&emsp;&ensp;Stepper I<sub>max</sub> (A)&emsp;&emsp;Stepper I<sub>nom</sub> (A)&emsp;&emsp;R<sub>sense</sub> (&#8486)&emsp;&emsp;&emsp;&emsp;&emsp;V<sub>ref</sub> (V)</b><br><br>
+                <div id="driverUsed"></div>
+            </div>
+            <!--Retraction Calibration Tab-->
+            <div class="tab-pane" id="retraction">
+                <form class="form-inline">
+                    <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="profile-selection-retra">Profile selection</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <select class="form-control" id="profile-selection-retra" data-bind="value: profile_selection_retra">
+                                    <option value=""></option>
+                                    <option value="profile1">Profile 1</option>
+                                    <option value="profile2">Profile 2</option>
+                                    <option value="profile3">Profile 3</option>
+                                </select>
+                                <button type="button" class="btn btn-primary" id="load-profile-retra">Load</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <br><br><br><br>
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Temperature</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-nozzle-retra">1<sup>st</sup> layer nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-nozzle-retra" data-bind="value: first_layer_nozzle_retra">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-nozzle-retra">Regular nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-nozzle-retra" data-bind="value: regular_nozzle_retra">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-bed-flow">Bed Temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-bed-retra" data-bind="value: regular_bed_retra">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div><br>
+
+                    <span id="regular-form-title"><h4><b>Fan</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-speed-retra">Fan at</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="fan-speed-retra" data-bind="value: fan_speed_retra">
+                                <span class="add-on">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-layer-retra">At layer</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="fan-layer-retra" data-bind="value: fan_layer_retra">
+                        </div>
+                    </div>
+                </form><br>
+
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Printing speed</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-speed-retra">First layer speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-speed-retra" data-bind="value: first_layer_speed_retra">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-speed-retra">Regular speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-speed-retra" data-bind="value: regular_speed_retra">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="travel-speed-retra">Travel speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="travel-speed-retra" data-bind="value: travel_speed_retra">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div><br>
+                    <span id="regular-form-title"><h4><b>Extra</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="flow-retra">Flow</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="flow-retra" data-bind="value: flow_retra">
+                        </div>
+                    </div>
+                    <span id="regular-form-title"><h4><b>ABL</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="abl-method-retra">ABL method</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <select class="form-control" id="abl-method-retra" data-bind="value: abl_method_retra">
+                                    <option value="no-abl">No ABL</option>
+                                    <option value="G29">G29</option>
+                                    <option value="M420 S1">M420 S1</option>
+                                    <option value="M420 L0 S1">M420 L0 S1</option>
+                                    <option value="M420 L1 S1">M420 L1 S1</option>
+                                    <option value="M420 L2 S1">M420 L2 S1</option>
+                                    <option value="M420 L3 S1">M420 L3 S1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                <form class="form-inline" id="gcode-centered-retra">
+                    <span id="regular-form-title"><h4><b>Gcode</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="start-gcode-retra">Start Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="start-gcode-retra" class="textarea" data-bind="value: start_gcode_retra" placeholder="This will be inserted before the print started..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="end-gcode-retra">End Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="end-gcode-retra" class="textarea" data-bind="value: end_gcode_retra" placeholder="This will be inserted after the print has finished..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form class="form-inline">
+                    <span id="regular-form-title"><h4><b></b></h4></span><br>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button class="btn" id="plus-button-retra" data-bind="click:function(){addRetraction();}"><i class="fa fa-plus"></i></button>
+                            <button class="btn" id="minus-button-retra" data-bind="click:function(){removeRetraction();}"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                </form>
+
+                <b>&ensp;&nbsp;&nbsp;Retraction (distance - speed)</b><br><br>
+                <div id="retraStage">
+                </div><br><br><br>
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Print</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-tower">Print retraction tower</label>
+                        <div class="controls">
+                            <button id="retraction-tower" class="btn btn-primary">Print retraction tower</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!--Temperature Calibration Tab-->
+            <div class="tab-pane" id="temperature">
+                <form class="form-inline">
+                    <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
+                        <div class="control-group">
+                            <label class="control-label" for="profile-selection-temp">Profile selection</label>
+                            <div class="controls">
+                                <div class="input-append">
+                                    <select class="form-control" id="profile-selection-temp" data-bind="value: profile_selection_temp">
+                                        <option value=""></option>
+                                        <option value="profile1">Profile 1</option>
+                                        <option value="profile2">Profile 2</option>
+                                        <option value="profile3">Profile 3</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary" id="load-profile-temp">Load</button>
+                                </div>
+                            </div>
+                        </div>
+                </form>
+                <br><br><br><br>
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Temperature</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-nozzle-temp">1<sup>st</sup> layer nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-nozzle-temp" data-bind="value: first_layer_nozzle_temp">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-bed-temp">Bed Temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-bed-temp" data-bind="value: regular_bed_temp">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div><br>
+
+                    <span id="regular-form-title"><h4><b>Fan</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-speed-temp">Fan at</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="fan-speed-temp" data-bind="value: fan_speed_temp">
+                                <span class="add-on">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-layer-temp">At layer</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="fan-layer-temp" data-bind="value: fan_layer_temp">
+                        </div>
+                    </div><br>
+
+                    <span id="regular-form-title"><h4><b>Printing speed</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-speed-temp">First layer speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-speed-temp" data-bind="value: first_layer_speed_temp">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-speed-temp">Regular speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-speed-temp" data-bind="value: regular_speed_temp">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="travel-speed-temp">Travel speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="travel-speed-temp" data-bind="value: travel_speed_temp">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Retraction</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-dist-temp">Retraction distance</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="retraction-dist-temp" data-bind="value: retraction_dist_temp">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-speed-temp">Retraction speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="retraction-speed-temp" data-bind="value: retraction_speed_temp">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span id="regular-form-title"><h4><b>Extra</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="flow-temp">Flow</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="flow-temp" data-bind="value: flow_temp">
+                        </div>
+                    </div><br>
+                    <span id="regular-form-title"><h4><b>ABL</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="abl-method-temp">ABL method</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <select class="form-control" id="abl-method-temp" data-bind="value: abl_method_temp">
+                                    <option value="no-abl">No ABL</option>
+                                    <option value="G29">G29</option>
+                                    <option value="M420 S1">M420 S1</option>
+                                    <option value="M420 L0 S1">M420 L0 S1</option>
+                                    <option value="M420 L1 S1">M420 L1 S1</option>
+                                    <option value="M420 L2 S1">M420 L2 S1</option>
+                                    <option value="M420 L3 S1">M420 L3 S1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                <form class="form-inline" id="gcode-centered-temp">
+                    <span id="regular-form-title"><h4><b>Gcode</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="start-gcode-temp">Start Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="start-gcode-temp" class="textarea" data-bind="value: start_gcode_temp" placeholder="This will be inserted before the print started..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="end-gcode-temp">End Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="end-gcode-temp" class="textarea" data-bind="value: end_gcode_temp" placeholder="This will be inserted after the print has finished..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form><br><br>
+                <form class="form-inline">
+                    <span id="regular-form-title"><h4><b></b></h4></span><br>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button class="btn" id="plus-button-temp" data-bind="click:function(){addTemp();}"><i class="fa fa-plus"></i></button>
+                            <button class="btn" id="minus-button-temp" data-bind="click:function(){removeTemp();}"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                </form>
+
+
+                <b>&ensp;&nbsp;&nbsp;Temperature (°C)</b><br><br>
+                <div id="tempStage"></div><br><br>
+                <br><br>
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Print</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-tower">Print temperature tower</label>
+                        <div class="controls">
+                            <button class="btn btn-primary" id="temp-tower">Print temperature tower</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!--Acceleration Calibration Tab-->
+            <div class="tab-pane" id="acceleration">
+                <form class="form-inline">
+                    <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
+                        <div class="control-group">
+                            <label class="control-label" for="profile-selection-accel">Profile selection</label>
+                            <div class="controls">
+                                <div class="input-append">
+                                    <select class="form-control" id="profile-selection-accel" data-bind="value: profile_selection_accel">
+                                        <option value=""></option>
+                                        <option value="profile1">Profile 1</option>
+                                        <option value="profile2">Profile 2</option>
+                                        <option value="profile3">Profile 3</option>
+                                    </select>
+                                    <button type="button" class="btn btn-primary" id="load-profile-accel">Load</button>
+                                </div>
+                            </div>
+                        </div>
+                </form>
+                <br><br><br><br>
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Temperature</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-nozzle-accel">1<sup>st</sup> layer nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-nozzle-accel" data-bind="value: first_layer_nozzle_accel">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-nozzle-accel">Regular nozzle temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-nozzle-accel" data-bind="value: regular_nozzle_accel">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-bed-accel">Bed Temperature</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-bed-accel" data-bind="value: regular_bed_accel">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div><br>
+
+                    <span id="regular-form-title"><h4><b>Fan</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-speed-accel">Fan at</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="fan-speed-accel" data-bind="value: fan_speed_accel">
+                                <span class="add-on">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="fan-layer-accel">At layer</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="fan-layer-accel" data-bind="value: fan_layer_accel">
+                        </div>
+                    </div><br>
+
+                    <span id="regular-form-title"><h4><b>Printing speed</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-speed-accel">First layer speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-speed-accel" data-bind="value: first_layer_speed_accel">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-speed-accel">Regular speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="regular-speed-accel" data-bind="value: regular_speed_accel">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="travel-speed-accel">Travel speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="travel-speed-accel" data-bind="value: travel_speed_accel">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Retraction</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-dist-accel">Retraction distance</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="retraction-dist-accel" data-bind="value: retraction_dist_accel">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="retraction-speed-accel">Retraction speed</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="retraction-speed-accel" data-bind="value: retraction_speed_accel">
+                                <span class="add-on">mm/s</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span id="regular-form-title"><h4><b>Extra</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="flow-accel">Flow</label>
+                        <div class="controls">
+                            <input type="text" class="midsizeTextbox" id="flow-accel" data-bind="value: flow_accel">
+                        </div>
+                    </div><br>
+                    <span id="regular-form-title"><h4><b>ABL</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="abl-method-accel">ABL method</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <select class="form-control" id="abl-method-accel" data-bind="value: abl_method_accel">
+                                    <option value="no-abl">No ABL</option>
+                                    <option value="G29">G29</option>
+                                    <option value="M420 S1">M420 S1</option>
+                                    <option value="M420 L0 S1">M420 L0 S1</option>
+                                    <option value="M420 L1 S1">M420 L1 S1</option>
+                                    <option value="M420 L2 S1">M420 L2 S1</option>
+                                    <option value="M420 L3 S1">M420 L3 S1</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                <br><br><br><br><br><br><br><br><br><br>
+                <form class="form-inline" id="gcode-centered-accel">
+                    <span id="regular-form-title"><h4><b>Gcode</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="start-gcode-accel">Start Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="start-gcode-accel" class="textarea" data-bind="value: start_gcode_accel" placeholder="This will be inserted before the print started..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="end-gcode-accel">End Gcode</label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <textarea id="end-gcode-accel" class="textarea" data-bind="value: end_gcode_accel" placeholder="This will be inserted after the print has finished..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form><br><br><br><br>
+                <form class="form-inline">
+                    <span id="regular-form-title"><h4><b></b></h4></span><br>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button class="btn" id="plus-button-accel" data-bind="click:function(){addAccel();}"><i class="fa fa-plus"></i></button>
+                            <button class="btn" id="minus-button-accel" data-bind="click:function(){removeAccel();}"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </div>
+                </form>
+
+                <b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;&nbsp;&nbsp;Acceleration&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Jerk (X - Y)&emsp;&emsp;&emsp;Junction Deviation</b>
+                <select name="parameter" id="parameter-select">
+                    <option value="jerk">Jerk</option>
+                    <option value="junction">Junction Deviation</option>
+                </select>
+                <form class="form-inline">
+                    <div id="accelStage"></div>
+                </form><br><br>
+                <br><br>
+                <form class="form-horizontal">
+                    <span id="regular-form-title"><h4><b>Print</b></h4></span><br>
+                    <div class="control-group">
+                        <label class="control-label" for="accel-tower">Print acceleration tower</label>
+                        <div class="controls">
+                            <button class="btn btn-primary" id="accel-tower">Print acceleration tower</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!--Linear Advance Calibration Tab-->
+            <div class="tab-pane" id="linear">Work in progress... &ensp;<i class="fa fa-bed" aria-hidden="true"></i></div>
+        </div>
+    </div>
+
+    <div class="modal-footer" id="modalFooter">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+
+<!--TODO: Vérifier la validité des Imax-->
+<!--TODO: Refaire tour accel en 0.4 avec la rétraction-->
