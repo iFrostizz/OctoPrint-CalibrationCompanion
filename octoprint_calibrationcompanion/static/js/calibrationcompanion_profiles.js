@@ -56,7 +56,7 @@ $(function() {
 
         let mainViewModel = self.calibrationcompanionViewModel;
 
-        self.onBeforeBinding = function() {
+        self.onBeforeBinding = function () {
             self.profile_selection(self.settingsViewModel.settings.plugins.calibrationcompanion.profile_selection());
             self.first_layer_nozzle_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_nozzle_profile1());
             self.regular_nozzle_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_nozzle_profile1());
@@ -109,32 +109,61 @@ $(function() {
             "retraction_speed", "start_gcode", "travel_speed"];
         let saveSettingsProfile
 
-        document.getElementById("load-profile").onclick = function() {
+        let restrictedInputsProfileClassic = ["first-layer-nozzle-profile", "regular-nozzle-profile", "regular-bed-profile", "fan-speed-profile",
+            "fan-layer-profile", "first-layer-speed-profile", "regular-speed-profile", "travel-speed-profile"];
+        let restrictedInputsProfileComma = ["retraction-dist-profile", "retraction-speed-profile", "flow-profile"];
+
+        document.getElementById("load-profile").onclick = function () {
+            let div;
             OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
                 let z = 0;
-                for (let x=0; x< Object.keys(response).length; x++) {
-                    if (self.profile_selection()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection())) {
+                for (let x = 0; x < Object.keys(response).length; x++) {
+                    if (self.profile_selection() !== "" && restrictedSettingsProfile[z] !== undefined && Object.keys(response)[x].includes(self.profile_selection())) {
                         saveSettingsProfile = restrictedInputsProfile[z] + "_" + self.profile_selection();
                         document.getElementById(restrictedInputsProfile[z]).value = Object.values(response)[x];
                         z++
                     }
                 }
-            });
-        }
-
-        document.getElementById("save-profile").onclick = function() {
-            OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                let z = 0;
-                for (let x=0; x< Object.keys(response).length; x++) {
-                    if (self.profile_selection()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection())) {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection();
-                        OctoPrint.settings.savePluginSettings('calibrationcompanion', {
-                            [saveSettingsProfile]: document.getElementById(restrictedInputsProfile[z]).value
-                        })
-                        z++;
+            }).then(function () {
+                for (let x = 0; x < restrictedInputsProfile.length; x++) {
+                    div = document.getElementById(restrictedInputsProfile[x])
+                    let element = div.parentNode.parentNode.parentNode;
+                    if (restrictedInputsProfileClassic.includes(div.id)) {
+                        mainViewModel.checkValue(div, element, mainViewModel.allowedArrayClassic);
+                    } else if (restrictedInputsProfileComma.includes(div.id)) {
+                        mainViewModel.checkValue(div, element, mainViewModel.allowedArrayComma);
                     }
                 }
             });
+
+        }
+
+        document.getElementById("save-profile").onclick = function () {
+            let el = document.getElementById("profiles").getElementsByClassName("control-group");
+            let array = [];
+            let boolEror = false
+            for (let x = 0; x < el.length; x++) {
+                array[x] = el[x].attributes[0].nodeValue;
+                if (array[x].includes("error")) {
+                    boolEror = true
+                }
+            }
+            if (!boolEror) {
+                OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
+                    let z = 0;
+                    for (let x = 0; x < Object.keys(response).length; x++) {
+                        if (self.profile_selection() !== "" && restrictedSettingsProfile[z] !== undefined && Object.keys(response)[x].includes(self.profile_selection())) {
+                            saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection();
+                            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
+                                [saveSettingsProfile]: document.getElementById(restrictedInputsProfile[z]).value
+                            })
+                            z++;
+                        }
+                    }
+                });
+            } else {
+                mainViewModel.errorMessage()
+            }
         }
 
         document.getElementById("reset-profile").onclick = function() {

@@ -40,6 +40,11 @@ $(function() {
             self.end_gcode_square(self.settingsViewModel.settings.plugins.calibrationcompanion.end_gcode_square());
         }
 
+        self.onAfterBinding = function() {
+            mainViewModel.resetProcedure();
+            console.log(mainViewModel.bed_center_x + " " + mainViewModel.bed_center_y)
+        }
+
         let restrictedInputsSquare = ["#extra-margin", "#regular-nozzle-square", "#regular-bed-square", "#fan-speed-square",
             "#regular-speed-square", "#travel-speed-square", "#retraction-dist-square", "#retraction-speed-square", "#flow-square", "#abl-method-square", "#start-gcode-square"];
         let saveInputsSquare = ["extra_margin", "regular_nozzle_square", "regular_bed_square", "fan_speed_square",
@@ -80,7 +85,7 @@ $(function() {
         let extra_margin, filename
 
         $('#knob, #step2').on("click", function() {
-            extra_margin = document.getElementById("extraMargin").value;
+            extra_margin = document.getElementById("extra-margin").value;
             filename = "knob_levelling";
             gcode_generated =
                 "; Bed leveling Ender 3 by ingenioso3D\n" +
@@ -227,12 +232,16 @@ $(function() {
                 if (sq < 5) {
                     if (!mainViewModel.variable.relative_positioning) {
                         gcode_generated[sq].push("\nG1 F" + mainViewModel.retraction_speed + " E" + (mainViewModel.feed_rate - mainViewModel.retraction_distance) + ";\n" +
+                            "GO F" + mainViewModel.regular_speed + " Z10\n" +
                             "G0 F" + mainViewModel.regular_speed + " X" + squares_position_x[sq] + " Y" + squares_position_y[sq] + ";\n" +
+                            "GO F" + mainViewModel.regular_speed + " Z" + mainViewModel.variable.nozzle_size/2 + ";\n" +
                             "G1 F" + mainViewModel.retraction_speed + " E" + mainViewModel.feed_rate + ";\n\n");
                     } else {
                         gcode_generated[sq].push("\nG1 F" + mainViewModel.retraction_speed + " E-" + mainViewModel.retraction_distance + ";\n" +
+                            "GO F" + mainViewModel.regular_speed + " Z10\n" +
                             "G0 F" + mainViewModel.regular_speed + " X" + returningPosX + " Y" + returningPosY + ";\n" +
-                            "G1 F" + mainViewModel.retraction_speed + " E" + mainViewModel.retraction_distance + ";\n\n");
+                            "GO F" + mainViewModel.regular_speed + " Z-10;\n" +
+                            "G1 F" + mainViewModel.retraction_speed + " E" + mainViewModel.retraction_distance + ";\n");
                     }
                 }
             }
@@ -301,8 +310,12 @@ $(function() {
             OctoPrint.control.sendGcode(['M851', 'M851 Z0', 'G28', 'M500', 'G90', 'G0 X' + mainViewModel.bed_center_x + ' Y' + mainViewModel.bed_center_y + ' F2000', 'G0 Z0.1', 'M211 S0'])
             document.getElementById("step1").disabled = true
             document.getElementById("step2").disabled = false
-            document.getElementById("plusz").disabled = false
-            document.getElementById("minusz").disabled = false
+            document.getElementById("step3").disabled = true
+            document.getElementById("step4").disabled = true
+            document.getElementById("plusz0.1").disabled = false
+            document.getElementById("minusz0.1").disabled = false
+            document.getElementById("plusz1").disabled = false
+            document.getElementById("minusz1").disabled = false
             self.notify = new PNotify({
                     title: 'Calibration Companion Step 1',
                     text: 'Put a sheet of paper under the nozzle. Then use the interface to lower the head.\n'+
@@ -318,10 +331,14 @@ $(function() {
 
         document.getElementById("step2").addEventListener("click", function(){
             OctoPrint.control.sendGcode(['M851 Z' + z_offset, 'M211 S1', 'M500', 'M117 zOffset = ' + z_offset])
+            document.getElementById("step1").disabled = true
             document.getElementById("step2").disabled = true
             document.getElementById("step3").disabled = false
-            document.getElementById("plusz").disabled = true
-            document.getElementById("minusz").disabled = true
+            document.getElementById("step4").disabled = true
+            document.getElementById("plusz0.1").disabled = true
+            document.getElementById("minusz0.1").disabled = true
+            document.getElementById("plusz1").disabled = true
+            document.getElementById("minusz1").disabled = true
             self.notify.update({hide: true});
             self.notify = new PNotify({
                 title: 'Calibration Companion Step 2',
@@ -341,10 +358,14 @@ $(function() {
         document.getElementById("step3").addEventListener("click", function(){
             OctoPrint.control.sendGcode(['M851', 'G28', 'G29', 'M500', 'M851 Z0', 'G28', 'G0 Z10 F2000', 'G0 X' + mainViewModel.bed_center_x + ' Y' + mainViewModel.bed_center_y + ' F2000', 'G0 Z0.1', 'M211 S0'])
             z_offset = 0.1;
+            document.getElementById("step1").disabled = true
+            document.getElementById("step2").disabled = true
             document.getElementById("step3").disabled = true
             document.getElementById("step4").disabled = false
-            document.getElementById("plusz").disabled = false
-            document.getElementById("minusz").disabled = false
+            document.getElementById("plusz0.1").disabled = false
+            document.getElementById("minusz0.1").disabled = false
+            document.getElementById("plusz1").disabled = false
+            document.getElementById("minusz1").disabled = false
             self.notify.update({hide: true});
                 self.notify = new PNotify({
                     title: 'Calibration Companion Step 3',
@@ -361,9 +382,14 @@ $(function() {
 
         document.getElementById("step4").addEventListener("click", function(){
             OctoPrint.control.sendGcode(['M851 Z' + z_offset, 'M211 S1', 'M500', 'M117 zOffset = ' + z_offset, 'G28'])
+            document.getElementById("step1").disabled = true
+            document.getElementById("step2").disabled = true
+            document.getElementById("step3").disabled = true
             document.getElementById("step4").disabled = true
-            document.getElementById("plusz").disabled = true
-            document.getElementById("minusz").disabled = true
+            document.getElementById("plusz0.1").disabled = true
+            document.getElementById("minusz0.1").disabled = true
+            document.getElementById("plusz1").disabled = true
+            document.getElementById("minusz1").disabled = true
             self.notify.update({hide: true});
                 self.notify = new PNotify({
                     title: 'Calibration Companion Step 4',
@@ -375,19 +401,76 @@ $(function() {
                         sticker: false
                     },
                 });
-            document.getElementById("step1").disabled = false;
+                mainViewModel.resetProcedure()
         }, false);
 
-        document.getElementById("plusz").addEventListener("click", function(){
-            z_offset+=0.1
-            z_offset = Math.round(z_offset*1e12)/1e12
-            OctoPrint.control.sendGcode(['G91', 'G1 Z0.1'])
-        }, false);
-        document.getElementById("minusz").addEventListener("click", function(){
+        document.getElementById("minusz0.1").addEventListener("click", function(){
             z_offset-=0.1
             z_offset= Math.round(z_offset*1e12)/1e12
             OctoPrint.control.sendGcode(['G91', 'G1 Z-0.1'])
         }, false);
+        document.getElementById("plusz0.1").addEventListener("click", function(){
+            z_offset+=0.1
+            z_offset = Math.round(z_offset*1e12)/1e12
+            OctoPrint.control.sendGcode(['G91', 'G1 Z0.1'])
+        }, false);
+        document.getElementById("minusz1").addEventListener("click", function(){
+            z_offset-=1
+            z_offset= Math.round(z_offset*1e12)/1e12
+            OctoPrint.control.sendGcode(['G91', 'G1 Z-1'])
+        }, false);
+        document.getElementById("plusz1").addEventListener("click", function(){
+            z_offset+=1
+            z_offset = Math.round(z_offset*1e12)/1e12
+            OctoPrint.control.sendGcode(['G91', 'G1 Z1'])
+        }, false);
+
+        self.onEventPrinterStateChanged = function(e) {
+            if (e.state_string === "Offline") {
+                mainViewModel.resetProcedure();
+            }
+        }
+
+        mainViewModel.resetProcedure = function() {
+            //OctoPrint.control.sendGcode("M851")
+            document.getElementById("step1").disabled = false
+            document.getElementById("step2").disabled = true
+            document.getElementById("step3").disabled = true
+            document.getElementById("step4").disabled = true
+            document.getElementById("minusz1").disabled = true
+            document.getElementById("minusz0.1").disabled = true
+            document.getElementById("plusz0.1").disabled = true
+            document.getElementById("plusz1").disabled = true
+            OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
+                if (response["procedureStarted"] === true) {
+                    if (typeof response["current_z_offset"] !== "undefined") {
+                        OctoPrint.control.sendGcode(["M851 Z" + response["current_z_offset"], "M500"])
+                        self.notify = new PNotify({
+                            title: 'Calibration Companion',
+                            text: 'The procedure was reset and your z offset value was restored to Z' + response["current_z_offset"],
+                            type: 'info',
+                            hide: true,
+                            buttons: {
+                                closer: true,
+                                sticker: false
+                            },
+                        });
+                    } else {
+                        self.notify = new PNotify({
+                            title: 'Calibration Companion',
+                            text: 'The procedure was reset',
+                            type: 'info',
+                            hide: true,
+                            buttons: {
+                                closer: true,
+                                sticker: false
+                            },
+                        });
+                    }
+                    OctoPrint.settings.savePluginSettings('calibrationcompanion', {'procedureStarted' : false})
+                }
+            })
+        }
 
     }
 

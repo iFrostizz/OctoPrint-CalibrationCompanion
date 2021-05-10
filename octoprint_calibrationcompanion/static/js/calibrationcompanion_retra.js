@@ -194,7 +194,7 @@ $(function() {
                 mainViewModel.zHeightWarning();
             }
         }
-        self.removeRetraction = function () {
+        mainViewModel.removeRetraction = function () {
             oldR = r;
             if (Math.sign(r) === 1) {
                 mainViewModel.spanValRetra = Math.round(mainViewModel.spanValRetra - stageHeightRetra / (mainViewModel.variable.nozzle_size / 2));
@@ -218,9 +218,7 @@ $(function() {
         $(document).on("input", function(e) {
             let id = e.target.id;
             let element = e.target;
-            if (id.includes("inputListRetraSpeed")) {
-                mainViewModel.checkValue(element, element.parentNode.parentNode, mainViewModel.allowedArrayClassic);
-            } else if (id.includes("inputListRetraDist")) {
+            if (id.includes("inputListRetraDist") || id.includes("inputListRetraSpeed")) {
                 mainViewModel.checkValue(element, element.parentNode.parentNode, mainViewModel.allowedArrayComma);
             }
         });

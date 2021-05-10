@@ -54,12 +54,6 @@ $(function () {
             self.relative_positioning(self.settingsViewModel.settings.plugins.calibrationcompanion.relative_positioning());
             self.nozzle_size(self.settingsViewModel.settings.plugins.calibrationcompanion.nozzle_size());
             self.filament_diameter(self.settingsViewModel.settings.plugins.calibrationcompanion.filament_diameter());
-
-            document.getElementById("plusz").disabled = true
-            document.getElementById("minusz").disabled = true
-            document.getElementById("step2").disabled = true
-            document.getElementById("step3").disabled = true
-            document.getElementById("step4").disabled = true
         }
 
         self.onAfterBinding = function() {
@@ -79,7 +73,6 @@ $(function () {
                 saveSettingsSetupCheckbox(this);
             });
             self.flow = 100;
-            self.resetProcedure();
         }
 
         self.zHeightWarning = function() {
@@ -122,77 +115,102 @@ $(function () {
             let id = element.id;
             let value = element.value;
             let booleanArray = [];
+            //console.log(id + " " + value)
             value.split('').forEach(elementLoop => booleanArray.push(array.includes(elementLoop)));
             let finalBoolean = !booleanArray.some((elementLoop) => elementLoop === false)
             if (finalBoolean) {
-                removeError(div)
+                self.removeError(div)
                 saveSettingsSetup(element)
-                if (id === "bedSizeX" || id === "bedSizeY") {
+                if (value.length <= 0) {
+                    self.removeWarning(div);
+                } else if (id === "bedSizeX" || id === "bedSizeY") {
                     if (value < 100) {
-                        checkWarning(div);
+                        self.checkWarning(div);
                     } else {
-                        removeWarning(div);
+                        self.removeWarning(div);
                     }
                 } else if (id === "bedSizeZ") {
                     if (value < 50) {
-                        checkWarning(div);
+                        self.checkWarning(div);
                     } else {
-                        removeWarning(div);
+                        self.removeWarning(div);
                     }
                 } else if (id.includes("inputListRetraSpeed")) {
                     if (value > 100) {
-                        checkWarning(div);
+                        self.checkWarning(div);
                     } else {
-                        removeWarning(div);
+                        self.removeWarning(div);
                     }
                 } else if (id.includes("inputListRetraDist")) {
                     if (value > 10) {
-                        checkWarning(div);
+                        self.checkWarning(div);
                     } else {
-                        removeWarning(div);
+                        self.removeWarning(div);
                     }
-                } else if (id.includes("inputListTemp")) {
+                } else if (id.includes("inputListTemp") || id.includes("first-layer-nozzle-") || id.includes("regular-nozzle-")) {
                     if (value < 180 || value > 280) {
-                        checkWarning(div);
+                        self.checkWarning(div);
                     } else {
-                        removeWarning(div);
+                        self.removeWarning(div);
                     }
-                } else if (id.includes("inputListAcceleration")) {
-                    if (value > 3000) {
-                        checkWarning(div);
+                } else if (id.includes("regular-bed-")) {
+                    if (value > 100) {
+                        self.checkWarning(div);
                     } else {
-                        removeWarning(div);
+                        self.removeWarning(div);
+                    }
+                }
+                else if (id.includes("inputListAcceleration")) {
+                    if (value > 3000) {
+                        self.checkWarning(div);
+                    } else {
+                        self.removeWarning(div);
                     }
                 } else if (id.includes("inputListJerk")) {
                     if (value > 30) {
-                        checkWarning(div);
+                        self.checkWarning(div);
                     } else {
-                        removeWarning(div);
+                        self.removeWarning(div);
                     }
                 } else if (id.includes("inputListJunction")) {
                     if (value > 1) {
-                        checkWarning(div);
+                        self.checkWarning(div);
                     } else {
-                        removeWarning(div);
+                        self.removeWarning(div);
                     }
                 }
             } else {
-                checkError(div);
+                self.checkError(div);
             }
         }
 
-        function checkWarning(div) {
+        self.checkWarning = function(div) {
             div.className = "control-group warning";
         }
-        function removeWarning(div) {
+        self.removeWarning = function(div) {
             div.className = "control-group";
         }
-        function checkError(div) {
+        self.checkError = function(div) {
             div.className = "control-group error";
         }
-        function removeError(div) {
+        self.removeError = function(div) {
             div.className = "control-group";
         }
+
+        let allowedArrayClassicInput = ["first-layer-nozzle-", "regular-nozzle-", "regular-bed-", "fan-speed-", "fan-layer-", "first-layer-speed-",
+            "regular-speed-", "travel-speed-"];
+        let allowedArrayCommaInput = ["retraction-dist-", "retraction-speed-", "flow-"];
+
+        $(document).on("input", function(e) {
+            let id = e.target.id;
+            let element = e.target;
+            //console.log(id.substr(0, id.lastIndexOf("-")+1))
+            if (allowedArrayClassicInput.includes(id.substr(0, id.lastIndexOf("-")+1))) {
+                self.checkValue(element, element.parentNode.parentNode.parentNode, self.allowedArrayClassic);
+            } else if (allowedArrayCommaInput.includes(id.substr(0, id.lastIndexOf("-")+1))) {
+                self.checkValue(element, element.parentNode.parentNode.parentNode, self.allowedArrayComma);
+            }
+        });
 
         document.getElementById("nozzleSize").onchange = function() {
             self.resetAccel();
@@ -203,6 +221,13 @@ $(function () {
         $(restrictedNoVerifInputs.join(",")).on("input", function() {
             saveSettingsSetup(this);
         });
+
+        let bed_size_verif = ["#bedSizeX, #bedSizeY"];
+        $(bed_size_verif.join(",")).on("input", function() {
+            $(restrictedCheckbox.join(",")).each(function() {
+                saveSettingsSetupCheckbox(this);
+            });
+        })
 
         function saveSettingsSetup(element) {
             let saveSettings = saveInputs[restrictedInputs.indexOf('#' + element.id)];
@@ -293,45 +318,6 @@ $(function () {
                 OctoPrint.settings.savePluginSettings('calibrationcompanion', {'procedureStarted' : false})
             }
         }*/
-
-        self.resetProcedure = function() {
-            //OctoPrint.control.sendGcode("M851")
-            document.getElementById("step1").disabled = false
-            document.getElementById("step2").disabled = true
-            document.getElementById("step3").disabled = true
-            document.getElementById("step4").disabled = true
-            document.getElementById("plusz").disabled = true
-            document.getElementById("minusz").disabled = true
-            OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                if (response["procedureStarted"] === true) {
-                    if (typeof response["current_z_offset"] !== "undefined") {
-                        OctoPrint.control.sendGcode(["M851 Z" + response["current_z_offset"], "M500"])
-                        self.notify = new PNotify({
-                            title: 'Calibration Companion',
-                            text: 'The procedure was reset and your z offset value was restored to Z' + response["current_z_offset"],
-                            type: 'info',
-                            hide: true,
-                            buttons: {
-                                closer: true,
-                                sticker: false
-                            },
-                        });
-                    } else {
-                        self.notify = new PNotify({
-                            title: 'Calibration Companion',
-                            text: 'The procedure was reset',
-                            type: 'info',
-                            hide: true,
-                            buttons: {
-                                closer: true,
-                                sticker: false
-                            },
-                        });
-                    }
-                    OctoPrint.settings.savePluginSettings('calibrationcompanion', {'procedureStarted' : false})
-                }
-            })
-        }
 
         /*function extruded_length_calculation(number_part, old_number_part) {
             if (number_part.includes("X") && number_part.includes("Y") && number_part.includes("Z")) {

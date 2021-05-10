@@ -251,7 +251,7 @@ $(function() {
                 mainViewModel.zHeightWarning();
             }
         }
-        self.removeAccel = function() {
+        mainViewModel.removeAccel = function() {
             olda = a;
             if (Math.sign(a) === 1) {
                 myBase[a].remove();
