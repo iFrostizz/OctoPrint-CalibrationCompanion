@@ -6,9 +6,9 @@ Let me explain all the tabs a bit more precisely before throwing yourself in the
 
 ## Pictures 
 
-![Calibration Companion Setup](setup.png)
+![Calibration Companion Setup](/assets/img/plugins/EasyServo/setup.png)
 
-![Calibration Companion Retraction](retraction.png)
+![Calibration Companion Retraction](/assets/img/plugins/EasyServo/retraction.png)
 
 
 If you need more informations, please head on: https://github.com/iFrostizz/OctoPrint-CalibrationCompanion
