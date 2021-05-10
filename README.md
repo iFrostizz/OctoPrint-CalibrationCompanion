@@ -9,7 +9,7 @@ This is the first tab you want to go to. Choose the values that fits your printe
 Please do it before attempting any operation.
 
 
-![Calibration Companion Setup](/assets/img/plugins/octoprint_calibrationcompanion/setup.png)
+![Calibration Companion Setup](setup.png)
 
 ### Profiles
 In this tab, you can load/save/reset profiles. This is really great to not have to type again all the values when you get to a new tab.
@@ -94,7 +94,7 @@ finalFlow = (100*nozzleDiameter)/averagedMeasurement
 ### Retraction, Temperature, Acceleration Tuning
 In this section, you can find your ideal settings per stages by creating a retraction/temperature/acceleration tower.
 
-![Calibration Companion Retraction](/assets/img/plugins/octoprint_calibrationcompanion/retraction.png)
+![Calibration Companion Retraction](retraction.png)
 
 
 ## Plugin Setup
