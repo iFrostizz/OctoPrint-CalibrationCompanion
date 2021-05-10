@@ -194,7 +194,7 @@ $(function() {
                 mainViewModel.zHeightWarning();
             }
         }
-        mainViewModel.removeRetraction = function () {
+        self.removeRetraction = function () {
             oldR = r;
             if (Math.sign(r) === 1) {
                 mainViewModel.spanValRetra = Math.round(mainViewModel.spanValRetra - stageHeightRetra / (mainViewModel.variable.nozzle_size / 2));
@@ -210,7 +210,7 @@ $(function() {
 
         mainViewModel.resetRetra = function() {
             while(r>0) {
-                self.removeRetraction()
+                self.removeRetraction();
             }
             mainViewModel.spanValRetra = 0;
         }
@@ -281,7 +281,7 @@ $(function() {
                 return;
             }
             let array = [];
-            let el = document.getElementById("retraction").getElementsByClassName("control-group");
+            let el = document.getElementById("retraction-calibrationcompanion").getElementsByClassName("control-group");
             for (let x=0; x<el.length; x++) {
                 array[x] = el[x].attributes[0].nodeValue;
                 if (array[x].includes("error")) {
@@ -563,6 +563,6 @@ $(function() {
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel_retra,
         dependencies: [  "settingsViewModel", "calibrationcompanionViewModel"  ],
-        elements: [ "#settings_plugin_calibrationcompanion", "#retraction" ]
+        elements: [ "#retraction-calibrationcompanion" ]
     });
 });

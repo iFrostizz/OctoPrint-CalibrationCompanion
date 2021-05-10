@@ -100,8 +100,6 @@ $(function() {
             inputListVref[d].className = "midsizeTextbox";
             myBase[d].appendChild(inputListVref[d]);
             document.getElementById(inputListVref[d].id).disabled = true;
-
-            console.log(myParent)
         }
         self.removeDriver = function() {
             if (Math.sign(d) === 1) {
@@ -110,7 +108,6 @@ $(function() {
             } else {
                 d = 0;
             }
-            console.log(myParent)
         }
 
         self.vrefCalculation = function(Driver, Inom, Rsense) {
@@ -179,6 +176,6 @@ $(function() {
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel_stepper,
         dependencies: [  "settingsViewModel", "calibrationcompanionViewModel"  ],
-        elements: [ "#settings_plugin_calibrationcompanion", "#current" ]
+        elements: [ "#current-calibrationcompanion" ]
     });
 });

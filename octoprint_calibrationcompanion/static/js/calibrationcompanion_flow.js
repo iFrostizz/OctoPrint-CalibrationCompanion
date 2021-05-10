@@ -226,6 +226,6 @@ $(function() {
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel_flow,
         dependencies: [  "settingsViewModel", "calibrationcompanionViewModel"  ],
-        elements: [ "#settings_plugin_calibrationcompanion", "#flow" ]
+        elements: [ "#flow-calibrationcompanion" ]
     });
 });

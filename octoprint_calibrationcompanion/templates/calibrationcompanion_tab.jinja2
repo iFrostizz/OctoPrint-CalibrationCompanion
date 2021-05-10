@@ -8,30 +8,30 @@
 <div id="go-button"><a href="#myModal" role="button" class="btn" data-toggle="modal">Let's go !</a></div><br>
 
 <!-- Modal -->
-<div id="myModal" class="modal large hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div id="myModal-calibrationcompanion" class="modal large hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h4 id="myModalLabel">Calibration process</h4>
     </div>
     <div class="modal-body">
         <ul class="nav nav-pills nav-fill" id="first-ul">
-            <li class="active"><a href="#setup" data-toggle="tab">Setup</a></li>
-            <li><a href="#profiles" data-toggle="tab">Profiles</a></li>
-            <li><a href="#pid" data-toggle="tab">Pid Autotune</a></li>
-            <li><a href="#layer" data-toggle="tab">First Layer</a></li>
-            <!--<li><a href="#baseline" data-toggle="tab">Baseline Print</a></li>-->
-            <li><a href="#extruder" data-toggle="tab">E-steps Calibration</a></li>
-            <li><a href="#flow" data-toggle="tab">Slicer Flow Calibration</a></li>
-            <li><a href="#current" data-toggle="tab">Stepper Motor Driver</a></li>
-            <li><a href="#retraction" data-toggle="tab">Retraction Tuning</a></li>
-            <li><a href="#temperature" data-toggle="tab">Temperature Tuning</a></li>
-            <li><a href="#acceleration" data-toggle="tab">Acceleration Tuning</a></li>
+            <li class="active"><a href="#setup-calibrationcompanion" data-toggle="tab">Setup</a></li>
+            <li><a href="#profiles-calibrationcompanion" data-toggle="tab">Profiles</a></li>
+            <li><a href="#pid-calibrationcompanion" data-toggle="tab">PID Autotune</a></li>
+            <li><a href="#layer-calibrationcompanion" data-toggle="tab">First Layer</a></li>
+            <!--<li><a href="#baseline-calibrationcompanion" data-toggle="tab">Baseline Print</a></li>-->
+            <li><a href="#extruder-calibrationcompanion" data-toggle="tab">E-steps Calibration</a></li>
+            <li><a href="#flow-calibrationcompanion" data-toggle="tab">Flow</a></li>
+            <!--<li><a href="#current-calibrationcompanion" data-toggle="tab">Stepper Motor Driver</a></li>-->
+            <li><a href="#retraction-calibrationcompanion" data-toggle="tab">Retraction Tuning</a></li>
+            <li><a href="#temperature-calibrationcompanion" data-toggle="tab">Temperature Tuning</a></li>
+            <li><a href="#acceleration-calibrationcompanion" data-toggle="tab">Acceleration Tuning</a></li>
             <!--<li><a href="#linear" data-toggle="tab">Linear Advance</a></li>-->
         </ul>
 
         <div class="tab-content">
             <!--Setup-->
-            <div class="tab-pane active" id="setup">
+            <div class="tab-pane active" id="setup-calibrationcompanion">
                 <form class="form-horizontal">
                     <div class="control-group">
                         <label class="control-label" for="printerName">Printer Name</label>
@@ -128,7 +128,7 @@
             </div>
 
             <!--Profiles Tab-->
-            <div class="tab-pane" id="profiles">
+            <div class="tab-pane" id="profiles-calibrationcompanion">
                 <form class="form-inline">
                     <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
                         <div class="control-group">
@@ -314,8 +314,22 @@
             </div>
 
             <!--PID Tab-->
-            <div class="tab-pane" id="pid">
-                <form class="form-horizontal">
+            <div class="tab-pane" id="pid-calibrationcompanion">
+                <form class="form-inline">
+                    <label class="control-label" for="nozzlePidTemp">Nozzle temperature</label>
+                    <div class="input-append">
+                        <input type="text" class="midsizeTextbox" id="nozzlePidTemp" data-bind="value: nozzle_pid_temp">
+                        <span class="add-on">°C</span>
+                    </div>
+                    <label class="control-label" for="bedPidTemp">Bed temperature</label>
+                    <div class="input-append">
+                        <input type="text" class="midsizeTextbox" id="bedPidTemp" placeholder="T (°C)" data-bind="value: bed_pid_temp">
+                        <span class="add-on">°C</span>
+                    </div>
+                    <a id="aboutBedPid" href="#" data-toggle="tooltip" data-placement="right" title="leave empty if not enabled"></a>
+                    <button type="button" class="btn btn-primary" data-bind="click:function(){pid_autotune_routine();}">Run PID autotune</button>
+                </form>
+                <!--<form class="form-horizontal">
                     <div class="control-group">
                         <label class="control-label" for="nozzlePidTemp">Nozzle temperature</label>
                         <div class="controls">
@@ -338,7 +352,14 @@
                         </div>
                     </div>
                 </form>
-                <br><br><br><br>
+                <form class="form-horizontal">
+                    <div class="control-group">
+                        <div class="controls">
+                            <button type="button" class="btn btn-primary" data-bind="click:function(){pid_autotune_routine();}">Run PID autotune</button>
+                        </div>
+                    </div>
+                </form>-->
+                <br>
                 <div class="btn-group" data-toggle="buttons-radio">
                     <button type="button" class="btn btn-primary" data-bind="click:function(){fan_trigger_on();}">Fans on</button>
                     <button type="button" class="btn btn-primary" data-bind="click:function(){fan_trigger_off();}">Fans off</button>
@@ -346,7 +367,7 @@
             </div>
 
             <!--First Layer Tab-->
-            <div class="tab-pane" id="layer">
+            <div class="tab-pane" id="layer-calibrationcompanion">
                 <form class="form-inline">
                     <form class="form-horizontal">
                         <div class="control-group">
@@ -537,11 +558,11 @@
                 </form>
             </div>
             <!--Baseline Print Tab-->
-            <!--<div class="tab-pane" id="baseline">
+            <!--<div class="tab-pane" id="baseline-calibrationcompanion">
                 <button class="btn btn-primary" id="baseline-cube">Print baseline cube</button>Work in progress... &ensp;<i class="fa fa-bed" aria-hidden="true"></i>
             </div>-->
             <!--Extruder Calibration Tab-->
-            <div class="tab-pane" id="extruder">
+            <div class="tab-pane" id="extruder-calibrationcompanion">
                 <form class="form-horizontal">
                     <span id="regular-form-title"><h4><b>Temperature</b></h4></span><br>
                     <div class="control-group">
@@ -590,7 +611,7 @@
                 </form>
             </div>
             <!--Flow Calibration Tab-->
-            <div class="tab-pane" id="flow">
+            <div class="tab-pane" id="flow-calibrationcompanion">
                 <form class="form-inline">
                     <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
                     <div class="control-group">
@@ -755,14 +776,14 @@
                 </form>
             </div>
             <!--Driver Vref calibration tab-->
-            <div class="tab-pane" id="current">
+            <div class="tab-pane" id="current-calibrationcompanion">
                 <button class="btn" id="plus-button-driver" data-bind="click:function(){addDriver();}"><i class="fa fa-plus"></i></button>
                 <button class="btn" id="minus-button-driver" data-bind="click:function(){removeDriver();}"><i class="fa fa-minus"></i></button>
                 <b>&emsp;&nbsp;Driver type&emsp;&emsp;&emsp;&ensp;Stepper I<sub>max</sub> (A)&emsp;&emsp;Stepper I<sub>nom</sub> (A)&emsp;&emsp;R<sub>sense</sub> (&#8486)&emsp;&emsp;&emsp;&emsp;&emsp;V<sub>ref</sub> (V)</b><br><br>
                 <div id="driverUsed"></div>
             </div>
             <!--Retraction Calibration Tab-->
-            <div class="tab-pane" id="retraction">
+            <div class="tab-pane" id="retraction-calibrationcompanion">
                 <form class="form-inline">
                     <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
                     <div class="control-group">
@@ -927,7 +948,7 @@
                 </form>
             </div>
             <!--Temperature Calibration Tab-->
-            <div class="tab-pane" id="temperature">
+            <div class="tab-pane" id="temperature-calibrationcompanion">
                 <form class="form-inline">
                     <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
                         <div class="control-group">
@@ -1103,7 +1124,7 @@
                 </form>
             </div>
             <!--Acceleration Calibration Tab-->
-            <div class="tab-pane" id="acceleration">
+            <div class="tab-pane" id="acceleration-calibrationcompanion">
                 <form class="form-inline">
                     <span id="regular-form-title"><h4><b>Profile</b></h4></span><br>
                         <div class="control-group">
@@ -1294,11 +1315,11 @@
                 </form>
             </div>
             <!--Linear Advance Calibration Tab-->
-            <div class="tab-pane" id="linear">Work in progress... &ensp;<i class="fa fa-bed" aria-hidden="true"></i></div>
+            <div class="tab-pane" id="linear-calibrationcompanion">Work in progress... &ensp;<i class="fa fa-bed" aria-hidden="true"></i></div>
         </div>
     </div>
 
-    <div class="modal-footer" id="modalFooter">
+    <div class="modal-footer" id="modalFooter-calibrationcompanion">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     </div>
 </div>

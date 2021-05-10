@@ -139,7 +139,7 @@ $(function() {
         }
 
         document.getElementById("save-profile").onclick = function () {
-            let el = document.getElementById("profiles").getElementsByClassName("control-group");
+            let el = document.getElementById("profiles-calibrationcompanion").getElementsByClassName("control-group");
             let array = [];
             let boolEror = false
             for (let x = 0; x < el.length; x++) {
@@ -176,6 +176,6 @@ $(function() {
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel_profiles,
         dependencies: [  "settingsViewModel", "calibrationcompanionViewModel"  ],
-        elements: [ "#settings_plugin_calibrationcompanion", "#profiles" ]
+        elements: [ "#profiles-calibrationcompanion" ]
     });
 });

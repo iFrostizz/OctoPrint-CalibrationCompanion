@@ -125,7 +125,7 @@ $(function() {
                 mainViewModel.zHeightWarning();
             }
         }
-        mainViewModel.removeTemp = function() {
+        self.removeTemp = function() {
             if (Math.sign(t) === 1) {
                 mainViewModel.spanValTemp = Math.round(mainViewModel.spanValTemp - stageHeightTemp / (mainViewModel.variable.nozzle_size / 2));
                 myBase[t].remove();
@@ -210,7 +210,7 @@ $(function() {
                 return;
             }
             let array = [];
-            let el = document.getElementById("temperature").getElementsByClassName("control-group");
+            let el = document.getElementById("temperature-calibrationcompanion").getElementsByClassName("control-group");
             for (let x=0; x<el.length; x++) {
                 array[x] = el[x].attributes[0].nodeValue;
                 if (array[x].includes("error")) {
@@ -417,6 +417,6 @@ $(function() {
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel_temp,
         dependencies: [  "settingsViewModel", "calibrationcompanionViewModel"  ],
-        elements: [ "#settings_plugin_calibrationcompanion", "#temperature" ]
+        elements: [ "#temperature-calibrationcompanion" ]
     });
 });

@@ -467,18 +467,18 @@ $(function () {
 
     $('#myTab a').click(function (e) {
         e.preventDefault();
-        $('#myTab a[href="#setup"]').tab('show');
-        $('#myTab a[href="#profiles"]').tab('show');
-        $('#myTab a[href="#pid"]').tab('show');
-        $('#myTab a[href="#layer"]').tab('show');
-        $('#myTab a[href="#baseline"]').tab('show');
-        $('#myTab a[href="#extruder"]').tab('show');
-        $('#myTab a[href="#flow"]').tab('show');
-        $('#myTab a[href="#current"]').tab('show');
-        $('#myTab a[href="#retraction"]').tab('show');
-        $('#myTab a[href="#temperature"]').tab('show');
-        $('#myTab a[href="#acceleration"]').tab('show');
-        $('#myTab a[href="#linear"]').tab('show');
+        $('#myTab a[href="#setup-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#profiles-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#pid-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#layer-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#baseline-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#extruder-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#flow-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#current-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#retraction-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#temperature-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#acceleration-calibrationcompanion"]').tab('show');
+        $('#myTab a[href="#linear-calibrationcompanion"]').tab('show');
     });
 
     $(document).ready(function(){
@@ -490,6 +490,6 @@ $(function () {
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel,
         dependencies: [  "settingsViewModel"  ],
-        elements: [ "#settings_plugin_calibrationcompanion", "#setup", "#modalFooter" ]
+        elements: [ "#setup-calibrationcompanion", "#modalFooter-calibrationcompanion" ]
     });
 });

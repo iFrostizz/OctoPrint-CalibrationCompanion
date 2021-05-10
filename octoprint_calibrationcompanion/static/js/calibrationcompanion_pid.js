@@ -39,13 +39,12 @@ $(function() {
         }
         self.fan_trigger_off = function() {
             OctoPrint.control.sendGcode(['M106 S0'])
-            //OctoPrint.printer.getFullState().then(console.log(readyState));
         }
     }
 
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel_pid,
         dependencies: [  "settingsViewModel", "calibrationcompanionViewModel"  ],
-        elements: [ "#settings_plugin_calibrationcompanion", "#pid" ]
+        elements: [ "#pid-calibrationcompanion" ]
     });
 });

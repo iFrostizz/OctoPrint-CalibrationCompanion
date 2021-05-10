@@ -42,7 +42,7 @@ $(function() {
 
         self.onAfterBinding = function() {
             mainViewModel.resetProcedure();
-            console.log(mainViewModel.bed_center_x + " " + mainViewModel.bed_center_y)
+            //console.log(mainViewModel.bed_center_x + " " + mainViewModel.bed_center_y)
         }
 
         let restrictedInputsSquare = ["#extra-margin", "#regular-nozzle-square", "#regular-bed-square", "#fan-speed-square",
@@ -477,6 +477,6 @@ $(function() {
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel_firstlayer,
         dependencies: [  "settingsViewModel", "calibrationcompanionViewModel", "controlViewModel"  ],
-        elements: [ "#settings_plugin_calibrationcompanion", "#layer" ]
+        elements: [ "#layer-calibrationcompanion" ]
     });
 });

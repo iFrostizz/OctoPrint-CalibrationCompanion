@@ -251,7 +251,7 @@ $(function() {
                 mainViewModel.zHeightWarning();
             }
         }
-        mainViewModel.removeAccel = function() {
+        self.removeAccel = function() {
             olda = a;
             if (Math.sign(a) === 1) {
                 myBase[a].remove();
@@ -311,7 +311,7 @@ $(function() {
                 return;
             }
             let array = [];
-            let el = document.getElementById("acceleration").getElementsByClassName("control-group");
+            let el = document.getElementById("acceleration-calibrationcompanion").getElementsByClassName("control-group");
             for (let x=0; x<el.length; x++) {
                 array[x] = el[x].attributes[0].nodeValue;
                 if (array[x].includes("error")) {
@@ -579,6 +579,6 @@ $(function() {
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel_acceleration,
         dependencies: [  "settingsViewModel", "calibrationcompanionViewModel"  ],
-        elements: [ "#settings_plugin_calibrationcompanion", "#acceleration" ]
+        elements: [ "#acceleration-calibrationcompanion" ]
     });
 });
