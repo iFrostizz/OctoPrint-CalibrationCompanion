@@ -8,6 +8,9 @@ Let me explain all the tabs a bit more precisely before throwing yourself in the
 This is the first tab you want to go to. Choose the values that fits your printer.
 Please do it before attempting any operation.
 
+
+![Calibration Companion Setup](/assets/img/plugins/OctoPrint-CalibrationCompanion/setup.png)
+
 ### Profiles
 In this tab, you can load/save/reset profiles. This is really great to not have to type again all the values when you get to a new tab.
 I already prepared a profile for you stored in "Profile 1". Please adapt it to your needs, more precisely the start and end gcode.
@@ -90,6 +93,8 @@ finalFlow = (100*nozzleDiameter)/averagedMeasurement
 
 ### Retraction, Temperature, Acceleration Tuning
 In this section, you can find your ideal settings per stages by creating a retraction/temperature/acceleration tower.
+
+![Calibration Companion Retraction](/assets/img/plugins/OctoPrint-CalibrationCompanion/retraction.png)
 
 
 ## Plugin Setup
