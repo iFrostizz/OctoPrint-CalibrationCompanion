@@ -17,12 +17,12 @@
         <ul class="nav nav-pills nav-fill" id="first-ul">
             <li class="active"><a href="#setup" data-toggle="tab">Setup</a></li>
             <li><a href="#profiles" data-toggle="tab">Profiles</a></li>
-            <li><a href="#pid" data-toggle="tab">PID Autotune</a></li>
+            <li><a href="#pid" data-toggle="tab">Pid Autotune</a></li>
             <li><a href="#layer" data-toggle="tab">First Layer</a></li>
             <!--<li><a href="#baseline" data-toggle="tab">Baseline Print</a></li>-->
             <li><a href="#extruder" data-toggle="tab">E-steps Calibration</a></li>
-            <li><a href="#flow" data-toggle="tab">Flow</a></li>
-            <!--<li><a href="#current" data-toggle="tab">Stepper Motor Driver</a></li>-->
+            <li><a href="#flow" data-toggle="tab">Slicer Flow Calibration</a></li>
+            <li><a href="#current" data-toggle="tab">Stepper Motor Driver</a></li>
             <li><a href="#retraction" data-toggle="tab">Retraction Tuning</a></li>
             <li><a href="#temperature" data-toggle="tab">Temperature Tuning</a></li>
             <li><a href="#acceleration" data-toggle="tab">Acceleration Tuning</a></li>
@@ -315,21 +315,7 @@
 
             <!--PID Tab-->
             <div class="tab-pane" id="pid">
-                <form class="form-inline">
-                    <label class="control-label" for="nozzlePidTemp">Nozzle temperature</label>
-                    <div class="input-append">
-                        <input type="text" class="midsizeTextbox" id="nozzlePidTemp" data-bind="value: nozzle_pid_temp">
-                        <span class="add-on">°C</span>
-                    </div>
-                    <label class="control-label" for="bedPidTemp">Bed temperature</label>
-                    <div class="input-append">
-                        <input type="text" class="midsizeTextbox" id="bedPidTemp" placeholder="T (°C)" data-bind="value: bed_pid_temp">
-                        <span class="add-on">°C</span>
-                    </div>
-                    <a id="aboutBedPid" href="#" data-toggle="tooltip" data-placement="right" title="leave empty if not enabled"></a>
-                    <button type="button" class="btn btn-primary" data-bind="click:function(){pid_autotune_routine();}">Run PID autotune</button>
-                </form>
-                <!--<form class="form-horizontal">
+                <form class="form-horizontal">
                     <div class="control-group">
                         <label class="control-label" for="nozzlePidTemp">Nozzle temperature</label>
                         <div class="controls">
@@ -352,14 +338,7 @@
                         </div>
                     </div>
                 </form>
-                <form class="form-horizontal">
-                    <div class="control-group">
-                        <div class="controls">
-                            <button type="button" class="btn btn-primary" data-bind="click:function(){pid_autotune_routine();}">Run PID autotune</button>
-                        </div>
-                    </div>
-                </form>-->
-                <br>
+                <br><br><br><br>
                 <div class="btn-group" data-toggle="buttons-radio">
                     <button type="button" class="btn btn-primary" data-bind="click:function(){fan_trigger_on();}">Fans on</button>
                     <button type="button" class="btn btn-primary" data-bind="click:function(){fan_trigger_off();}">Fans off</button>
