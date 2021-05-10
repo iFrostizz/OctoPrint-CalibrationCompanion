@@ -14,12 +14,16 @@ I already prepared a profile for you stored in "Profile 1". Please adapt it to y
 
 ##### Buttons
 - Profile dropdown
+
 Choose your profile between the 3 available. This number may change regarding your needs, please post an "issue" if you need more.
 - Load button
+
 This button will load the selected profile in the dropdown and all of its stored values.
 - Save button
+
 Using this one, you will save all the entered values that are in the input boxes to the selected profile.
 - Reset button
+
 Pressing the "reset" button will delete all the data in the input boxes, but it is not going to be saved automatically. If you want to empty the selected profile, press "save".
 
 ##### Variables
