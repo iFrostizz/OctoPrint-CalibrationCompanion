@@ -42,7 +42,7 @@ $(function() {
 
         self.onAfterBinding = function() {
             mainViewModel.resetProcedure();
-            console.log(mainViewModel.bed_center_x + " " + mainViewModel.bed_center_y)
+            //console.log(mainViewModel.bed_center_x + " " + mainViewModel.bed_center_y)
         }
 
         let restrictedInputsSquare = ["#extra-margin", "#regular-nozzle-square", "#regular-bed-square", "#fan-speed-square",

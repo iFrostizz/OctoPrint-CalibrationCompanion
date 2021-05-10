@@ -125,7 +125,7 @@ $(function() {
                 mainViewModel.zHeightWarning();
             }
         }
-        mainViewModel.removeTemp = function() {
+        self.removeTemp = function() {
             if (Math.sign(t) === 1) {
                 mainViewModel.spanValTemp = Math.round(mainViewModel.spanValTemp - stageHeightTemp / (mainViewModel.variable.nozzle_size / 2));
                 myBase[t].remove();
