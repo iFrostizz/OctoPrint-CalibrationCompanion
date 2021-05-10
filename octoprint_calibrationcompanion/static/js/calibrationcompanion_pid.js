@@ -39,6 +39,7 @@ $(function() {
         }
         self.fan_trigger_off = function() {
             OctoPrint.control.sendGcode(['M106 S0'])
+            //OctoPrint.printer.getFullState().then(console.log(readyState));
         }
     }
 

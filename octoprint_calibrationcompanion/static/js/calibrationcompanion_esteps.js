@@ -32,7 +32,7 @@ $(function() {
             OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
                 document.getElementById("actual-estep").value = response["current_e_steps"]
                 self.actual_estep_value(response["current_e_steps"])
-                //console.log(self.actual_estep_value())
+                console.log(self.actual_estep_value())
                 self.final_estep_calculation();
             })
         }

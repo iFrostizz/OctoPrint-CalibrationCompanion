@@ -194,7 +194,7 @@ $(function() {
                 mainViewModel.zHeightWarning();
             }
         }
-        self.removeRetraction = function () {
+        mainViewModel.removeRetraction = function () {
             oldR = r;
             if (Math.sign(r) === 1) {
                 mainViewModel.spanValRetra = Math.round(mainViewModel.spanValRetra - stageHeightRetra / (mainViewModel.variable.nozzle_size / 2));
@@ -210,7 +210,7 @@ $(function() {
 
         mainViewModel.resetRetra = function() {
             while(r>0) {
-                self.removeRetraction();
+                self.removeRetraction()
             }
             mainViewModel.spanValRetra = 0;
         }
