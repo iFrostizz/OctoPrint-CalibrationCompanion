@@ -94,7 +94,7 @@ finalFlow = (100*nozzleDiameter)/averagedMeasurement
 ### Retraction, Temperature, Acceleration Tuning
 In this section, you can find your ideal settings per stages by creating a retraction/temperature/acceleration tower.
 
-![Calibration Companion Retraction](/assets/img/plugins/OctoPrint-CalibrationCompanion/retraction.png)
+![Calibration Companion Retraction](/assets/img/plugins/CalibrationCompanion/retraction.png)
 
 
 ## Plugin Setup
