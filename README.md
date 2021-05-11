@@ -30,7 +30,7 @@ Using this one, you will save all the entered values that are in the input boxes
 Pressing the "reset" button will delete all the data in the input boxes, but it is not going to be saved automatically. If you want to empty the selected profile, press "save".
 
 ##### Variables
-Some variable that you can use were introduced for the start and end gcode. The start gcode will be inserted just after the "ABL method" and before the nozzle placement to start the print. So make sure that the nozzle is hot! The end gcode will be inserted at the end of the print, you may want to turn off the heaters here. The variables syntax is [variable_name]. Now let's take a look to all the variables:
+Some variables that you can use were introduced for the start and end gcode. The start gcode will be inserted just after the "ABL method" and before the nozzle placement to start the print. So make sure that the nozzle is hot! The end gcode will be inserted at the end of the print, you may want to turn off the heaters here. The variables syntax is [variable_name]. Now let's take a look to all the variables:
 
 - printer_name
 - filament_used
@@ -52,7 +52,7 @@ Some variable that you can use were introduced for the start and end gcode. The 
 - flow
 - abl_method
 
-Some of them are already used in the start gcode, so maybe you can use it if you need help.
+Some of them are already used in the start and end gcode, so maybe you can use it if you need help.
 
 ### PID Autotune
 Enter the temperature for the nozzle and the bed that fits the most your need before running the PID autotune.
