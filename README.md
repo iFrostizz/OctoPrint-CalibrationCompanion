@@ -10,6 +10,7 @@ Please do it before attempting any operation.
 
 
 ![Calibration Companion Setup](setup.png)
+*Setup tab*
 
 ### Profiles
 In this tab, you can load/save/reset profiles. This is really great to not have to type again all the values when you get to a new tab.
@@ -60,7 +61,7 @@ You can either enter just the nozzle, just the bed, or both.
 You can also turn on the fans before running the PID by clicking on the radio buttons.
 
 ### First Layer
-First, you may need to modify the "Extra margin from edges" values. This value will be taken in account in both the "knob_levelling.gcode" file and the "calibration.squares.gcode" file. It is used to prevent printing on anything that is on the sides of your bed, like clips.
+First, you may need to modify the "Extra margin from edges" values. This value will be taken in account in both the "knob_levelling.gcode" file and the "calibration_squares.gcode" file. It is used to prevent printing on anything that is on the sides of your bed, like clips.
 - No ABL
 If you don't have any ABL system, the button "Start Bed Levelling Routine" button will add a file to the file manager to bring the nozzle to the four corners. Then you should adjust the knobs by using a 0.1mm sheet of paper. You need to have a very light touch on all of them, and do not touch the knobs when the nozzle is on the middle of the bed.
 - ABL
@@ -95,6 +96,7 @@ finalFlow = (100*nozzleDiameter)/averagedMeasurement
 In this section, you can find your ideal settings per stages by creating a retraction/temperature/acceleration tower.
 
 ![Calibration Companion Retraction](retraction.png)
+*Retraction tower example*
 
 
 ## Plugin Setup
