@@ -107,10 +107,14 @@ or manually using this URL:
 
 ### Credits
 
-Huge thanks to Teaching Tech for his tutorials that helped me a lot to write this plugin. I borrowed him some images, like the retraction and temperature towers ones.
+Huge thanks to Teaching Tech for his tutorials that helped me a lot to write this plugin.
+I borrowed him some images, like the retraction and temperature towers ones.
 You can find his great work here: https://teachingtechyt.github.io/index.html
+
 I used the acceleration tower file from Teaching Tech as well: https://www.thingiverse.com/thing:4169896
+
 This is the temperature tower file I used for the temperature tab: https://www.thingiverse.com/thing:261420
+
 And of course, thanks to the Cura software, that sliced my models perfectly. Github here: https://github.com/Ultimaker/Cura
 
 ## DISCLAIMER
