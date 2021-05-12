@@ -105,7 +105,17 @@ or manually using this URL:
 
     https://github.com/iFrostizz/OctoPrint-CalibrationCompanion/archive/master.zip
 
+### Credits
+
+Huge thanks to Teaching Tech for his tutorials that helped me a lot to write this plugin. I borrowed him some images, like the retraction and temperature towers ones.
+You can find his great work here: https://teachingtechyt.github.io/index.html
+I used the acceleration tower file from Teaching Tech as well: https://www.thingiverse.com/thing:4169896
+This is the temperature tower file I used for the temperature tab: https://www.thingiverse.com/thing:261420
+And of course, thanks to the Cura software, that sliced my models perfectly. Github here: https://github.com/Ultimaker/Cura
+
 ## DISCLAIMER
 
 This plugin has been tested but could contains bugs. If you spot any of them, open an issue describing it and what happened to lead to this bug.
 Please always handle it with care, import the GCodes in Cura before printing, and inspect them carefully. I will not be responsible for any physical injury.
+
+Enjoy!
