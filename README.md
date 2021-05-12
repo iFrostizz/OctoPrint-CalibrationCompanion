@@ -75,8 +75,6 @@ Here, you can load your profile to see your settings.
 The squares are made to finetune your z-offset as well as the knobs.
 Don't hesitate to repeat the file until having a perfectly levelled bed.
 
-Thanks to Critters for providing me this procedure.
-
 
 ### E-steps
 To guide yourself in the process, please check this video:
@@ -114,6 +112,8 @@ You can find his great work here: https://teachingtechyt.github.io/index.html
 I used the acceleration tower file from Teaching Tech as well: https://www.thingiverse.com/thing:4169896
 
 This is the temperature tower file I used for the temperature tab: https://www.thingiverse.com/thing:261420
+
+Thanks to Critters for providing me his bed levelling procedure.
 
 And of course, thanks to the Cura software, that sliced my models perfectly. Github here: https://github.com/Ultimaker/Cura
 
