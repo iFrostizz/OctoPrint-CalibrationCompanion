@@ -13,7 +13,7 @@ Please do it before attempting any operation.
 *Setup tab*
 
 ### Profiles
-In this tab, you can load/save/reset profiles. This is really great to not have to type again all the values when you get to a new tab.
+In this tab, you can load/save/reset profiles. This is really great so that you do not have to type again all the values when you get to a new tab.
 I already prepared a profile for you stored in "Profile 1". Please adapt it to your needs, more precisely the start and end gcode.
 
 ##### Buttons
