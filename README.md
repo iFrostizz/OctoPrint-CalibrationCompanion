@@ -1,7 +1,7 @@
 # Calibration Companion
 
 This plugin was created to calibrate your 3D printer settings easily.
-It comes really handy when you want to try a new filament for example.
+It comes really handy when you want to try a new filament for instance.
 Let me explain all the tabs a bit more precisely before throwing yourself in the process.
 
 ### Setup
