@@ -117,6 +117,10 @@ Thanks to Critters for providing me his bed levelling procedure.
 
 And of course, thanks to the Cura software, that sliced my models perfectly. Github here: https://github.com/Ultimaker/Cura
 
+### Known issues
+
+- The page will sometimes refresh after generating a .gcode file
+
 ## DISCLAIMER
 
 This plugin has been tested but could contains bugs. If you spot any of them, open an issue describing it and what happened to lead to this bug.
