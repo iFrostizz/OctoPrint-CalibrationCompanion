@@ -120,6 +120,8 @@ And of course, thanks to the Cura software, that sliced my models perfectly. Git
 ### Known issues
 
 - The page will sometimes refresh after generating a .gcode file
+- Some "Steps" from the calibration tabs are getting activated when they shouldn't
+- The procedure is reset after clicking on the step 4, losing your zOffset
 
 ## DISCLAIMER
 
