@@ -107,7 +107,7 @@ $(function() {
             mainViewModel.retraction_distance = document.getElementById("retraction-dist-flow").value;
             mainViewModel.retraction_speed = document.getElementById("retraction-speed-flow").value * 60;
             mainViewModel.flow = 100;
-            mainViewModel.abl_method = document.getElementById("abl-method-temp").value;
+            mainViewModel.abl_method = document.getElementById("abl-method-flow").value;
             mainViewModel.filename = "flow_cube";
             let boolean = [true]
             mainViewModel.first_x_pos = String(mainViewModel.bed_center_x + 20 / 2);
@@ -186,7 +186,7 @@ $(function() {
             }
             gcode_generated.push(end_gcode);
 
-            let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "echo";
+            let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
             OctoPrint.post(url, {"name": mainViewModel.getFullFilename(mainViewModel.filename), "generated gcode": gcode_generated.flat().join('')})
 
             gcode_generated = [];

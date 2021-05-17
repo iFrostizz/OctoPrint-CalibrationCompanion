@@ -1,9 +1,6 @@
-#regular-form-title, #regular-form, #layer, #flow {
+#regular-form-title, #gcode-centered-profile, #gcode-centered-square,
+#gcode-centered-flow, #gcode-centered-retra, #gcode-centered-temp, #gcode-centered-accel {
     text-align: center;
-}
-
-#fname {
-  width:50px;
 }
 
 .smallSizeTextbox {
@@ -14,37 +11,22 @@
     width: 100px;
 }
 
-label.control-label {
-	font-weight: 900;
+/*#setup-calibrationcompanion {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
 }
 
-span.baseText {
-    position: absolute;
-    margin-top: 10px;
-}
-
-ul#bottom-list {
-    display:inline-block;
-}
-
-div.origin, form#download-path, input#knob, form[class~="form-horizontal"], form#two-arrows {
-	float: left;
-    margin-left: 20px;
-    margin-top: 10px;
-}
-
-select#ABLMethod {
-    width: 200px;
-}
-
-#title {
-	font-weight: 900;
-}
+#1, #2, #3 {
+  flex-basis: 45%;
+  margin-top: 20px;
+}*/
 
 span.whitespace {
     display: inline-block;
     width: 50px;
 }
+
 span.whitespace2 {
     display: inline-block;
     width: 20px;
@@ -72,15 +54,12 @@ span.layerHeightTemp {
     height: 30px;
 }
 
-.textarea {
+#start-gcode-profile, #end-gcode-profile, #start-gcode-square, #end-gcode-square, #start-gcode-flow, #end-gcode-flow,
+#start-gcode-retra, #end-gcode-retra, #start-gcode-temp, #end-gcode-temp, #start-gcode-accel, #end-gcode-accel {
     min-width: 240px;
     min-height: 140px;
     max-width: 700px;
     max-height: 300px;
-}
-
-#gcode-centered-profile, #gcode-centered-square, #gcode-centered-flow, #gcode-centered-retra, #gcode-centered-temp, #gcode-centered-accel {
-    text-align: center;
 }
 
 .control-box-retra {

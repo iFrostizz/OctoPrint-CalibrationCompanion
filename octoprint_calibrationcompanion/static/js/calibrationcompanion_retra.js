@@ -492,7 +492,7 @@ $(function() {
             }
             gcode_generated.push(end_gcode);
 
-            let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "echo";
+            let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
             OctoPrint.post(url, {"name": mainViewModel.getFullFilename(mainViewModel.filename), "generated gcode": gcode_generated.flat().join('')})
 
             gcode_generated = [];

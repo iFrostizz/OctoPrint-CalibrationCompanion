@@ -82,7 +82,8 @@ $(function() {
             });
         }
 
-        let extra_margin, filename
+        let extra_margin, filename;
+        let gcode_generated = [];
 
         $('#knob, #step2').on("click", function() {
             extra_margin = document.getElementById("extra-margin").value;
@@ -135,13 +136,12 @@ $(function() {
                 "G28;\n" +
                 "M84 ; disable motors"
 
-            let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "echo";
+            let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
+            console.log(url)
             OctoPrint.post(url, {"name": filename, "generated gcode": gcode_generated})
 
             gcode_generated = [];
         })
-
-        let gcode_generated = [];
 
         let pos_x = [];
         let pos_y = [];
@@ -267,7 +267,7 @@ $(function() {
             gcode_generated.push(end_gcode);
 
 
-            let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "echo";
+            let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
             OctoPrint.post(url, {
                 "name": mainViewModel.getFullFilename(mainViewModel.filename),
                 "generated gcode": gcode_generated.flat().join('')

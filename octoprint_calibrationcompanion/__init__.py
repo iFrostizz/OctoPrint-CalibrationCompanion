@@ -18,11 +18,13 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 	def __init__(self):
 		self.origin_check = False
 		self.relative_positioning = False
+		self.iteration = 0
 
 	def get_settings_defaults(self):
 		return dict(
 			nozzle_pid_temp="",
 			bed_pid_temp="",
+			cycles_amount="5",
 			bed_size_x="",
 			bed_size_y="",
 			bed_size_z="",
@@ -58,7 +60,8 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			abl_method_profile1="M420 S1",
 			start_gcode_profile1="G90;absolute mode\nG0 F[travel_speed] X100 Y100 Z10;place the nozzle for heating\n"
 								 "M140 S[regular_bed];set bed to [regular_bed]C\nM190 S[regular_bed];wait for bed to [regular_bed]C\n"
-								 "M104 S[regular_nozzle];set hotend to [regular_nozzle]C\n M109 S[regular_nozzle];wait hotend to [regular_nozzle]C",
+								 "M104 S[regular_nozzle];set hotend to [regular_nozzle]C\nM109 S[regular_nozzle];wait hotend to [regular_nozzle]C\n"
+								 "G92 E0;reset extruder",
 			end_gcode_profile1="G91;relative mode\nG92 E0;reset extruder\nG1 F[retraction_speed] E-[retraction_distance];retract a bit to avoid oozing\n"
 							   "G0 Z10 F[travel_speed];move up\nM140 S0;set bed to 0C\nM104 S0;set hotend to 0C\nM107;turn off fans\nG90;absolute mode\n"
 							   "G0 F[travel_speed] Y[bed_size_y];show the print\nG1 F[retraction_speed] E0;set the filament at the end of the nozzle again",
@@ -178,8 +181,9 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 
 	def on_after_startup(self):
 		self._logger.info("Initializing Calibration Companion Plugin!")
+		self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})
 
-	def get_z_offset(self, comm, line, *args, **kwargs):
+	def get_received_gcode(self, comm, line, *args, **kwargs):
 		if "Probe Offset X" in line:
 			currentZOffset = re.findall(r"[-+]?\d*\.\d+|\d+", line)[2]
 			self._settings.set(["current_z_offset"], currentZOffset)
@@ -190,21 +194,27 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			self._settings.save()
 		else:
 			return line  # Avoid blocking the communication
+		"""elif "PID Autotune start" in line:
+			self.iteration = 0
+			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})
+		elif "Kp: " in line:
+			self.iteration += 1
+			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})"""
 
-	@octoprint.plugin.BlueprintPlugin.route("/echo", methods=["POST"])
+
+	@octoprint.plugin.BlueprintPlugin.route("/downloadFile", methods=["POST"])
 	def myEcho(self):
-		self._logger.info("Here is the output {}".format(flask.request.values))
+		#self._logger.info("Here is the output {}".format(flask.request.values))
 		gcode = flask.request.values["generated gcode"]
 		filename = flask.request.values["name"]
-		# self._logger.info("0 {}".format(gcode))
 		test_file = open(self._settings.global_get_basefolder("watched") + "/" + filename + ".gcode", "w")
 		test_file.write(gcode)
 		test_file.close()
-		return flask.request.values["generated gcode"]
+		return gcode
 
 	def bodysize_hook(self, current_max_body_sizes, *args, **kwargs):
-		self._logger.info("current_max_body_sizes {}".format(current_max_body_sizes))
-		return [("POST", r"/echo", 1024 * 1024 * 32)]  # 32MB should be enough
+		#self._logger.info("current_max_body_sizes {}".format(current_max_body_sizes))
+		return [("POST", r"/downloadFile", 1024 * 1024 * 32)]  # 32MB should be enough
 
 	##~~ AssetPlugin mixin
 
@@ -235,7 +245,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 		# Plugin here. See https://docs.octoprint.org/en/master/bundledplugins/softwareupdate.html
 		# for details.
 		return dict(
-			TTPrinterCalibration=dict(
+			calibrationcompanion=dict(
 				displayName="Calibration Companion",
 				displayVersion=self._plugin_version,
 
@@ -262,5 +272,5 @@ def __plugin_load__():
 	__plugin_hooks__ = {
 		"octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
 		"octoprint.server.http.bodysize": __plugin_implementation__.bodysize_hook,
-		"octoprint.comm.protocol.gcode.received": __plugin_implementation__.get_z_offset
+		"octoprint.comm.protocol.gcode.received": __plugin_implementation__.get_received_gcode
 	}

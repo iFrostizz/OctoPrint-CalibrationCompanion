@@ -77,7 +77,7 @@ $(function () {
 
         self.zHeightWarning = function() {
             self.notify = new PNotify({
-                title: 'Calibration Plugin',
+                title: 'Calibration Companion',
                 text: 'Maximum height was reached, please check your Printer Height Z',
                 type: 'alert',
                 hide: true,
@@ -174,6 +174,12 @@ $(function () {
                     }
                 } else if (id.includes("inputListJunction")) {
                     if (value > 1) {
+                        self.checkWarning(div);
+                    } else {
+                        self.removeWarning(div);
+                    }
+                } else if (id.includes("flow-")) {
+                    if (value > 120 || value < 80) {
                         self.checkWarning(div);
                     } else {
                         self.removeWarning(div);
