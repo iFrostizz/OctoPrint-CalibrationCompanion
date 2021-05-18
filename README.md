@@ -101,7 +101,7 @@ In this section, you can find your ideal settings per stages by creating a retra
 Install via the bundled [Plugin Manager](https://docs.octoprint.org/en/master/bundledplugins/pluginmanager.html)
 or manually using this URL:
 
-    https://github.com/iFrostizz/OctoPrint-CalibrationCompanion/archive/master.zip
+    https://github.com/iFrostizz/OctoPrint-CalibrationCompanion/archive/main.zip
 
 ### Credits
 
