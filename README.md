@@ -31,7 +31,7 @@ Using this one, you will save all the entered values that are in the input boxes
 Pressing the "reset" button will delete all the data in the input boxes, but it is not going to be saved automatically. If you want to empty the selected profile, press "save".
 
 ##### Variables
-Some variables that you can use were introduced for the start and end gcode. The start gcode will be inserted just after the "ABL method" and before the nozzle placement to start the print. So make sure that the nozzle is hot! The end gcode will be inserted at the end of the print, you may want to turn off the heaters here. The variables syntax is [variable_name]. Now let's take a look to all the variables:
+Some variables that you can use were introduced for the start and end gcode. The start gcode will be inserted just after the "ABL method" and before the nozzle placement to start the print. So make sure that the nozzle is hot! The end gcode will be inserted at the end of the print, you may want to turn off the heaters here. The variable's syntax is [variable_name]. Now let's take a look to all the variables:
 
 - printer_name
 - filament_used
@@ -56,23 +56,23 @@ Some variables that you can use were introduced for the start and end gcode. The
 Some of them are already used in the start and end gcode, so maybe you can use it if you need help.
 
 ### PID Autotune
-Enter the temperature for the nozzle and the bed that fits the most your need before running the PID autotune.
+Enter the temperature for the nozzle, and the bed that fits the most your need before running the PID autotune.
 You can either enter just the nozzle, just the bed, or both.
 You can also turn on the fans before running the PID by clicking on the radio buttons.
 
 ### First Layer
-First, you may need to modify the "Extra margin from edges" values. This value will be taken in account in both the "knob_levelling.gcode" file and the "calibration_squares.gcode" file. It is used to prevent printing on anything that is on the sides of your bed, like clips.
+First, you may need to modify the "Extra margin from edges" values. This value will be taken in account in both the "knob_levelling.gcode" file, and the "calibration_squares.gcode" file. It is used to prevent printing on anything that is on the sides of your bed, like clips.
 - No ABL
-If you don't have any ABL system, the button "Start Bed Levelling Routine" button will add a file to the file manager to bring the nozzle to the four corners. Then you should adjust the knobs by using a 0.1mm sheet of paper. You need to have a very light touch on all of them, and do not touch the knobs when the nozzle is on the middle of the bed.
+If you don't have any ABL system, the button "Start Bed Levelling Routine" button will add a file to the file manager to bring the nozzle to the four corners. Then you should adjust the knobs by using a 0.1 mm sheet of paper. You need to have a very light touch on all of them, and do not touch the knobs when the nozzle is in the middle of the bed.
 - ABL
-If you have an ABL equipment, the "ABL" part might be interesting. You will need to click on the steps and a message box will guide you. When starting the procedure, your z-offset value will be stored using the gcode command `M851` and can be restored at any moment when the procedure is reset (either clicking on the button to reset the procedure, or refresh/disconnect) the printer/server.
+If you have an ABL equipment, the "ABL" part might be interesting. You will need to click on the steps, and a message box will guide you. When starting the procedure, your z-offset value will be stored using the gcode command `M851` and can be restored at any moment when the procedure is reset (either clicking on the button to reset the procedure, or refresh/disconnect) the printer/server.
 Step 1: The printer will home and place the nozzle at the center of the bed. Here, you will need to use the buttons placed on the right to lower or upper the nozzle and a sheet of paper to feel a very light touch on the paper. When done, click on the step 2.
 Step 2: Storing the z-offset and preparing for you the "knob_levelling.gcode". The file will be placed on the file manager.
 Step 3: Plot the bed and repeat the step 1.
 Step 4: Storing the z-offset.
 Now, you can print the final squares by exploring the bottom of the page.
 Here, you can load your profile to see your settings.
-The squares are made to finetune your z-offset as well as the knobs.
+The squares are made to fine-tune your z-offset as well as the knobs.
 Don't hesitate to repeat the file until having a perfectly levelled bed.
 
 
@@ -80,14 +80,14 @@ Don't hesitate to repeat the file until having a perfectly levelled bed.
 To guide yourself in the process, please check this video:
 https://www.youtube.com/watch?v=axBlXVRwt_s
 Filament Path Distance corresponds to the distance that will be travelled by the filament in the extruder.
-In the video, a mark is made at 120mm, minus 20mm for the measurement which gives us 100mm.
+In the video, a mark is made at 120 mm, minus 20 mm for the measurement which gives us 100 mm.
 You can change this value for your convenience.
 The "Get Estep Value" button will get your current steps/mm for the extruder. You can also enter a custom value.
 If you want to make the filament go backwards instead, you can check the box.
-The Final Estep Value will be computed and displayed in the disabled input box, and you can apply it using the Apply Final Esteps button.
+The Final Estep Value will be computed and displayed in the disabled input box, and you can apply it using the "Apply Final Esteps" button.
 
 ### Flow
-Printing a hollow cube to adjust the flow. Measure all the sides precisely several times on the middle using a caliper and average the values. Compare the average with your nozzle diameter and do this calculation:
+Printing a hollow cube to adjust the flow. Measure all the sides precisely several times in the middle using a caliper and average the values. Compare the average with your nozzle diameter and do this calculation:
 finalFlow = (100*nozzleDiameter)/averagedMeasurement
 
 ### Retraction, Temperature, Acceleration Tuning
@@ -115,7 +115,7 @@ This is the temperature tower file I used for the temperature tab: https://www.t
 
 Thanks to Critters for providing me his bed levelling procedure.
 
-And of course, thanks to the Cura software, that sliced my models perfectly. Github here: https://github.com/Ultimaker/Cura
+Thanks to the Cura software, that sliced my models perfectly. GitHub here: https://github.com/Ultimaker/Cura
 
 ### Known issues
 
@@ -125,7 +125,7 @@ And of course, thanks to the Cura software, that sliced my models perfectly. Git
 
 ## DISCLAIMER
 
-This plugin has been tested but could contains bugs. If you spot any of them, open an issue describing it and what happened to lead to this bug.
+This plugin has been tested but could contain bugs. If you spot any of them, open an issue describing it and what happened to lead to this bug.
 Please always handle it with care, import the GCodes in Cura before printing, and inspect them carefully. I will not be responsible for any physical injury.
 
 Enjoy!
