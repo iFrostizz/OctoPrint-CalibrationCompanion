@@ -60,9 +60,9 @@ $(function () {
         }
 
         self.onAfterBinding = function() {
-            /*$(restrictedNoVerifInputs.join(",")).each(function () {
+            $(restrictedNoVerifInputs.join(",")).each(function () {
                 saveSettingsSetup(this);
-            });*/
+            });
             $(restrictedIdClassic.join(",")).each(function() {
                 self.checkValue(this, this.parentNode.parentNode.parentNode, self.allowedArrayClassic);
             });
@@ -72,9 +72,9 @@ $(function () {
             $(restrictedIdText.join(",")).each(function() {
                 self.checkValue(this, this.parentNode.parentNode, self.allowedArrayText);
             });
-            /*$(restrictedCheckbox.join(",")).each(function() {
+            $(restrictedCheckbox.join(",")).each(function() {
                 saveSettingsSetupCheckbox(this);
-            });*/
+            });
         }
 
         self.PNotifyData = {
@@ -275,37 +275,42 @@ $(function () {
         function saveSettingsSetup(element) {
             let saveSettings = saveInputs[restrictedInputs.indexOf('#' + element.id)];
             self.variable[saveSettings] = element.value;
+            self.saveSettingsTab(saveSettings, element.value);
+        }
+
+        async function saveSettingsSetupCheckbox(element) {
+            let saveSettingsCheckbox = saveCheckbox[restrictedCheckbox.indexOf('#' + element.id)];
             OctoPrint.settings.savePluginSettings('calibrationcompanion', {
-                [saveSettings]: element.value})
+                [saveSettingsCheckbox]: element.checked
+            })
+            self.variable[saveSettingsCheckbox] = element.checked;
+            self.saveSettingsTab(saveSettingsCheckbox, element.checked)
+            await function () {
+                if (saveSettingsCheckbox === "origin_check") {
+                    if (element.checked) {
+                        document.getElementById("bedSizeY").disabled = true;
+                        self.bed_center_x = 0;
+                        self.bed_center_y = 0;
+                    } else {
+                        document.getElementById("bedSizeY").disabled = false;
+                        self.bed_center_x = Math.round(self.variable.bed_size_x / 2);
+                        self.bed_center_y = Math.round(self.variable.bed_size_y / 2);
+                    }
+                }
+            }
         }
 
         self.saveSettingsTab = function(settingName, value) {
+            let spinner = document.getElementById("spinner-loading-save")
+            spinner.style.visibility = "visible";
             OctoPrint.settings.savePluginSettings('calibrationcompanion', {
                 [settingName]: value
-            })
+            }).done(spinner.style.visibility = "hidden")
         }
 
         $(restrictedCheckbox.join(",")).on("click", function() {
             saveSettingsSetupCheckbox(this);
         });
-
-        function saveSettingsSetupCheckbox(element) {
-            let saveSettingsCheckbox = saveCheckbox[restrictedCheckbox.indexOf('#' + element.id)];
-            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
-                [saveSettingsCheckbox]: element.checked})
-            self.variable[saveSettingsCheckbox] = element.checked;
-            if (saveSettingsCheckbox === "origin_check") {
-                if (element.checked) {
-                    document.getElementById("bedSizeY").disabled = true;
-                    self.bed_center_x = 0;
-                    self.bed_center_y = 0;
-                } else {
-                    document.getElementById("bedSizeY").disabled = false;
-                    self.bed_center_x = Math.round(self.variable.bed_size_x / 2);
-                    self.bed_center_y = Math.round(self.variable.bed_size_y / 2);
-                }
-            }
-        }
 
         self.whitespace = document.createElement("span");
         self.whitespace.className = "whitespace"

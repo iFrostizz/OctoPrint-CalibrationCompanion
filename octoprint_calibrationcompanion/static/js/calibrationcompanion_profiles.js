@@ -110,11 +110,10 @@ $(function() {
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "flow", "regular_bed", "regular_nozzle", "regular_speed", "retraction_dist",
             "retraction_speed", "start_gcode", "travel_speed"];
-        let saveSettingsProfile
-
         let restrictedInputsProfileClassic = ["first-layer-nozzle-profile", "regular-nozzle-profile", "regular-bed-profile", "fan-speed-profile",
             "fan-layer-profile", "first-layer-speed-profile", "regular-speed-profile", "travel-speed-profile"];
         let restrictedInputsProfileComma = ["retraction-dist-profile", "retraction-speed-profile", "flow-profile"];
+        let saveSettingsProfile
 
         document.getElementById("load-profile").onclick = function () {
             if (self.profile_selection() !== "") {

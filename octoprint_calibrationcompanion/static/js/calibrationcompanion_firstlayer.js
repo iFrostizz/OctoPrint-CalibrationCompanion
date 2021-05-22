@@ -24,20 +24,23 @@ $(function() {
         self.start_gcode_square = ko.observable();
         self.end_gcode_square = ko.observable();
 
+        let pluginSettings;
+
         self.onBeforeBinding = function() {
-            self.profile_selection_square(self.settingsViewModel.settings.plugins.calibrationcompanion.profile_selection_square());
-            self.extra_margin(self.settingsViewModel.settings.plugins.calibrationcompanion.extra_margin());
-            self.regular_nozzle_square(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_nozzle_square());
-            self.regular_bed_square(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_bed_square());
-            self.fan_speed_square(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_speed_square());
-            self.regular_speed_square(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_speed_square());
-            self.travel_speed_square(self.settingsViewModel.settings.plugins.calibrationcompanion.travel_speed_square());
-            self.retraction_dist_square(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_dist_square());
-            self.retraction_speed_square(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_speed_square());
-            self.flow_square(self.settingsViewModel.settings.plugins.calibrationcompanion.flow_square());
-            self.abl_method_square(self.settingsViewModel.settings.plugins.calibrationcompanion.abl_method_square());
-            self.start_gcode_square(self.settingsViewModel.settings.plugins.calibrationcompanion.start_gcode_square());
-            self.end_gcode_square(self.settingsViewModel.settings.plugins.calibrationcompanion.end_gcode_square());
+            pluginSettings = self.settingsViewModel.settings.plugins.calibrationcompanion;
+            self.profile_selection_square(pluginSettings.profile_selection_square());
+            self.extra_margin(pluginSettings.extra_margin());
+            self.regular_nozzle_square(pluginSettings.regular_nozzle_square());
+            self.regular_bed_square(pluginSettings.regular_bed_square());
+            self.fan_speed_square(pluginSettings.fan_speed_square());
+            self.regular_speed_square(pluginSettings.regular_speed_square());
+            self.travel_speed_square(pluginSettings.travel_speed_square());
+            self.retraction_dist_square(pluginSettings.retraction_dist_square());
+            self.retraction_speed_square(pluginSettings.retraction_speed_square());
+            self.flow_square(pluginSettings.flow_square());
+            self.abl_method_square(pluginSettings.abl_method_square());
+            self.start_gcode_square(pluginSettings.start_gcode_square());
+            self.end_gcode_square(pluginSettings.end_gcode_square());
         }
 
         self.onAfterBinding = function() {
@@ -49,45 +52,33 @@ $(function() {
             "#regular-speed-square", "#travel-speed-square", "#retraction-dist-square", "#retraction-speed-square", "#flow-square", "#abl-method-square", "#start-gcode-square"];
         let saveInputsSquare = ["extra_margin", "regular_nozzle_square", "regular_bed_square", "fan_speed_square",
             "regular_speed_square", "travel_speed_square", "retraction_dist_square", "retraction_speed_square", "flow_square", "abl_method_square", "start_gcode_square"];
-
-        $(restrictedInputsSquare.join(",")).on("input", function() {
-            let saveSettingsTemp = saveInputsSquare[restrictedInputsSquare.indexOf('#' + this.id)]
-            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
-                [saveSettingsTemp]: this.value})
-        });
-
         let restrictedInputsProfile = ["abl-method-square", "end-gcode-square", "novalue", "fan-speed-square", "novalue",
             "novalue", "flow-square", "regular-bed-square", "regular-nozzle-square", "regular-speed-square", "retraction-dist-square",
             "retraction-speed-square", "start-gcode-square", "travel-speed-square"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "novalue", "fan_speed", "novalue",
             "novalue", "flow", "regular_bed", "regular_nozzle", "regular_speed", "retraction_dist",
             "retraction_speed", "start_gcode", "travel_speed"];
-        let saveSettingsProfile, saveSettingsTextbox;
+        let saveSettingsProfile, saveSettingsSquare, saveSettingsProfileSquare;
+
+        /*$(restrictedInputsSquare.join(",")).on("input", function() {
+            saveSettingsSquare = saveInputsSquare[restrictedInputsSquare.indexOf('#' + this.id)]
+            saveSettingsProfileSquare = this.value;
+            mainViewModel.saveSettingsTab((saveSettingsSquare), saveSettingsProfileSquare)
+        });*/
 
         document.getElementById("load-profile-square").onclick = function() {
-            /*OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                let z = 0;
-                for (let x=0; x< Object.keys(response).length; x++) {
-                    if (self.profile_selection_square()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_square()) && restrictedSettingsProfile[z]!=="novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection_square();
-                        saveSettingsTextbox = restrictedSettingsProfile[z] + "_square";
-                        document.getElementById(restrictedInputsProfile[z]).value = Object.values(response)[x];
-                        OctoPrint.settings.savePluginSettings('calibrationcompanion', {[saveSettingsTextbox]: Object.values(response)[x]});
-                        z++;
-                    } else if (self.profile_selection_square()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_square()) && restrictedSettingsProfile[z] === "novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection_square();
-                        z++;
+            if (self.profile_selection_square() !== "") {
+                for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                    if (restrictedSettingsProfile[x] !== "novalue") {
+                        saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_square();
+                        saveSettingsSquare = restrictedSettingsProfile[x] + "_square";
+                        saveSettingsProfileSquare = pluginSettings[saveSettingsProfile]()
+                        document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileSquare; // loading setting
+                        mainViewModel.saveSettingsTab((saveSettingsSquare), saveSettingsProfileSquare)
                     }
                 }
-            });*/
-            for (let x = 0; x < restrictedSettingsProfile.length; x++) {
-                if (self.profile_selection() !== "") {
-                    saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
-                    if (self[saveSettingsProfile]() !== undefined) {
-                        document.getElementById(restrictedInputsProfile[x]).value = self[saveSettingsProfile]();
-                        //console.log(saveSettingsProfile + " " + self[saveSettingsProfile]())
-                    }
-                }
+            } else {
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }
         }
 
@@ -146,7 +137,6 @@ $(function() {
                 "M84 ; disable motors"
 
             let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
-            console.log(url)
             OctoPrint.post(url, {"name": filename, "generated gcode": gcode_generated})
 
             gcode_generated = [];

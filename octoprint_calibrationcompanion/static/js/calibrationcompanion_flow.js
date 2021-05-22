@@ -55,11 +55,11 @@ $(function() {
             "retraction_speed", "start_gcode", "travel_speed"];
         let saveSettingsProfile, saveSettingsFlow, saveSettingsProfileFlow;
 
-        $(restrictedInputsFlow.join(",")).on("input", function() {
+        /*$(restrictedInputsFlow.join(",")).on("input", function() {
             saveSettingsFlow = saveInputsFlow[restrictedInputsFlow.indexOf('#' + this.id)]
             saveSettingsProfileFlow = this.value;
             mainViewModel.saveSettingsTab((saveSettingsFlow), saveSettingsProfileFlow)
-        });
+        });*/
 
         document.getElementById("load-profile-flow").onclick = function() {
             if (self.profile_selection_flow() !== "") {
