@@ -23,22 +23,25 @@ $(function() {
         self.start_gcode_accel = ko.observable();
         self.end_gcode_accel = ko.observable();
 
+        let pluginSettings;
+
         self.onBeforeBinding = function() {
-            self.profile_selection_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.profile_selection_accel());
-            self.first_layer_nozzle_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_nozzle_accel())
-            self.regular_nozzle_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_nozzle_accel())
-            self.regular_bed_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_bed_accel())
-            self.fan_speed_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_speed_accel())
-            self.fan_layer_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_layer_accel())
-            self.first_layer_speed_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_speed_accel())
-            self.regular_speed_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_speed_accel())
-            self.travel_speed_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.travel_speed_accel())
-            self.retraction_dist_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_dist_accel())
-            self.retraction_speed_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_speed_accel())
-            self.flow_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.flow_accel())
-            self.abl_method_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.abl_method_accel())
-            self.start_gcode_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.start_gcode_accel())
-            self.end_gcode_accel(self.settingsViewModel.settings.plugins.calibrationcompanion.end_gcode_accel())
+            pluginSettings = self.settingsViewModel.settings.plugins.calibrationcompanion;
+            self.profile_selection_accel(pluginSettings.profile_selection_accel());
+            self.first_layer_nozzle_accel(pluginSettings.first_layer_nozzle_accel())
+            self.regular_nozzle_accel(pluginSettings.regular_nozzle_accel())
+            self.regular_bed_accel(pluginSettings.regular_bed_accel())
+            self.fan_speed_accel(pluginSettings.fan_speed_accel())
+            self.fan_layer_accel(pluginSettings.fan_layer_accel())
+            self.first_layer_speed_accel(pluginSettings.first_layer_speed_accel())
+            self.regular_speed_accel(pluginSettings.regular_speed_accel())
+            self.travel_speed_accel(pluginSettings.travel_speed_accel())
+            self.retraction_dist_accel(pluginSettings.retraction_dist_accel())
+            self.retraction_speed_accel(pluginSettings.retraction_speed_accel())
+            self.flow_accel(pluginSettings.flow_accel())
+            self.abl_method_accel(pluginSettings.abl_method_accel())
+            self.start_gcode_accel(pluginSettings.start_gcode_accel())
+            self.end_gcode_accel(pluginSettings.end_gcode_accel())
         }
 
         let stageHeightAccel;
@@ -56,37 +59,34 @@ $(function() {
             "#first-layer-speed-accel", "#regular-speed-accel", "#travel-speed-accel", "#flow-accel", "#retraction-dist-accel", "#retraction-speed-accel", "#abl-method-accel", "#start-gcode-accel"];
         let saveInputsAccel = ["first_layer_nozzle_accel", "regular_nozzle_accel", "regular_bed_accel", "fan_speed_accel", "fan_layer_accel",
             "first_layer_speed_accel", "regular_speed_accel", "travel_speed_accel", "flow_accel", "retraction_dist_accel", "retraction_speed_accel", "abl_method_accel", "start_gcode_accel"];
-
-        $(restrictedInputsAccel.join(",")).on("input", function() {
-            let saveSettingsAccel = saveInputsAccel[restrictedInputsAccel.indexOf('#' + this.id)]
-            OctoPrint.settings.savePluginSettings('calibrationcompanion', {[saveSettingsAccel]: this.value})
-        });
-
         let restrictedInputsProfile = ["abl-method-accel", "end-gcode-accel", "fan-layer-accel", "fan-speed-accel", "first-layer-nozzle-accel",
             "first-layer-speed-accel", "flow-accel", "regular-bed-accel", "regular-nozzle-accel", "regular-speed-accel", "retraction-dist-accel",
             "retraction-speed-accel", "start-gcode-accel", "travel-speed-accel"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "flow", "regular_bed", "regular_nozzle", "regular_speed", "retraction_dist",
             "retraction_speed", "start_gcode", "travel_speed"];
-        let saveSettingsProfile, saveSettingsTextbox;
+        let saveSettingsProfile, saveSettingsAccel, saveSettingsProfileAccel;
+
+        $(restrictedInputsAccel.join(",")).on("input", function() {
+            saveSettingsAccel = saveInputsAccel[restrictedInputsAccel.indexOf('#' + this.id)]
+            saveSettingsProfileAccel = this.value;
+            mainViewModel.saveSettingsTab((saveSettingsAccel), saveSettingsProfileAccel)
+        });
 
         document.getElementById("load-profile-accel").onclick = function() {
-            OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                let z = 0;
-                for (let x=0; x< Object.keys(response).length; x++) {
-                    if (self.profile_selection_accel()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_accel()) && restrictedSettingsProfile[z]!=="novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection_accel();
-                        saveSettingsTextbox = restrictedSettingsProfile[z] + "_accel";
-                        document.getElementById(restrictedInputsProfile[z]).value = Object.values(response)[x];
-                        OctoPrint.settings.savePluginSettings('calibrationcompanion', {[saveSettingsTextbox]: Object.values(response)[x]});
-                        z++;
-                    } else if (self.profile_selection_accel()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_accel()) && restrictedSettingsProfile[z] === "novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection_accel();
-                        z++;
+            if (self.profile_selection_accel() !== "") {
+                for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                    if (restrictedSettingsProfile[x] !== "novalue") {
+                        saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_accel();
+                        saveSettingsAccel = restrictedSettingsProfile[x] + "_accel";
+                        saveSettingsProfileAccel = pluginSettings[saveSettingsProfile]()
+                        document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileAccel; // loading setting
+                        mainViewModel.saveSettingsTab((saveSettingsAccel), saveSettingsProfileAccel)
                     }
                 }
-            });
-
+            } else {
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
+            }
         }
 
         let myParent;

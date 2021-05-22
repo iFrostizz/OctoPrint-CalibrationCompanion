@@ -65,7 +65,7 @@ $(function() {
         let saveSettingsProfile, saveSettingsTextbox;
 
         document.getElementById("load-profile-square").onclick = function() {
-            OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
+            /*OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
                 let z = 0;
                 for (let x=0; x< Object.keys(response).length; x++) {
                     if (self.profile_selection_square()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_square()) && restrictedSettingsProfile[z]!=="novalue") {
@@ -79,7 +79,16 @@ $(function() {
                         z++;
                     }
                 }
-            });
+            });*/
+            for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                if (self.profile_selection() !== "") {
+                    saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
+                    if (self[saveSettingsProfile]() !== undefined) {
+                        document.getElementById(restrictedInputsProfile[x]).value = self[saveSettingsProfile]();
+                        //console.log(saveSettingsProfile + " " + self[saveSettingsProfile]())
+                    }
+                }
+            }
         }
 
         let extra_margin, filename;

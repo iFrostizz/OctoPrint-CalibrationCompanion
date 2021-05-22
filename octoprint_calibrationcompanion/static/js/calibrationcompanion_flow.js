@@ -23,58 +23,58 @@ $(function() {
         self.start_gcode_flow = ko.observable();
         self.end_gcode_flow = ko.observable();
 
-        self.onBeforeBinding = function () {
-            self.profile_selection_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.profile_selection_flow());
-            self.first_layer_nozzle_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_nozzle_flow());
-            self.regular_nozzle_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_nozzle_flow());
-            self.regular_bed_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_bed_flow());
-            self.fan_speed_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_speed_flow());
-            self.fan_layer_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_layer_flow());
-            self.first_layer_speed_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_speed_flow());
-            self.regular_speed_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_speed_flow());
-            self.travel_speed_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.travel_speed_flow());
-            self.retraction_dist_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_dist_flow());
-            self.retraction_speed_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_speed_flow());
-            self.abl_method_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.abl_method_flow());
-            self.start_gcode_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.start_gcode_flow());
-            self.end_gcode_flow(self.settingsViewModel.settings.plugins.calibrationcompanion.start_gcode_flow());
+        let pluginSettings;
+
+        self.onBeforeBinding = function() {
+            pluginSettings = self.settingsViewModel.settings.plugins.calibrationcompanion;
+            self.profile_selection_flow(pluginSettings.profile_selection_flow());
+            self.first_layer_nozzle_flow(pluginSettings.first_layer_nozzle_flow());
+            self.regular_nozzle_flow(pluginSettings.regular_nozzle_flow());
+            self.regular_bed_flow(pluginSettings.regular_bed_flow());
+            self.fan_speed_flow(pluginSettings.fan_speed_flow());
+            self.fan_layer_flow(pluginSettings.fan_layer_flow());
+            self.first_layer_speed_flow(pluginSettings.first_layer_speed_flow());
+            self.regular_speed_flow(pluginSettings.regular_speed_flow());
+            self.travel_speed_flow(pluginSettings.travel_speed_flow());
+            self.retraction_dist_flow(pluginSettings.retraction_dist_flow());
+            self.retraction_speed_flow(pluginSettings.retraction_speed_flow());
+            self.abl_method_flow(pluginSettings.abl_method_flow());
+            self.start_gcode_flow(pluginSettings.start_gcode_flow());
+            self.end_gcode_flow(pluginSettings.start_gcode_flow());
         }
 
         let restrictedInputsFlow = ["#first-layer-nozzle-flow", "#regular-nozzle-flow", "#regular-bed-flow", "#fan-speed-flow", "#fan-layer-flow", "#first-layer-speed-flow",
             "#regular-speed-flow", "#travel-speed-flow", "#retraction-dist-flow", "#retraction-speed-flow", "#abl-method-flow", "#start-gcode-flow"];
         let saveInputsFlow = ["first_layer_nozzle_flow", "regular_nozzle_flow", "regular_bed_flow", "fan_speed_flow", "fan_layer_flow", "first_layer_speed_flow",
             "regular_speed_flow", "travel_speed_flow", "retraction_dist_flow", "retraction_speed_flow", "abl_method_flow", "start_gcode_flow"];
-
-        $(restrictedInputsFlow.join(",")).on("input", function() {
-            let saveSettingsFlow = saveInputsFlow[restrictedInputsFlow.indexOf('#' + this.id)]
-            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
-                [saveSettingsFlow]: this.value})
-        });
-
         let restrictedInputsProfile = ["abl-method-flow", "end-gcode-flow", "fan-layer-flow", "fan-speed-flow", "first-layer-nozzle-flow",
             "first-layer-speed-flow", "novalue", "regular-bed-flow", "regular-nozzle-flow", "regular-speed-flow", "retraction-dist-flow",
             "retraction-speed-flow", "start-gcode-flow", "travel-speed-flow"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "novalue", "regular_bed", "regular_nozzle", "regular_speed", "retraction_dist",
             "retraction_speed", "start_gcode", "travel_speed"];
-        let saveSettingsProfile, saveSettingsTextbox;
+        let saveSettingsProfile, saveSettingsFlow, saveSettingsProfileFlow;
+
+        $(restrictedInputsFlow.join(",")).on("input", function() {
+            saveSettingsFlow = saveInputsFlow[restrictedInputsFlow.indexOf('#' + this.id)]
+            saveSettingsProfileFlow = this.value;
+            mainViewModel.saveSettingsTab((saveSettingsFlow), saveSettingsProfileFlow)
+        });
 
         document.getElementById("load-profile-flow").onclick = function() {
-            OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                let z = 0;
-                for (let x=0; x< Object.keys(response).length; x++) {
-                    if (self.profile_selection_flow()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_flow()) && restrictedSettingsProfile[z]!=="novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection_flow();
-                        saveSettingsTextbox = restrictedSettingsProfile[z] + "_flow";
-                        document.getElementById(restrictedInputsProfile[z]).value = Object.values(response)[x];
-                        OctoPrint.settings.savePluginSettings('calibrationcompanion', {[saveSettingsTextbox]: Object.values(response)[x]});
-                        z++;
-                    } else if (self.profile_selection_flow()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_flow()) && restrictedSettingsProfile[z] === "novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection_flow();
-                        z++;
+            if (self.profile_selection_flow() !== "") {
+                for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                    if (restrictedSettingsProfile[x] !== "novalue") {
+                        saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_flow();
+                        saveSettingsFlow = restrictedSettingsProfile[x] + "_flow";
+                        saveSettingsProfileFlow = pluginSettings[saveSettingsProfile]()
+                        document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileFlow; // loading setting
+                        mainViewModel.saveSettingsTab((saveSettingsFlow), saveSettingsProfileFlow)
                     }
                 }
-            });
+            } else {
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
+            }
         }
 
         let GStatus, layerStatus;

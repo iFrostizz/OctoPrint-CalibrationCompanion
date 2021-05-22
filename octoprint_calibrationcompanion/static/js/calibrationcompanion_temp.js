@@ -37,21 +37,24 @@ $(function() {
 
         let t = 0;
 
+        let pluginSettings
+
         self.onBeforeBinding = function () {
-            self.profile_selection_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.profile_selection_temp());
-            self.first_layer_nozzle_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_nozzle_temp());
-            self.regular_bed_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_bed_temp());
-            self.fan_speed_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_speed_temp());
-            self.fan_layer_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_layer_temp());
-            self.first_layer_speed_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_speed_temp());
-            self.regular_speed_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_speed_temp());
-            self.travel_speed_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.travel_speed_temp());
-            self.retraction_dist_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_dist_temp());
-            self.retraction_speed_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_speed_temp());
-            self.flow_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.flow_temp());
-            self.abl_method_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.abl_method_temp());
-            self.start_gcode_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.start_gcode_temp());
-            self.end_gcode_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.end_gcode_temp());
+            pluginSettings = self.settingsViewModel.settings.plugins.calibrationcompanion;
+            self.profile_selection_temp(pluginSettings.profile_selection_temp());
+            self.first_layer_nozzle_temp(pluginSettings.first_layer_nozzle_temp());
+            self.regular_bed_temp(pluginSettings.regular_bed_temp());
+            self.fan_speed_temp(pluginSettings.fan_speed_temp());
+            self.fan_layer_temp(pluginSettings.fan_layer_temp());
+            self.first_layer_speed_temp(pluginSettings.first_layer_speed_temp());
+            self.regular_speed_temp(pluginSettings.regular_speed_temp());
+            self.travel_speed_temp(pluginSettings.travel_speed_temp());
+            self.retraction_dist_temp(pluginSettings.retraction_dist_temp());
+            self.retraction_speed_temp(pluginSettings.retraction_speed_temp());
+            self.flow_temp(pluginSettings.flow_temp());
+            self.abl_method_temp(pluginSettings.abl_method_temp());
+            self.start_gcode_temp(pluginSettings.start_gcode_temp());
+            self.end_gcode_temp(pluginSettings.end_gcode_temp());
         }
 
         self.onAfterBinding = function () {
@@ -122,7 +125,7 @@ $(function() {
                 myParent.insertBefore(myBase[t], myBase[t - 1]);
             }
             else {
-                mainViewModel.zHeightWarning();
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.zHeightWarning)
             }
         }
         self.removeTemp = function() {
@@ -155,37 +158,34 @@ $(function() {
             "#regular-speed-temp", "#travel-speed-temp", "#retraction-dist-temp", "#retraction-speed-temp", "#flow-temp", "#abl-method-temp", "#start-gcode-temp"];
         let saveInputsTemp = ["first_layer_nozzle_temp", "regular_bed_temp", "fan_speed_temp", "fan_layer_temp", "first_layer_speed_temp",
             "regular_speed_temp", "travel_speed_temp", "retraction_dist_temp", "retraction_speed_temp", "flow_temp", "abl_method_temp", "start_gcode_temp"];
-
-        $(restrictedInputsTemp.join(",")).on("input", function() {
-            let saveSettingsTemp = saveInputsTemp[restrictedInputsTemp.indexOf('#' + this.id)]
-            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
-                [saveSettingsTemp]: this.value})
-        });
-
         let restrictedInputsProfile = ["abl-method-temp", "end-gcode-temp", "fan-layer-temp", "fan-speed-temp", "first-layer-nozzle-temp",
             "first-layer-speed-temp", "flow-temp", "regular-bed-temp", "novalue", "regular-speed-temp", "retraction-dist-temp",
             "retraction-speed-temp", "start-gcode-temp", "travel-speed-temp"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "flow", "regular_bed", "novalue", "regular_speed", "retraction_dist",
             "retraction_speed", "start_gcode", "travel_speed"];
-        let saveSettingsProfile, saveSettingsTextbox;
+        let saveSettingsProfile, saveSettingsTemp, saveSettingsProfileTemp;
+
+        $(restrictedInputsTemp.join(",")).on("input", function() {
+            saveSettingsTemp = saveInputsTemp[restrictedInputsTemp.indexOf('#' + this.id)]
+            saveSettingsProfileTemp = this.value;
+            mainViewModel.saveSettingsTab((saveSettingsTemp), saveSettingsProfileTemp)
+        });
 
         document.getElementById("load-profile-temp").onclick = function() {
-            OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                let z = 0;
-                for (let x=0; x< Object.keys(response).length; x++) {
-                    if (self.profile_selection_temp()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_temp()) && restrictedSettingsProfile[z]!=="novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection_temp();
-                        saveSettingsTextbox = restrictedSettingsProfile[z] + "_temp";
-                        document.getElementById(restrictedInputsProfile[z]).value = Object.values(response)[x];
-                        OctoPrint.settings.savePluginSettings('calibrationcompanion', {[saveSettingsTextbox]: Object.values(response)[x]});
-                        z++;
-                    } else if (self.profile_selection_temp()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_temp()) && restrictedSettingsProfile[z] === "novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection_temp();
-                        z++;
+            if (self.profile_selection_temp() !== "") {
+                for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                    if (restrictedSettingsProfile[x] !== "novalue") {
+                        saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_temp();
+                        saveSettingsTemp = restrictedSettingsProfile[x] + "_temp";
+                        saveSettingsProfileTemp = pluginSettings[saveSettingsProfile]()
+                        document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileTemp; // loading setting
+                        mainViewModel.saveSettingsTab((saveSettingsTemp), saveSettingsProfileTemp)
                     }
                 }
-            });
+            } else {
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
+            }
         }
 
         let GStatus, layerStatus, EStatus;
@@ -206,7 +206,7 @@ $(function() {
         let printing_speed, l, start_gcode, end_gcode;
         document.getElementById("temp-tower").onclick = function () {
             if (t === 0) {
-                mainViewModel.noStageMessage()
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.noStageMessage)
                 return;
             }
             let array = [];
@@ -214,7 +214,7 @@ $(function() {
             for (let x=0; x<el.length; x++) {
                 array[x] = el[x].attributes[0].nodeValue;
                 if (array[x].includes("error")) {
-                    mainViewModel.errorMessage()
+                    self.PNotify = new PNotify(mainViewModel.PNotifyData.errorMessage)
                     return
                 }
             }

@@ -121,6 +121,22 @@
                         </div>
                     </div>
                 </form>
+                <a href="javascript:void(0)" class="muted" onclick="$(this).children().toggleClass('fa-caret-right fa-caret-down').parent().next().slideToggle('fast')">
+                    <i class="fas fa-caret-right"></i>Advanced options</a>
+                <div style="display: none">
+                    <br>
+                    <div class="control-group">
+                        <label class="control-label" for="autoPrint"><strong>Auto print</strong></label>
+                        <div class="controls">
+                            <div class="input-append" onmouseover="$('#aboutAutoPrint').tooltip('show')" onmouseleave="$('#aboutAutoPrint').tooltip('hide')">
+                                <a id="aboutAutoPrint" href="#" data-toggle="tooltip" data-placement="right" title="Print automagically after gcode generation">
+                                    <input type="checkbox" id="autoPrint" data-bind="checked: auto_print">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <br><br>
+                </div>
             </div>
 
             <!--Profiles Tab-->
@@ -189,7 +205,7 @@
                     <div class="control-group">
                         <label class="control-label" for="fan-layer-profile"><strong>At layer</strong></label>
                         <div class="controls">
-                            <div class="input-append">
+                            <div>
                                 <input type="text" class="midsizeTextbox" id="fan-layer-profile">
                             </div>
                         </div>
@@ -306,10 +322,11 @@
                         <span class="add-on">°C</span>
                     </div>
                     <label class="control-label" for="bedPidTemp"><strong>Bed temperature</strong></label>
-                    <div class="input-append">
-                        <input type="text" class="midsizeTextbox" id="bedPidTemp" data-bind="value: bed_pid_temp">
+                    <div class="input-append" onmouseover="$('#aboutBedPid').tooltip('show')" onmouseleave="$('#aboutBedPid').tooltip('hide')">
+                        <a id="aboutBedPid" href="#" data-toggle="tooltip" data-placement="bottom" title="leave empty if not enabled">
+                            <input type="text" class="midsizeTextbox" id="bedPidTemp" data-bind="value: bed_pid_temp">
+                        </a>
                         <span class="add-on">°C</span>
-                        <a id="aboutBedPid" href="#" data-toggle="tooltip" data-placement="bottom" title="leave empty if not enabled"></a>
                     </div>
                     <label class="control-label" for="cyclesAmount"><strong>Cycles</strong></label>
                     <input type="text" class="midsizeTextbox" id="cyclesAmount" data-bind="value: cycles_amount">
@@ -510,7 +527,6 @@
                 <form class="form-horizontal" id="print-squares-button">
                     <span id="regular-form-title"><h4><b>Print</b></h4></span><br>
                     <div class="control-group">
-                        <label class="control-label" for="calibration-square"><strong>Print Squares</strong></label>
                         <div class="controls">
                             <button id="calibration-square" class="btn btn-primary">Print squares</button>
                         </div>
@@ -729,7 +745,6 @@
                 <form class="form-horizontal">
                     <span id="regular-form-title"><h4><b>Print</b></h4></span><br>
                     <div class="control-group">
-                        <label class="control-label" for="flow-cube"><strong>Print flow cube</strong></label>
                         <div class="controls">
                             <button id="flow-cube" class="btn btn-primary">Print flow cube</button>
                         </div>
@@ -907,7 +922,6 @@
                 <form class="form-horizontal">
                     <span id="regular-form-title"><h4><b>Print</b></h4></span><br>
                     <div class="control-group">
-                        <label class="control-label" for="retraction-tower"><strong>Print retraction tower</strong></label>
                         <div class="controls">
                             <button id="retraction-tower" class="btn btn-primary">Print retraction tower</button>
                         </div>
@@ -1088,7 +1102,6 @@
                 <form class="form-horizontal">
                     <span id="regular-form-title"><h4><b>Print</b></h4></span><br>
                     <div class="control-group">
-                        <label class="control-label" for="retraction-tower"><strong>Print temperature tower</strong></label>
                         <div class="controls">
                             <button class="btn btn-primary" id="temp-tower">Print temperature tower</button>
                         </div>
@@ -1283,7 +1296,6 @@
                 <form class="form-horizontal">
                     <span id="regular-form-title"><h4><b>Print</b></h4></span><br>
                     <div class="control-group">
-                        <label class="control-label" for="accel-tower"><strong>Print acceleration tower</strong></label>
                         <div class="controls">
                             <button class="btn btn-primary" id="accel-tower">Print acceleration tower</button>
                         </div>

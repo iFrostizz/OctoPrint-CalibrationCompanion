@@ -11,6 +11,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 						   octoprint.plugin.AssetPlugin,
 						   octoprint.plugin.TemplatePlugin,
 						   octoprint.plugin.StartupPlugin,
+						   octoprint.plugin.EventHandlerPlugin,
 						   octoprint.plugin.BlueprintPlugin):
 
 	##~~ SettingsPlugin mixin
@@ -18,6 +19,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 	def __init__(self):
 		self.origin_check = False
 		self.relative_positioning = False
+		self.auto_print = False
 		self.iteration = 0
 
 	def get_settings_defaults(self):
@@ -38,6 +40,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			movement_speed="",
 			first_layer_speed="",
 			printing_speed="",
+			auto_print=False,
 
 			profile_selection="",
 			profile_selection_square="",
@@ -201,15 +204,21 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			self.iteration += 1
 			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})"""
 
+	def on_event(self, event, payload):
+		if self._settings.get_boolean(["auto_print"]):
+			if event == "FileAdded":
+				if payload['name'] == self.filename + ".gcode":
+					self._printer.select_file(self.filename + ".gcode", sd=False, printAfterSelect=True)
 
 	@octoprint.plugin.BlueprintPlugin.route("/downloadFile", methods=["POST"])
 	def myEcho(self):
 		#self._logger.info("Here is the output {}".format(flask.request.values))
 		gcode = flask.request.values["generated gcode"]
-		filename = flask.request.values["name"]
-		test_file = open(self._settings.global_get_basefolder("watched") + "/" + filename + ".gcode", "w")
-		test_file.write(gcode)
-		test_file.close()
+		self.filename = flask.request.values["name"]
+		file = open(self._settings.global_get_basefolder("watched") + "/" + self.filename + ".gcode", "w")
+		file.write(gcode)
+		file.close()
+		#self._printer.select_file(self._settings.global_get_basefolder("watched") + "/" + filename + ".gcode", sd=False, printAfterSelect=True)
 		return gcode
 
 	def bodysize_hook(self, current_max_body_sizes, *args, **kwargs):

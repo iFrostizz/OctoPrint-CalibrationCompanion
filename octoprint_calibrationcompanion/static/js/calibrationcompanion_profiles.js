@@ -56,49 +56,52 @@ $(function() {
 
         let mainViewModel = self.calibrationcompanionViewModel;
 
+        let pluginSettings;
+
         self.onBeforeBinding = function () {
-            self.profile_selection(self.settingsViewModel.settings.plugins.calibrationcompanion.profile_selection());
-            self.first_layer_nozzle_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_nozzle_profile1());
-            self.regular_nozzle_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_nozzle_profile1());
-            self.regular_bed_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_bed_profile1());
-            self.fan_speed_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_speed_profile1());
-            self.fan_layer_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_layer_profile1());
-            self.regular_speed_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_speed_profile1());
-            self.travel_speed_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.travel_speed_profile1());
-            self.retraction_dist_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_dist_profile1());
-            self.retraction_speed_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_speed_profile1());
-            self.flow_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.flow_profile1());
-            self.abl_method_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.abl_method_profile1());
-            self.start_gcode_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.start_gcode_profile1());
-            self.end_gcode_profile1(self.settingsViewModel.settings.plugins.calibrationcompanion.end_gcode_profile1());
+            pluginSettings = self.settingsViewModel.settings.plugins.calibrationcompanion;
+            self.profile_selection(pluginSettings.profile_selection());
+            self.first_layer_nozzle_profile1(pluginSettings.first_layer_nozzle_profile1());
+            self.regular_nozzle_profile1(pluginSettings.regular_nozzle_profile1());
+            self.regular_bed_profile1(pluginSettings.regular_bed_profile1());
+            self.fan_speed_profile1(pluginSettings.fan_speed_profile1());
+            self.fan_layer_profile1(pluginSettings.fan_layer_profile1());
+            self.regular_speed_profile1(pluginSettings.regular_speed_profile1());
+            self.travel_speed_profile1(pluginSettings.travel_speed_profile1());
+            self.retraction_dist_profile1(pluginSettings.retraction_dist_profile1());
+            self.retraction_speed_profile1(pluginSettings.retraction_speed_profile1());
+            self.flow_profile1(pluginSettings.flow_profile1());
+            self.abl_method_profile1(pluginSettings.abl_method_profile1());
+            self.start_gcode_profile1(pluginSettings.start_gcode_profile1());
+            self.end_gcode_profile1(pluginSettings.end_gcode_profile1());
 
-            self.first_layer_nozzle_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_nozzle_profile2());
-            self.regular_nozzle_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_nozzle_profile2());
-            self.regular_bed_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_bed_profile2());
-            self.fan_speed_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_speed_profile2());
-            self.fan_layer_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_layer_profile2());
-            self.regular_speed_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_speed_profile2());
-            self.travel_speed_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.travel_speed_profile2());
-            self.retraction_dist_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_dist_profile2());
-            self.retraction_speed_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_speed_profile2());
-            self.flow_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.flow_profile2());
-            self.abl_method_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.abl_method_profile2());
-            self.start_gcode_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.start_gcode_profile2());
-            self.end_gcode_profile2(self.settingsViewModel.settings.plugins.calibrationcompanion.end_gcode_profile2());
+            self.first_layer_nozzle_profile2(pluginSettings.first_layer_nozzle_profile2());
+            self.regular_nozzle_profile2(pluginSettings.regular_nozzle_profile2());
+            self.regular_bed_profile2(pluginSettings.regular_bed_profile2());
+            self.fan_speed_profile2(pluginSettings.fan_speed_profile2());
+            self.fan_layer_profile2(pluginSettings.fan_layer_profile2());
+            self.regular_speed_profile2(pluginSettings.regular_speed_profile2());
+            self.travel_speed_profile2(pluginSettings.travel_speed_profile2());
+            self.retraction_dist_profile2(pluginSettings.retraction_dist_profile2());
+            self.retraction_speed_profile2(pluginSettings.retraction_speed_profile2());
+            self.flow_profile2(pluginSettings.flow_profile2());
+            self.abl_method_profile2(pluginSettings.abl_method_profile2());
+            self.start_gcode_profile2(pluginSettings.start_gcode_profile2());
+            self.end_gcode_profile2(pluginSettings.end_gcode_profile2());
 
-            self.first_layer_nozzle_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_nozzle_profile3());
-            self.regular_nozzle_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_nozzle_profile3());
-            self.regular_bed_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_bed_profile3());
-            self.fan_speed_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_speed_profile3());
-            self.fan_layer_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_layer_profile3());
-            self.regular_speed_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_speed_profile3());
-            self.travel_speed_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.travel_speed_profile3());
-            self.retraction_dist_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_dist_profile3());
-            self.retraction_speed_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.retraction_speed_profile3());
-            self.flow_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.flow_profile3());
-            self.abl_method_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.abl_method_profile3());
-            self.start_gcode_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.start_gcode_profile3());
-            self.end_gcode_profile3(self.settingsViewModel.settings.plugins.calibrationcompanion.end_gcode_profile3());
+            self.first_layer_nozzle_profile3(pluginSettings.first_layer_nozzle_profile3());
+            self.regular_nozzle_profile3(pluginSettings.regular_nozzle_profile3());
+            self.regular_bed_profile3(pluginSettings.regular_bed_profile3());
+            self.fan_speed_profile3(pluginSettings.fan_speed_profile3());
+            self.fan_layer_profile3(pluginSettings.fan_layer_profile3());
+            self.regular_speed_profile3(pluginSettings.regular_speed_profile3());
+            self.travel_speed_profile3(pluginSettings.travel_speed_profile3());
+            self.retraction_dist_profile3(pluginSettings.retraction_dist_profile3());
+            self.retraction_speed_profile3(pluginSettings.retraction_speed_profile3());
+            self.flow_profile3(pluginSettings.flow_profile3());
+            self.abl_method_profile3(pluginSettings.abl_method_profile3());
+            self.start_gcode_profile3(pluginSettings.start_gcode_profile3());
+            self.end_gcode_profile3(pluginSettings.end_gcode_profile3());
         }
 
         let restrictedInputsProfile = ["abl-method-profile", "end-gcode-profile", "fan-layer-profile", "fan-speed-profile", "first-layer-nozzle-profile",
@@ -114,61 +117,55 @@ $(function() {
         let restrictedInputsProfileComma = ["retraction-dist-profile", "retraction-speed-profile", "flow-profile"];
 
         document.getElementById("load-profile").onclick = function () {
-            let div;
-            OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                let z = 0;
-                for (let x = 0; x < Object.keys(response).length; x++) {
-                    if (self.profile_selection() !== "" && restrictedSettingsProfile[z] !== undefined && Object.keys(response)[x].includes(self.profile_selection())) {
-                        saveSettingsProfile = restrictedInputsProfile[z] + "_" + self.profile_selection();
-                        document.getElementById(restrictedInputsProfile[z]).value = Object.values(response)[x];
-                        z++
+            if (self.profile_selection() !== "") {
+                for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                    saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
+                    if (pluginSettings[saveSettingsProfile]() !== undefined) {
+                        document.getElementById(restrictedInputsProfile[x]).value = pluginSettings[saveSettingsProfile]();
+                    }
+                    let element = document.getElementById(restrictedInputsProfile[x])
+                    let div = element.parentNode.parentNode.parentNode;
+                    if (restrictedInputsProfileClassic.includes(element.id)) {
+                        mainViewModel.checkValue(element, div, mainViewModel.allowedArrayClassic);
+                    } else if (restrictedInputsProfileComma.includes(element.id)) {
+                        mainViewModel.checkValue(element, div, mainViewModel.allowedArrayComma);
                     }
                 }
-            }).then(function () {
-                for (let x = 0; x < restrictedInputsProfile.length; x++) {
-                    div = document.getElementById(restrictedInputsProfile[x])
-                    let element = div.parentNode.parentNode.parentNode;
-                    if (restrictedInputsProfileClassic.includes(div.id)) {
-                        mainViewModel.checkValue(div, element, mainViewModel.allowedArrayClassic);
-                    } else if (restrictedInputsProfileComma.includes(div.id)) {
-                        mainViewModel.checkValue(div, element, mainViewModel.allowedArrayComma);
-                    }
-                }
-            });
-
+            } else {
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
+            }
         }
 
         document.getElementById("save-profile").onclick = function () {
             let el = document.getElementById("profiles-calibrationcompanion").getElementsByClassName("control-group");
             let array = [];
-            let boolEror = false
+            let boolError = false;
             for (let x = 0; x < el.length; x++) {
                 array[x] = el[x].attributes[0].nodeValue;
                 if (array[x].includes("error")) {
-                    boolEror = true
+                    boolError = true;
                 }
             }
-            if (!boolEror) {
-                OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                    let z = 0;
-                    for (let x = 0; x < Object.keys(response).length; x++) {
-                        if (self.profile_selection() !== "" && restrictedSettingsProfile[z] !== undefined && Object.keys(response)[x].includes(self.profile_selection())) {
-                            saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection();
-                            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
-                                [saveSettingsProfile]: document.getElementById(restrictedInputsProfile[z]).value
-                            })
-                            z++;
-                        }
+            if (!boolError) {
+                if (self.profile_selection() !== "") {
+                    for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                        saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
+                        pluginSettings[saveSettingsProfile](document.getElementById(restrictedInputsProfile[x]).value);
                     }
-                });
+                } else {
+                    self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
+                }
             } else {
-                mainViewModel.errorMessage()
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.errorMessage)
             }
         }
 
         document.getElementById("reset-profile").onclick = function() {
             for (let x=0; x < restrictedInputsProfile.length; x++) {
-                document.getElementById(restrictedInputsProfile[x]).value = "";
+                let element = document.getElementById(restrictedInputsProfile[x])
+                let div = element.parentNode.parentNode.parentNode;
+                element.value = "";
+                mainViewModel.removeWarning(div);
             }
         }
     }

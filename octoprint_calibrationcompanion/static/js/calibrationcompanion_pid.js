@@ -19,14 +19,6 @@ $(function() {
             self.cycles_amount(self.settingsViewModel.settings.plugins.calibrationcompanion.cycles_amount());
         }
 
-        document.getElementById("bedPidTemp").onmouseover = function() {
-            $('#aboutBedPid').tooltip('show');
-        }
-
-        document.getElementById("bedPidTemp").onmouseleave = function() {
-            $('#aboutBedPid').tooltip('hide');
-        }
-
         self.pid_autotune_routine = function() {
             if (self.nozzle_pid_temp().split(" ").join("").length !== 0 || self.bed_pid_temp().split(" ").join("").length !== 0 && self.cycles_amount().split(" ").join("").length !== 0) {
                 //setProgressBarPercentage(0);
@@ -53,7 +45,7 @@ $(function() {
                 },
             });
         }
-        
+
         self.onDataUpdaterPluginMessage = function(plugin, message) {
             if (plugin !== "calibrationcompanion" || typeof message.cycleIteration !== "number"){
                 return

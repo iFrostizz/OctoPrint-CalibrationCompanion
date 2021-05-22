@@ -21,8 +21,10 @@ $(function () {
         self.abl_method_temp = ko.observable();
         self.nozzle_size = ko.observable();
         self.filament_diameter = ko.observable();
+        self.auto_print = ko.observable();
 
         self.variable = {};
+        self.PNotifyData = {};
 
         let restrictedIdClassic = ["#bedSizeX", "#bedSizeY", "#bedSizeZ"];
         self.allowedArrayClassic = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -39,8 +41,8 @@ $(function () {
         let restrictedNoVerifInputs = ["null", "#filamentUsed", "null", "null", "null", "null", "#nozzleSize"]
         let saveInputs = ["printer_name", "filament_used", "filament_diameter", "bed_size_x", "bed_size_y", "bed_size_z", "nozzle_size"];
 
-        let restrictedCheckbox = ["#relativePositioning", "#originCheck"];
-        let saveCheckbox = ["relative_positioning", "origin_check"];
+        let restrictedCheckbox = ["#relativePositioning", "#originCheck", "#autoPrint"];
+        let saveCheckbox = ["relative_positioning", "origin_check", "auto_print"];
 
         self.appendedArrayComma = [];
 
@@ -54,12 +56,13 @@ $(function () {
             self.relative_positioning(self.settingsViewModel.settings.plugins.calibrationcompanion.relative_positioning());
             self.nozzle_size(self.settingsViewModel.settings.plugins.calibrationcompanion.nozzle_size());
             self.filament_diameter(self.settingsViewModel.settings.plugins.calibrationcompanion.filament_diameter());
+            self.auto_print(self.settingsViewModel.settings.plugins.calibrationcompanion.auto_print());
         }
 
         self.onAfterBinding = function() {
-            $(restrictedNoVerifInputs.join(",")).each(function () {
+            /*$(restrictedNoVerifInputs.join(",")).each(function () {
                 saveSettingsSetup(this);
-            });
+            });*/
             $(restrictedIdClassic.join(",")).each(function() {
                 self.checkValue(this, this.parentNode.parentNode.parentNode, self.allowedArrayClassic);
             });
@@ -69,14 +72,13 @@ $(function () {
             $(restrictedIdText.join(",")).each(function() {
                 self.checkValue(this, this.parentNode.parentNode, self.allowedArrayText);
             });
-            $(restrictedCheckbox.join(",")).each(function() {
+            /*$(restrictedCheckbox.join(",")).each(function() {
                 saveSettingsSetupCheckbox(this);
-            });
-            self.flow = 100;
+            });*/
         }
 
-        self.zHeightWarning = function() {
-            self.notify = new PNotify({
+        self.PNotifyData = {
+            zHeightWarning: {
                 title: 'Calibration Companion',
                 text: 'Maximum height was reached, please check your Printer Height Z',
                 type: 'alert',
@@ -85,7 +87,37 @@ $(function () {
                     closer: true,
                     sticker: false
                 },
-            });
+            },
+            noStageMessage: {
+                title: 'Calibration Companion',
+                text: 'Please add at least one stage first!',
+                type: 'alert',
+                hide: true,
+                buttons: {
+                    closer: true,
+                    sticker: false
+                },
+            },
+            errorMessage: {
+                title: 'Calibration Companion',
+                text: 'It seems like some parameters are off.',
+                type: 'alert',
+                hide: true,
+                buttons: {
+                    closer: true,
+                    sticker: false
+                },
+            },
+            noProfileMessage: {
+                title: 'Calibration Companion',
+                text: 'Please choose one profile',
+                type: 'alert',
+                hide: true,
+                buttons: {
+                    closer: true,
+                    sticker: false
+                },
+            },
         }
 
         let readyState;
@@ -115,7 +147,6 @@ $(function () {
             let id = element.id;
             let value = element.value;
             let booleanArray = [];
-            //console.log(id + " " + value)
             value.split('').forEach(elementLoop => booleanArray.push(array.includes(elementLoop)));
             let finalBoolean = !booleanArray.some((elementLoop) => elementLoop === false)
             if (finalBoolean) {
@@ -125,62 +156,69 @@ $(function () {
                     self.removeWarning(div);
                 } else if (id === "bedSizeX" || id === "bedSizeY") {
                     if (value < 100) {
-                        self.checkWarning(div);
+                        self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
                 } else if (id === "bedSizeZ") {
                     if (value < 50) {
-                        self.checkWarning(div);
+                        self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
-                } else if (id.includes("inputListRetraSpeed")) {
+                } else if (id.includes("inputListRetraSpeed") || id.includes("regular-bed-") || id.includes("fan-speed-") ||
+                    id.includes("first-layer-speed-") || id.includes("retraction-speed-")) {
                     if (value > 100) {
-                        self.checkWarning(div);
+                        self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
-                } else if (id.includes("inputListRetraDist")) {
+                } else if (id.includes("inputListRetraDist") || id.includes("retraction-dist-")) {
                     if (value > 10) {
-                        self.checkWarning(div);
+                        self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
                 } else if (id.includes("inputListTemp") || id.includes("first-layer-nozzle-") || id.includes("regular-nozzle-")) {
                     if (value < 180 || value > 280) {
-                        self.checkWarning(div);
+                        self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
-                } else if (id.includes("regular-bed-")) {
-                    if (value > 100) {
-                        self.checkWarning(div);
+                } else if (id.includes("regular-speed-") || id.includes("travel-speed-")) {
+                    if (value > 150) {
+                        self.addWarning(div);
+                    } else {
+                        self.removeWarning(div);
+                    }
+                } else if (id.includes("travel-speed-")) {
+                    if (value > 200) {
+                        self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
                 }
                 else if (id.includes("inputListAcceleration")) {
                     if (value > 3000) {
-                        self.checkWarning(div);
+                        self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
                 } else if (id.includes("inputListJerk")) {
                     if (value > 30) {
-                        self.checkWarning(div);
+                        self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
                 } else if (id.includes("inputListJunction")) {
                     if (value > 1) {
-                        self.checkWarning(div);
+                        self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
                 } else if (id.includes("flow-")) {
                     if (value > 120 || value < 80) {
-                        self.checkWarning(div);
+                        self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
@@ -190,7 +228,7 @@ $(function () {
             }
         }
 
-        self.checkWarning = function(div) {
+        self.addWarning = function(div) {
             div.className = "control-group warning";
         }
         self.removeWarning = function(div) {
@@ -210,7 +248,6 @@ $(function () {
         $(document).on("input", function(e) {
             let id = e.target.id;
             let element = e.target;
-            //console.log(id.substr(0, id.lastIndexOf("-")+1))
             if (allowedArrayClassicInput.includes(id.substr(0, id.lastIndexOf("-")+1))) {
                 self.checkValue(element, element.parentNode.parentNode.parentNode, self.allowedArrayClassic);
             } else if (allowedArrayCommaInput.includes(id.substr(0, id.lastIndexOf("-")+1))) {
@@ -240,6 +277,12 @@ $(function () {
             self.variable[saveSettings] = element.value;
             OctoPrint.settings.savePluginSettings('calibrationcompanion', {
                 [saveSettings]: element.value})
+        }
+
+        self.saveSettingsTab = function(settingName, value) {
+            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
+                [settingName]: value
+            })
         }
 
         $(restrictedCheckbox.join(",")).on("click", function() {
@@ -281,32 +324,6 @@ $(function () {
 
         self.getFullFilename = function(filename) {
             return self.variable.printer_name + "_" + self.variable.filament_used + "_" + self.variable.nozzle_size + "_" + filename;
-        }
-
-        self.noStageMessage = function() {
-            self.notify = new PNotify({
-                title: 'Calibration Companion',
-                text: 'Please add at least one stage first!',
-                type: 'alert',
-                hide: true,
-                buttons: {
-                    closer: true,
-                    sticker: false
-                },
-            });
-        }
-
-        self.errorMessage = function() {
-            self.notify = new PNotify({
-                title: 'Calibration Companion',
-                text: 'It seems like some parameters are off.',
-                type: 'alert',
-                hide: true,
-                buttons: {
-                    closer: true,
-                    sticker: false
-                },
-            });
         }
 
         let procedureStarted = false

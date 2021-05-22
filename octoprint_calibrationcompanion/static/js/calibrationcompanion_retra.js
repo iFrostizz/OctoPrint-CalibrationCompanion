@@ -48,20 +48,23 @@ $(function() {
         let r = 0;
         let oldR = -1;
 
+        let pluginSettings;
+
         self.onBeforeBinding = function () {
-            self.profile_selection_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.profile_selection_retra());
-            self.first_layer_nozzle_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_nozzle_retra());
-            self.regular_nozzle_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_nozzle_retra());
-            self.regular_bed_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_bed_retra());
-            self.fan_speed_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_speed_retra());
-            self.fan_layer_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.fan_layer_retra());
-            self.first_layer_speed_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.first_layer_speed_retra());
-            self.regular_speed_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.regular_speed_retra());
-            self.travel_speed_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.travel_speed_retra());
-            self.flow_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.flow_retra());
-            self.abl_method_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.abl_method_retra());
-            self.start_gcode_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.start_gcode_retra());
-            self.end_gcode_retra(self.settingsViewModel.settings.plugins.calibrationcompanion.end_gcode_retra());
+            pluginSettings = self.settingsViewModel.settings.plugins.calibrationcompanion;
+            self.profile_selection_retra(pluginSettings.profile_selection_retra());
+            self.first_layer_nozzle_retra(pluginSettings.first_layer_nozzle_retra());
+            self.regular_nozzle_retra(pluginSettings.regular_nozzle_retra());
+            self.regular_bed_retra(pluginSettings.regular_bed_retra());
+            self.fan_speed_retra(pluginSettings.fan_speed_retra());
+            self.fan_layer_retra(pluginSettings.fan_layer_retra());
+            self.first_layer_speed_retra(pluginSettings.first_layer_speed_retra());
+            self.regular_speed_retra(pluginSettings.regular_speed_retra());
+            self.travel_speed_retra(pluginSettings.travel_speed_retra());
+            self.flow_retra(pluginSettings.flow_retra());
+            self.abl_method_retra(pluginSettings.abl_method_retra());
+            self.start_gcode_retra(pluginSettings.start_gcode_retra());
+            self.end_gcode_retra(pluginSettings.end_gcode_retra());
         }
 
         self.onAfterBinding = function () {
@@ -110,7 +113,7 @@ $(function() {
                 spanControl1[r].className = "controls";
 
                 spanControlGroup1[r].appendChild(spanControl1[r])
-                
+
                 spanInputAppend1[r] = document.createElement("span");
                 spanInputAppend1[r].className = "input-append";
 
@@ -191,7 +194,7 @@ $(function() {
                     myBase[r].parentNode.insertBefore(baseImage, myBase[r].nextSibling);
                 }
             } else {
-                mainViewModel.zHeightWarning();
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.zHeightWarning)
             }
         }
         self.removeRetraction = function () {
@@ -227,37 +230,34 @@ $(function() {
             "#first-layer-speed-retra", "#regular-speed-retra", "#travel-speed-retra", "#flow-retra", "#abl-method-retra", "#start-gcode-retra"];
         let saveInputsRetra = ["first_layer_nozzle_retra", "regular_nozzle_retra", "regular_bed_retra", "fan_speed_retra", "fan_layer_retra",
             "first_layer_speed_retra", "regular_speed_retra", "travel_speed_retra", "flow_retra", "abl_method_retra", "start_gcode_retra"];
-
-        $(restrictedInputsRetra.join(",")).on("input", function() {
-            let saveSettingsRetra = saveInputsRetra[restrictedInputsRetra.indexOf('#' + this.id)]
-            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
-                [saveSettingsRetra]: this.value})
-        });
-
         let restrictedInputsProfile = ["abl-method-retra", "end-gcode-retra", "fan-layer-retra", "fan-speed-retra", "first-layer-nozzle-retra",
             "first-layer-speed-retra", "flow-retra", "regular-bed-retra", "regular-nozzle-retra", "regular-speed-retra", "novalue",
             "novalue", "start-gcode-retra", "travel-speed-retra"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "flow", "regular_bed", "regular_nozzle", "regular_speed", "novalue",
             "novalue", "start_gcode", "travel_speed"];
-        let saveSettingsProfile, saveSettingsTextbox;
+        let saveSettingsProfile, saveSettingsRetra, saveSettingsProfileRetra;
+
+        $(restrictedInputsRetra.join(",")).on("input", function() {
+            saveSettingsRetra = saveInputsRetra[restrictedInputsRetra.indexOf('#' + this.id)]
+            saveSettingsProfileRetra = this.value;
+            mainViewModel.saveSettingsTab((saveSettingsRetra), saveSettingsProfileRetra)
+        });
 
         document.getElementById("load-profile-retra").onclick = function() {
-            OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                let z = 0;
-                for (let x=0; x< Object.keys(response).length; x++) {
-                    if (self.profile_selection_retra()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_retra()) && restrictedSettingsProfile[z]!=="novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection_retra();
-                        saveSettingsTextbox = restrictedSettingsProfile[z] + "_retra";
-                        document.getElementById(restrictedInputsProfile[z]).value = Object.values(response)[x];
-                        OctoPrint.settings.savePluginSettings('calibrationcompanion', {[saveSettingsTextbox]: Object.values(response)[x]});
-                        z++;
-                    } else if (self.profile_selection_retra()!=="" && restrictedSettingsProfile[z]!==undefined && Object.keys(response)[x].includes(self.profile_selection_retra()) && restrictedSettingsProfile[z] === "novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[z] + "_" + self.profile_selection_retra();
-                        z++;
+            if (self.profile_selection_retra() !== "") {
+                for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                    if (restrictedSettingsProfile[x] !== "novalue") {
+                        saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_retra();
+                        saveSettingsRetra = restrictedSettingsProfile[x] + "_retra";
+                        saveSettingsProfileRetra = pluginSettings[saveSettingsProfile]()
+                        document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileRetra; // loading setting
+                        mainViewModel.saveSettingsTab((saveSettingsRetra), saveSettingsProfileRetra)
                     }
                 }
-            });
+            } else {
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
+            }
         }
 
         let GStatus, layerStatus, EStatus;
@@ -277,7 +277,7 @@ $(function() {
         let printing_speed, l, start_gcode, end_gcode;
         document.getElementById("retraction-tower").onclick = function () {
             if (r === 0) {
-                mainViewModel.noStageMessage()
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.noStageMessage)
                 return;
             }
             let array = [];
@@ -285,7 +285,7 @@ $(function() {
             for (let x=0; x<el.length; x++) {
                 array[x] = el[x].attributes[0].nodeValue;
                 if (array[x].includes("error")) {
-                    mainViewModel.errorMessage()
+                    self.PNotify = new PNotify(mainViewModel.PNotifyData.errorMessage)
                     return
                 }
             }
