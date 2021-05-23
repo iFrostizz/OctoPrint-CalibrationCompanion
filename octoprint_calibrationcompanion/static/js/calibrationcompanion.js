@@ -266,10 +266,14 @@ $(function () {
         });
 
         let bed_size_verif = ["#bedSizeX, #bedSizeY"];
-        $(bed_size_verif.join(",")).on("input", function() {
+        /*$(bed_size_verif.join(",")).on("input", function() {
             $(restrictedCheckbox.join(",")).each(function() {
                 saveSettingsSetupCheckbox(this);
             });
+        })*/
+
+        $(restrictedCheckbox.join(",")).on("input", function() {
+            saveSettingsSetupCheckbox(this);
         })
 
         function saveSettingsSetup(element) {
@@ -278,24 +282,22 @@ $(function () {
             self.saveSettingsTab(saveSettings, element.value);
         }
 
-        async function saveSettingsSetupCheckbox(element) {
+        function saveSettingsSetupCheckbox(element) {
             let saveSettingsCheckbox = saveCheckbox[restrictedCheckbox.indexOf('#' + element.id)];
             OctoPrint.settings.savePluginSettings('calibrationcompanion', {
                 [saveSettingsCheckbox]: element.checked
             })
             self.variable[saveSettingsCheckbox] = element.checked;
             self.saveSettingsTab(saveSettingsCheckbox, element.checked)
-            await function () {
-                if (saveSettingsCheckbox === "origin_check") {
-                    if (element.checked) {
-                        document.getElementById("bedSizeY").disabled = true;
-                        self.bed_center_x = 0;
-                        self.bed_center_y = 0;
-                    } else {
-                        document.getElementById("bedSizeY").disabled = false;
-                        self.bed_center_x = Math.round(self.variable.bed_size_x / 2);
-                        self.bed_center_y = Math.round(self.variable.bed_size_y / 2);
-                    }
+            if (saveSettingsCheckbox === "origin_check") {
+                if (element.checked) {
+                    document.getElementById("bedSizeY").disabled = true;
+                    self.bed_center_x = 0;
+                    self.bed_center_y = 0;
+                } else {
+                    document.getElementById("bedSizeY").disabled = false;
+                    self.bed_center_x = Math.round(self.variable.bed_size_x / 2);
+                    self.bed_center_y = Math.round(self.variable.bed_size_y / 2);
                 }
             }
         }

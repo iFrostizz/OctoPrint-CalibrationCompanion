@@ -243,6 +243,7 @@ $(function() {
                 mainViewModel.first_z_pos = String((mainViewModel.variable.nozzle_size/2)*l);
                 first_x_absolute_pos = mainViewModel.first_x_pos;
                 first_y_absolute_pos = mainViewModel.first_y_pos;
+                console.log(first_x_absolute_pos + " " + first_y_absolute_pos)
                 startZHeight[s] = parseFloat(mainViewModel.zLastAbsolute) + parseFloat(mainViewModel.variable.nozzle_size)/2
                 startFeedRate[s] = mainViewModel.feed_rate
                 tempTowerCoord(parseFloat(mainViewModel.variable.nozzle_size));
