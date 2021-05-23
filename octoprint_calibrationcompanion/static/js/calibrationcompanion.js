@@ -308,6 +308,12 @@ $(function () {
             }).done(self.stopLoading())
         }
 
+        self.saveSettingsNoLoading = function(settingName, value) {
+            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
+                [settingName]: value
+            })
+        }
+
         self.startLoading = function() {
             spinner.style.visibility = "visible";
         }

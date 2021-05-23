@@ -253,7 +253,7 @@ $(function() {
                         saveSettingsRetra = restrictedSettingsProfile[x] + "_retra";
                         saveSettingsProfileRetra = pluginSettings[saveSettingsProfile]()
                         document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileRetra; // loading setting
-                        mainViewModel.saveSettingsTab((saveSettingsRetra), saveSettingsProfileRetra)
+                        mainViewModel.saveSettingsNoLoading((saveSettingsRetra), saveSettingsProfileRetra)
                     }
                 }
                 mainViewModel.stopLoading();
@@ -486,7 +486,7 @@ $(function() {
             gcode_generated.unshift("G28;\n\n" +
                 ";---------ABL METHOD---------\n" + mainViewModel.abl_method + ";\n;---------ABL METHOD---------\n\n" +
                 ";---------START G-CODE---------\n" + start_gcode + ";\n;---------START G-CODE---------\n\n" +
-                "G0 F" + mainViewModel.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
+                "G90 E0;\nG0 F" + mainViewModel.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
                 ";\n" + "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + ";\n")
 
             for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {

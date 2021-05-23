@@ -323,9 +323,8 @@
                     </div>
                     <label class="control-label" for="bedPidTemp"><strong>Bed temperature</strong></label>
                     <div class="input-append" onmouseover="$('#aboutBedPid').tooltip('show')" onmouseleave="$('#aboutBedPid').tooltip('hide')">
-                        <a id="aboutBedPid" href="#" data-toggle="tooltip" data-placement="bottom" title="leave empty if not enabled">
-                            <input type="text" class="midsizeTextbox" id="bedPidTemp" data-bind="value: bed_pid_temp">
-                        </a>
+                        <input type="text" class="midsizeTextbox" id="bedPidTemp" data-bind="value: bed_pid_temp">
+                        <a id="aboutBedPid" href="#" data-toggle="tooltip" data-placement="bottom" title="leave empty if not enabled" style="position: relative; top: 10px; right: 25px;"></a>
                         <span class="add-on">°C</span>
                     </div>
                     <label class="control-label" for="cyclesAmount"><strong>Cycles</strong></label>

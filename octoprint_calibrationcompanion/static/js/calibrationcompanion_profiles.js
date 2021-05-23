@@ -117,7 +117,6 @@ $(function() {
 
         document.getElementById("load-profile").onclick = function () {
             if (self.profile_selection() !== "") {
-                mainViewModel.startLoading();
                 for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                     saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
                     if (pluginSettings[saveSettingsProfile]() !== undefined) {
@@ -131,34 +130,90 @@ $(function() {
                         mainViewModel.checkValue(element, div, mainViewModel.allowedArrayComma);
                     }
                 }
-                mainViewModel.stopLoading();
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }
         }
 
         document.getElementById("save-profile").onclick = function () {
-            let el = document.getElementById("profiles-calibrationcompanion").getElementsByClassName("control-group");
+            saveSettingsFromProfile();
+            /*let el = document.getElementById("profiles-calibrationcompanion").getElementsByClassName("control-group");
             let array = [];
+            let value = [];
             let boolError = false;
-            for (let x = 0; x < el.length; x++) {
+            let whiteSpaceError = false;
+            for (let x = 1; x < el.length; x++) {
                 array[x] = el[x].attributes[0].nodeValue;
+                value[x] = el[x].children[1].children[0].children[0].value;
+                console.log(value[x] + " " + value[x].length + " " + typeof value[x].length)
                 if (array[x].includes("error")) {
                     boolError = true;
+                } else if (value[x].length === 0 || value[x].indexOf(' ') >= 0) {
+                    whiteSpaceError = true;
+                }
+            }
+            console.log(boolError + " " + whiteSpaceError)
+            if (!boolError) {
+                if (!whiteSpaceError) {
+                    if (self.profile_selection() !== "") {
+                        mainViewModel.startLoading()
+                        for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                            saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
+                            pluginSettings[saveSettingsProfile](document.getElementById(restrictedInputsProfile[x]).value);
+                        }
+                        mainViewModel.stopLoading()
+                    } else {
+                        self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
+                    }
+                } else {
+                    self.PNotify = new PNotify(mainViewModel.PNotifyData.errorMessage)
+                }
+            } else {
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.errorMessage)
+            }*/
+        }
+
+        function saveSettingsNow() {
+            let el = document.getElementById("profiles-calibrationcompanion").getElementsByClassName("control-group");
+            let array = [];
+            let value = [];
+            let boolError = false;
+            let whiteSpaceError = false;
+            for (let x = 1; x < el.length; x++) {
+                array[x] = el[x].attributes[0].nodeValue;
+                value[x] = el[x].children[1].children[0].children[0].value;
+                console.log("setting " + value[x] + " " + value[x].length)
+                if (array[x].includes("error")) {
+                    boolError = true;
+                } else if (value[x].length <= 0) {
+                    whiteSpaceError = true;
                 }
             }
             if (!boolError) {
-                if (self.profile_selection() !== "") {
-                    for (let x = 0; x < restrictedSettingsProfile.length; x++) {
-                        saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
-                        pluginSettings[saveSettingsProfile](document.getElementById(restrictedInputsProfile[x]).value);
+                if (!whiteSpaceError) {
+                    if (self.profile_selection() !== "") {
+                        mainViewModel.startLoading()
+                        for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                            saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
+                            pluginSettings[saveSettingsProfile](document.getElementById(restrictedInputsProfile[x]).value);
+                        }
+                        mainViewModel.stopLoading()
+                    } else {
+                        self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
                     }
                 } else {
-                    self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
+                    self.PNotify = new PNotify(mainViewModel.PNotifyData.errorMessage)
                 }
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.errorMessage)
             }
+        }
+
+        async function saveSettingsFromProfile() {
+            const millisBefore = Date.now();
+            await saveSettingsNow();
+            const millisNow = Date.now();
+            console.log(millisNow - millisBefore)
         }
 
         document.getElementById("reset-profile").onclick = function() {

@@ -75,17 +75,15 @@ $(function() {
 
         document.getElementById("load-profile-accel").onclick = function() {
             if (self.profile_selection_accel() !== "") {
-                mainViewModel.startLoading();
                 for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                     if (restrictedSettingsProfile[x] !== "novalue") {
                         saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_accel();
                         saveSettingsAccel = restrictedSettingsProfile[x] + "_accel";
                         saveSettingsProfileAccel = pluginSettings[saveSettingsProfile]()
                         document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileAccel; // loading setting
-                        mainViewModel.saveSettingsTab((saveSettingsAccel), saveSettingsProfileAccel)
+                        mainViewModel.saveSettingsNoLoading((saveSettingsAccel), saveSettingsProfileAccel)
                     }
                 }
-                mainViewModel.stopLoading();
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }
@@ -508,7 +506,7 @@ $(function() {
             gcode_generated.unshift("G28;\n\n" +
                 ";---------ABL METHOD---------\n" + mainViewModel.abl_method + ";\n;---------ABL METHOD---------\n\n" +
                 ";---------START G-CODE---------\n" + start_gcode + ";\n;---------START G-CODE---------\n\n" +
-                "G0 F" + mainViewModel.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
+                "G90 E0;\nG0 F" + mainViewModel.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
                 ";\n" + "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + ";\n")
 
             for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {

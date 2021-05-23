@@ -253,7 +253,7 @@ $(function() {
             gcode_generated.unshift("G28;\n\n" +
                 ";---------ABL METHOD---------\n" + mainViewModel.abl_method + ";\n;---------ABL METHOD---------\n\n" +
                 ";---------START G-CODE---------\n" + start_gcode + ";\n;---------START G-CODE---------\n\n" +
-                "G0 F" + mainViewModel.travel_speed + " X" + squares_position_x[0] + " Y" + squares_position_y[0] +
+                "G90 E0;\nG0 F" + mainViewModel.travel_speed + " X" + squares_position_x[0] + " Y" + squares_position_y[0] +
                 ";\n" + "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + ";\n")
 
             for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {
