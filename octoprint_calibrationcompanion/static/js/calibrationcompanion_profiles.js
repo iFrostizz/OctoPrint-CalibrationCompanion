@@ -192,12 +192,12 @@ $(function() {
             if (!boolError) {
                 if (!whiteSpaceError) {
                     if (self.profile_selection() !== "") {
-                        mainViewModel.startLoading()
                         for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                             saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
-                            pluginSettings[saveSettingsProfile](document.getElementById(restrictedInputsProfile[x]).value);
+                            self[saveSettingsProfile](document.getElementById(restrictedInputsProfile[x]).value);
+                            mainViewModel.saveSettingsNoLoading(saveSettingsProfile, document.getElementById(restrictedInputsProfile[x]).value)
+                            console.log(saveSettingsProfile + " " + self[saveSettingsProfile] + " " + document.getElementById(restrictedInputsProfile[x]).value)
                         }
-                        mainViewModel.stopLoading()
                     } else {
                         self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
                     }
@@ -210,9 +210,11 @@ $(function() {
         }
 
         async function saveSettingsFromProfile() {
+            mainViewModel.startLoading()
             const millisBefore = Date.now();
             await saveSettingsNow();
             const millisNow = Date.now();
+            mainViewModel.stopLoading()
             console.log(millisNow - millisBefore)
         }
 
