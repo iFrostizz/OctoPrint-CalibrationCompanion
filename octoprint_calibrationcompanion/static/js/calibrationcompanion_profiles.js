@@ -196,7 +196,6 @@ $(function() {
                             saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
                             self[saveSettingsProfile](document.getElementById(restrictedInputsProfile[x]).value);
                             mainViewModel.saveSettingsNoLoading(saveSettingsProfile, document.getElementById(restrictedInputsProfile[x]).value)
-                            console.log(saveSettingsProfile + " " + self[saveSettingsProfile] + " " + document.getElementById(restrictedInputsProfile[x]).value)
                         }
                     } else {
                         self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
