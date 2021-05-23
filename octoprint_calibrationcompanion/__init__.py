@@ -81,8 +81,13 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			retraction_speed_profile2="",
 			flow_profile2="",
 			abl_method_profile2="",
-			start_gcode_profile2="",
-			end_gcode_profile2="",
+			start_gcode_profile2="G90;absolute mode\nG0 F[travel_speed] X100 Y100 Z10;place the nozzle for heating\n"
+								 "M140 S[regular_bed];set bed to [regular_bed]C\nM190 S[regular_bed];wait for bed to [regular_bed]C\n"
+								 "M104 S[regular_nozzle];set hotend to [regular_nozzle]C\nM109 S[regular_nozzle];wait hotend to [regular_nozzle]C\n"
+								 "G92 E0;reset extruder",
+			end_gcode_profile2="G91;relative mode\nG92 E0;reset extruder\nG1 F[retraction_speed] E-[retraction_distance];retract a bit to avoid oozing\n"
+							   "G0 Z10 F[travel_speed];move up\nM140 S0;set bed to 0C\nM104 S0;set hotend to 0C\nM107;turn off fans\nG90;absolute mode\n"
+							   "G0 F[travel_speed] Y[bed_size_y];show the print\nG1 F[retraction_speed] E0;set the filament at the end of the nozzle again",
 
 			first_layer_nozzle_profile3="",
 			regular_nozzle_profile3="",
@@ -96,8 +101,13 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			retraction_speed_profile3="",
 			flow_profile3="",
 			abl_method_profile3="",
-			start_gcode_profile3="",
-			end_gcode_profile3="",
+			start_gcode_profile3="G90;absolute mode\nG0 F[travel_speed] X100 Y100 Z10;place the nozzle for heating\n"
+								 "M140 S[regular_bed];set bed to [regular_bed]C\nM190 S[regular_bed];wait for bed to [regular_bed]C\n"
+								 "M104 S[regular_nozzle];set hotend to [regular_nozzle]C\nM109 S[regular_nozzle];wait hotend to [regular_nozzle]C\n"
+								 "G92 E0;reset extruder",
+			end_gcode_profile3="G91;relative mode\nG92 E0;reset extruder\nG1 F[retraction_speed] E-[retraction_distance];retract a bit to avoid oozing\n"
+							   "G0 Z10 F[travel_speed];move up\nM140 S0;set bed to 0C\nM104 S0;set hotend to 0C\nM107;turn off fans\nG90;absolute mode\n"
+							   "G0 F[travel_speed] Y[bed_size_y];show the print\nG1 F[retraction_speed] E0;set the filament at the end of the nozzle again",
 
 			first_layer_nozzle_accel="",
 			regular_nozzle_accel="",
