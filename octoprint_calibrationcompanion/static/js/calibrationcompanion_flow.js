@@ -55,14 +55,9 @@ $(function() {
             "retraction_speed", "start_gcode", "travel_speed"];
         let saveSettingsProfile, saveSettingsFlow, saveSettingsProfileFlow;
 
-        /*$(restrictedInputsFlow.join(",")).on("input", function() {
-            saveSettingsFlow = saveInputsFlow[restrictedInputsFlow.indexOf('#' + this.id)]
-            saveSettingsProfileFlow = this.value;
-            mainViewModel.saveSettingsTab((saveSettingsFlow), saveSettingsProfileFlow)
-        });*/
-
         document.getElementById("load-profile-flow").onclick = function() {
             if (self.profile_selection_flow() !== "") {
+                mainViewModel.startLoading();
                 for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                     if (restrictedSettingsProfile[x] !== "novalue") {
                         saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_flow();
@@ -72,6 +67,7 @@ $(function() {
                         mainViewModel.saveSettingsTab((saveSettingsFlow), saveSettingsProfileFlow)
                     }
                 }
+                mainViewModel.stopLoading();
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }

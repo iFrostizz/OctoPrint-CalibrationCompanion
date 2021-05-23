@@ -117,6 +117,7 @@ $(function() {
 
         document.getElementById("load-profile").onclick = function () {
             if (self.profile_selection() !== "") {
+                mainViewModel.startLoading();
                 for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                     saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection();
                     if (pluginSettings[saveSettingsProfile]() !== undefined) {
@@ -130,6 +131,7 @@ $(function() {
                         mainViewModel.checkValue(element, div, mainViewModel.allowedArrayComma);
                     }
                 }
+                mainViewModel.stopLoading();
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }

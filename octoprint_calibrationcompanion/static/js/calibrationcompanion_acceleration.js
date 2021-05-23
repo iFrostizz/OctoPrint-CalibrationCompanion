@@ -75,6 +75,7 @@ $(function() {
 
         document.getElementById("load-profile-accel").onclick = function() {
             if (self.profile_selection_accel() !== "") {
+                mainViewModel.startLoading();
                 for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                     if (restrictedSettingsProfile[x] !== "novalue") {
                         saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_accel();
@@ -84,6 +85,7 @@ $(function() {
                         mainViewModel.saveSettingsTab((saveSettingsAccel), saveSettingsProfileAccel)
                     }
                 }
+                mainViewModel.stopLoading();
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }

@@ -300,12 +300,19 @@ $(function () {
             }
         }
 
+        let spinner = document.getElementById("spinner-loading-save")
+
         self.saveSettingsTab = function(settingName, value) {
-            let spinner = document.getElementById("spinner-loading-save")
-            spinner.style.visibility = "visible";
             OctoPrint.settings.savePluginSettings('calibrationcompanion', {
                 [settingName]: value
-            }).done(spinner.style.visibility = "hidden")
+            }).done(self.stopLoading())
+        }
+
+        self.startLoading = function() {
+            spinner.style.visibility = "visible";
+        }
+        self.stopLoading = function() {
+            spinner.style.visibility = "hidden"
         }
 
         $(restrictedCheckbox.join(",")).on("click", function() {

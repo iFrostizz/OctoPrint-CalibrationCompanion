@@ -246,6 +246,7 @@ $(function() {
 
         document.getElementById("load-profile-retra").onclick = function() {
             if (self.profile_selection_retra() !== "") {
+                mainViewModel.startLoading();
                 for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                     if (restrictedSettingsProfile[x] !== "novalue") {
                         saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_retra();
@@ -255,6 +256,7 @@ $(function() {
                         mainViewModel.saveSettingsTab((saveSettingsRetra), saveSettingsProfileRetra)
                     }
                 }
+                mainViewModel.stopLoading();
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }

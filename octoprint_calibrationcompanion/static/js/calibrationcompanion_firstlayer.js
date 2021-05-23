@@ -60,14 +60,9 @@ $(function() {
             "retraction_speed", "start_gcode", "travel_speed"];
         let saveSettingsProfile, saveSettingsSquare, saveSettingsProfileSquare;
 
-        /*$(restrictedInputsSquare.join(",")).on("input", function() {
-            saveSettingsSquare = saveInputsSquare[restrictedInputsSquare.indexOf('#' + this.id)]
-            saveSettingsProfileSquare = this.value;
-            mainViewModel.saveSettingsTab((saveSettingsSquare), saveSettingsProfileSquare)
-        });*/
-
         document.getElementById("load-profile-square").onclick = function() {
             if (self.profile_selection_square() !== "") {
+                mainViewModel.startLoading();
                 for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                     if (restrictedSettingsProfile[x] !== "novalue") {
                         saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_square();
@@ -77,6 +72,7 @@ $(function() {
                         mainViewModel.saveSettingsTab((saveSettingsSquare), saveSettingsProfileSquare)
                     }
                 }
+                mainViewModel.stopLoading();
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }
