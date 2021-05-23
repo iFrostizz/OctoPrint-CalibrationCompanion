@@ -182,7 +182,7 @@ $(function() {
             for (let x = 1; x < el.length; x++) {
                 array[x] = el[x].attributes[0].nodeValue;
                 value[x] = el[x].children[1].children[0].children[0].value;
-                console.log("setting " + value[x] + " " + value[x].length)
+                //console.log("setting " + value[x] + " " + value[x].length)
                 if (array[x].includes("error")) {
                     boolError = true;
                 } else if (value[x].length <= 0) {
