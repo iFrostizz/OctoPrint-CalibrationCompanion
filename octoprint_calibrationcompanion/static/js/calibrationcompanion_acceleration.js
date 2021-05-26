@@ -45,20 +45,11 @@ $(function() {
         }
 
         let stageHeightAccel;
-
-        self.onAfterBinding = function() {
-            mainViewModel.spanValAccel = 0;
-            if (mainViewModel.variable.nozzle_size === "0.6") {
-                stageHeightAccel = 4.8;
-            } else {
-                stageHeightAccel = 5;
-            }
-        }
-
-        let restrictedInputsAccel = ["#first-layer-nozzle-accel", "#regular-nozzle-accel", "#regular-bed-accel", "#fan-speed-accel", "#fan-layer-accel",
-            "#first-layer-speed-accel", "#regular-speed-accel", "#travel-speed-accel", "#flow-accel", "#retraction-dist-accel", "#retraction-speed-accel", "#abl-method-accel", "#start-gcode-accel"];
-        let saveInputsAccel = ["first_layer_nozzle_accel", "regular_nozzle_accel", "regular_bed_accel", "fan_speed_accel", "fan_layer_accel",
-            "first_layer_speed_accel", "regular_speed_accel", "travel_speed_accel", "flow_accel", "retraction_dist_accel", "retraction_speed_accel", "abl_method_accel", "start_gcode_accel"];
+        
+        let restrictedInputsAccel = ["#first-layer-nozzle-accel", "#regular-nozzle-accel", "#regular-bed-accel", "#fan-speed-accel", "#fan-layer-accel", "#first-layer-speed-accel",
+            "#regular-speed-accel", "#travel-speed-accel", "#retraction-speed-accel", "#retraction-dist-accel", "#flow-accel", "#abl-method-accel", "#start-gcode-accel", "#end-gcode-accel"];
+        let saveInputsAccel = ["first_layer_nozzle_accel", "regular_nozzle_accel", "regular_bed_accel", "fan_speed_accel", "fan_layer_accel", "first_layer_speed_accel",
+            "regular_speed_accel", "travel_speed_accel", "retraction_speed_accel", "retraction_dist_accel", "flow_accel", "abl_method_accel", "start_gcode_accel", "end_gcode_accel"];
         let restrictedInputsProfile = ["abl-method-accel", "end-gcode-accel", "fan-layer-accel", "fan-speed-accel", "first-layer-nozzle-accel",
             "first-layer-speed-accel", "flow-accel", "regular-bed-accel", "regular-nozzle-accel", "regular-speed-accel", "retraction-dist-accel",
             "retraction-speed-accel", "start-gcode-accel", "travel-speed-accel"];
@@ -67,23 +58,49 @@ $(function() {
             "retraction_speed", "start_gcode", "travel_speed"];
         let saveSettingsProfile, saveSettingsAccel, saveSettingsProfileAccel;
 
-        $(restrictedInputsAccel.join(",")).on("input", function() {
-            saveSettingsAccel = saveInputsAccel[restrictedInputsAccel.indexOf('#' + this.id)]
-            saveSettingsProfileAccel = this.value;
-            mainViewModel.saveSettingsTab((saveSettingsAccel), saveSettingsProfileAccel)
-        });
+        self.onAfterBinding = function() {
+            $(restrictedInputsAccel.join(",")).each(function() {
+                let element = this
+                let div = this.parentNode.parentNode.parentNode;
+                let id = element.id
+                saveSettingsAccel = saveInputsAccel[restrictedInputsAccel.indexOf('#' + this.id)]
+                saveSettingsProfileAccel = element.value;
+                if (restrictedInputsAccel.indexOf('#' + id) <= 8) {
+                    mainViewModel.checkValue(element, div, mainViewModel.allowedArrayClassic)
+                } else if (restrictedInputsAccel.indexOf('#' + id) <= 10 && restrictedInputsAccel.indexOf('#' + id) >= 9) {
+                    mainViewModel.checkValue(element, div, mainViewModel.allowedArrayComma)
+                }
+            });
+            mainViewModel.spanValAccel = 0;
+            if (mainViewModel.nozzle_size() === "0.6") {
+                stageHeightAccel = 4.8;
+            } else {
+                stageHeightAccel = 5;
+            }
+        }
 
+        let settingName;
+        let settingValue;
+        
         document.getElementById("load-profile-accel").onclick = function() {
+            settingName = [];
+            settingValue = [];
             if (self.profile_selection_accel() !== "") {
+                mainViewModel.firstTime = Date.now();
+                mainViewModel.startLoading()
                 for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                     if (restrictedSettingsProfile[x] !== "novalue") {
+                        let element = document.getElementById(restrictedInputsProfile[x]);
                         saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_accel();
                         saveSettingsAccel = restrictedSettingsProfile[x] + "_accel";
                         saveSettingsProfileAccel = pluginSettings[saveSettingsProfile]()
-                        document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileAccel; // loading setting
-                        mainViewModel.saveSettingsNoLoading((saveSettingsAccel), saveSettingsProfileAccel)
+                        element.value = saveSettingsProfileAccel; // loading setting
+                        settingName.push(saveSettingsAccel);
+                        settingValue.push(saveSettingsProfileAccel);
+                        mainViewModel.sortToCheck(element, "loaded");
                     }
                 }
+                mainViewModel.saveSettingsLoading(settingName, settingValue, "loaded and saved")
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }
@@ -114,12 +131,12 @@ $(function() {
         //let booleanCheck = true;
 
         self.addAccel = function() {
-            if (mainViewModel.variable.nozzle_size === "0.6") {
+            if (mainViewModel.nozzle_size() === "0.6") {
                 stageHeightAccel = 4.8;
             } else {
                 stageHeightAccel = 4.8;
             }
-            if (mainViewModel.variable.bed_size_z > mainViewModel.spanValAccel * (mainViewModel.variable.nozzle_size/2)) {
+            if (mainViewModel.bed_size_z() > mainViewModel.spanValAccel * (mainViewModel.nozzle_size()/2)) {
                 //mainViewModel.stageAvailable()
                 olda = a;
                 a++;
@@ -227,7 +244,7 @@ $(function() {
                 layerHeightAccel[a].className = "layerHeightRetra"
                 layerHeightAccel[a].textContent = mainViewModel.spanValAccel + 1;
                 myBase[a].appendChild(layerHeightAccel[a])
-                mainViewModel.spanValAccel = Math.ceil(mainViewModel.spanValAccel + stageHeightAccel / ((mainViewModel.variable.nozzle_size / 2)));
+                mainViewModel.spanValAccel = Math.ceil(mainViewModel.spanValAccel + stageHeightAccel / ((mainViewModel.nozzle_size() / 2)));
 
                 if (document.getElementById("parameter-select").value === "jerk") {
                     for (let x = 1; x <= a; x++) {
@@ -255,7 +272,7 @@ $(function() {
             olda = a;
             if (Math.sign(a) === 1) {
                 myBase[a].remove();
-                mainViewModel.spanValAccel = Math.ceil(mainViewModel.spanValAccel - stageHeightAccel / ((mainViewModel.variable.nozzle_size / 2)));
+                mainViewModel.spanValAccel = Math.ceil(mainViewModel.spanValAccel - stageHeightAccel / ((mainViewModel.nozzle_size() / 2)));
                 a--;
             } else {
                 a = 0;
@@ -319,45 +336,46 @@ $(function() {
                     return
                 }
             }
+            $('#accel-tower').button('loading');
             mainViewModel.flowCube = false
             l = 0;
-            mainViewModel.zLastAbsolute = mainViewModel.variable.nozzle_size/2;
+            mainViewModel.zLastAbsolute = mainViewModel.nozzle_size()/2;
             mainViewModel.last_feed_rate = 0;
             start_gcode = document.getElementById("start-gcode-accel").value;
             end_gcode = document.getElementById("end-gcode-accel").value;
-            mainViewModel.first_layer_nozzle = document.getElementById("first-layer-nozzle-accel").value;
-            mainViewModel.regular_nozzle = document.getElementById("regular-nozzle-accel").value;
-            mainViewModel.regular_bed = document.getElementById("regular-bed-accel").value;
-            mainViewModel.fan_speed = document.getElementById("fan-speed-accel").value;
-            mainViewModel.fan_layer = document.getElementById("fan-layer-accel").value;
-            mainViewModel.first_layer_speed = document.getElementById("first-layer-speed-accel").value * 60;
-            mainViewModel.regular_speed = document.getElementById("regular-speed-accel").value * 60;
-            mainViewModel.travel_speed = document.getElementById("travel-speed-accel").value * 60;
-            mainViewModel.retraction_distance = document.getElementById("retraction-dist-accel").value;
-            mainViewModel.retraction_speed = document.getElementById("retraction-speed-accel").value * 60;
-            mainViewModel.flow = document.getElementById("flow-accel").value;
-            mainViewModel.abl_method = document.getElementById("abl-method-accel").value;
-            mainViewModel.filename = "accel_tower";
+            mainViewModel.variable.first_layer_nozzle = document.getElementById("first-layer-nozzle-accel").value;
+            mainViewModel.variable.regular_nozzle = document.getElementById("regular-nozzle-accel").value;
+            mainViewModel.variable.regular_bed = document.getElementById("regular-bed-accel").value;
+            mainViewModel.variable.fan_speed = document.getElementById("fan-speed-accel").value;
+            mainViewModel.variable.fan_layer = document.getElementById("fan-layer-accel").value;
+            mainViewModel.variable.first_layer_speed = document.getElementById("first-layer-speed-accel").value * 60;
+            mainViewModel.variable.regular_speed = document.getElementById("regular-speed-accel").value * 60;
+            mainViewModel.variable.travel_speed = document.getElementById("travel-speed-accel").value * 60;
+            mainViewModel.variable.retraction_distance = document.getElementById("retraction-dist-accel").value;
+            mainViewModel.variable.retraction_speed = document.getElementById("retraction-speed-accel").value * 60;
+            mainViewModel.variable.flow = document.getElementById("flow-accel").value;
+            mainViewModel.variable.abl_method = document.getElementById("abl-method-accel").value;
+            mainViewModel.variable.filename = "acceltower";
 
             for (let s=1; s<=a; s++) {
                 let boolean = [true]
-                if (mainViewModel.variable.nozzle_size === "0.4" || mainViewModel.variable.nozzle_size === "0.6") {
+                if (mainViewModel.nozzle_size() === "0.4" || mainViewModel.nozzle_size() === "0.6") {
                     mainViewModel.first_x_pos = String(mainViewModel.bed_center_x + 120 / 2 - 40.5);
                     mainViewModel.first_y_pos = String(mainViewModel.bed_center_y + 100 / 2);
                 }
-                if (mainViewModel.variable.nozzle_size === "0.8") {
+                if (mainViewModel.nozzle_size() === "0.8") {
                     mainViewModel.first_x_pos = String(mainViewModel.bed_center_x + 120 / 2 - 40.5);
                     mainViewModel.first_y_pos = String(mainViewModel.bed_center_y + 100 / 2);
                 }
 
-                mainViewModel.first_z_pos = String((mainViewModel.variable.nozzle_size / 2) * l);
+                mainViewModel.first_z_pos = String((mainViewModel.nozzle_size() / 2) * l);
                 first_x_absolute_pos = mainViewModel.first_x_pos;
                 first_y_absolute_pos = mainViewModel.first_y_pos;
-                startZHeight[s] = parseFloat(mainViewModel.zLastAbsolute) + parseFloat(mainViewModel.variable.nozzle_size / 2)
+                startZHeight[s] = parseFloat(mainViewModel.zLastAbsolute) + parseFloat(mainViewModel.nozzle_size() / 2)
                 startFeedRate[s] = mainViewModel.feed_rate
-                accelTowerCoord(parseFloat(mainViewModel.variable.nozzle_size));
+                accelTowerCoord(parseFloat(mainViewModel.nozzle_size()));
                 for (let z = 0; z <= relative_pos_x.length; z++) {
-                    if (mainViewModel.variable.relative_positioning) {
+                    if (mainViewModel.relative_positioning()) {
                         pos_x[z] = relative_pos_x[z]
                         pos_y[z] = relative_pos_y[z]
                         pos_z[z] = relative_pos_z[z]
@@ -368,7 +386,7 @@ $(function() {
                         pos_z[z] = mainViewModel.zAbsolute[z]
                     }
                 }
-                if (mainViewModel.variable.relative_positioning) {
+                if (mainViewModel.relative_positioning()) {
                     returningPosX = mainViewModel.getReturningPosition(relative_pos_x);
                     returningPosY = mainViewModel.getReturningPosition(relative_pos_y);
                 } else {
@@ -379,14 +397,14 @@ $(function() {
                     returningPosY = parseFloat(pos_y[pos_y.length - 1]) + mainViewModel.getReturningPosition(relative_pos_y);
                     mainViewModel.first_x_pos = returningPosX
                     mainViewModel.first_y_pos = returningPosY
-                    mainViewModel.first_z_pos = (mainViewModel.variable.nozzle_size / 2) * l
+                    mainViewModel.first_z_pos = (mainViewModel.nozzle_size() / 2) * l
                 }
                 gcode_generated[s] = [];
                 for (let x = 0; x < relative_pos_x.length; x++) {
                     if (l <= 1) {
-                        printing_speed = mainViewModel.first_layer_speed;
+                        printing_speed = mainViewModel.variable.first_layer_speed;
                     } else {
-                        printing_speed = mainViewModel.regular_speed;
+                        printing_speed = mainViewModel.variable.regular_speed;
                     }
                     if (GStatus[x] !== "null") {
                         if (relative_pos_z[x] === "null") {
@@ -394,17 +412,17 @@ $(function() {
                                 gcode_generated[s][x] = GStatus[x] + " F" + mainViewModel.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + ";\n";
                             } else {
                                 if (EStatus[x] !== "null") {
-                                    if (mainViewModel.variable.relative_positioning) {
+                                    if (mainViewModel.relative_positioning()) {
                                         if (EStatus[x] === "retract") {
-                                            gcode_generated[s][x] = "G1 F" + mainViewModel.retraction_speed + " E-" + mainViewModel.retraction_distance + ";\n";
+                                            gcode_generated[s][x] = "G1 F" + mainViewModel.variable.retraction_speed + " E-" + mainViewModel.variable.retraction_distance + ";\n";
                                         } else if (EStatus[x] === "extrude") {
-                                            gcode_generated[s][x] = "G1 F" + mainViewModel.retraction_speed + "E" + mainViewModel.retraction_distance + ";\n";
+                                            gcode_generated[s][x] = "G1 F" + mainViewModel.variable.retraction_speed + "E" + mainViewModel.variable.retraction_distance + ";\n";
                                         }
                                     } else {
                                         if (EStatus[x] === "retract") {
-                                            gcode_generated[s][x] = "G1 F" + mainViewModel.retraction_speed + " E" + (mainViewModel.feed_rate - mainViewModel.retraction_distance).toFixed(5) + ";\n";
+                                            gcode_generated[s][x] = "G1 F" + mainViewModel.variable.retraction_speed + " E" + (mainViewModel.feed_rate - mainViewModel.variable.retraction_distance).toFixed(5) + ";\n";
                                         } else if (EStatus[x] === "extrude") {
-                                            gcode_generated[s][x] = "G1 F" + mainViewModel.retraction_speed + " E" + mainViewModel.feed_rate + ";\n";
+                                            gcode_generated[s][x] = "G1 F" + mainViewModel.variable.retraction_speed + " E" + mainViewModel.feed_rate + ";\n";
                                         }
                                     }
                                 } else {
@@ -414,16 +432,16 @@ $(function() {
                             }
                         } else {
                             if (GStatus[x] === "G0") {
-                                gcode_generated[s][x] = GStatus[x] + " F" + mainViewModel.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + ";\n";
+                                gcode_generated[s][x] = GStatus[x] + " F" + mainViewModel.variable.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + ";\n";
                             } else {
                                 mainViewModel.extruded_length_calculation_relative(relative_pos_x[x], relative_pos_y[x])
                                 gcode_generated[s][x] = GStatus[x] + " F" + printing_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + " E" + mainViewModel.feed_rate + ";\n";
                             }
                         }
                     } else if (layerStatus[x] === "LAYER") {
-                        if (l >= 1 && l <= mainViewModel.fan_layer) {
+                        if (l >= 1 && l <= mainViewModel.variable.fan_layer) {
                             gcode_generated[s][x] = ";LAYER:" + l + "\n" +
-                                "M106 S" + Math.round(l * (mainViewModel.fan_speed * (255 / 100) * 10) / mainViewModel.fan_layer) / 10 + ";\n";
+                                "M106 S" + Math.round(l * (mainViewModel.variable.fan_speed * (255 / 100) * 10) / mainViewModel.variable.fan_layer) / 10 + ";\n";
                         } else {
                             gcode_generated[s][x] = ";LAYER:" + l + "\n"
                         }
@@ -432,15 +450,15 @@ $(function() {
                         }
                     }
                 }
-                if (mainViewModel.variable.relative_positioning) {
+                if (mainViewModel.relative_positioning()) {
                     if (document.getElementById("parameter-select").value === "jerk") {
                         if (s > 1) {
                             gcode_generated[s].unshift("M204 P" + document.getElementById("inputListAcceleration" + s).value + ";\n" +
                                 "M205 X" + document.getElementById("inputListJerkX" + s).value + " Y" + document.getElementById("inputListJerkY" + s).value + ";\n" +
                                 "M117 St" + s + "/" + a + " Acc" + document.getElementById("inputListAcceleration" + s).value +
                                 " Jx" + document.getElementById("inputListJerkX" + s).value + "Jy" + document.getElementById("inputListJerkY" + s).value + ";\n" +
-                                "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + "\n" +
-                                "G0 F" + mainViewModel.travel_speed + " X" + returningPosX + " Y" + returningPosY + ";\n");
+                                "G0 F" + mainViewModel.variable.travel_speed + " Z" + mainViewModel.nozzle_size() / 2 + "\n" +
+                                "G0 F" + mainViewModel.variable.travel_speed + " X" + returningPosX + " Y" + returningPosY + ";\n");
                         } else {
                             gcode_generated[s].unshift("M204 P" + document.getElementById("inputListAcceleration" + s).value + ";\n" +
                                 "M205 X" + document.getElementById("inputListJerkX" + s).value + " Y" + document.getElementById("inputListJerkY" + s).value + ";\n" +
@@ -453,8 +471,8 @@ $(function() {
                                 "M205 J" + document.getElementById("inputListJunction" + s).value + ";\n" +
                                 "M117 St" + s + "/" + a + " Acc" + document.getElementById("inputListAcceleration" + s).value +
                                 " Junc" + document.getElementById("inputListJunction" + s).value + ";\n" +
-                                "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + "\n" +
-                                "G0 F" + mainViewModel.travel_speed + " X" + returningPosX + " Y" + returningPosY + ";\n");
+                                "G0 F" + mainViewModel.variable.travel_speed + " Z" + mainViewModel.nozzle_size() / 2 + "\n" +
+                                "G0 F" + mainViewModel.variable.travel_speed + " X" + returningPosX + " Y" + returningPosY + ";\n");
                         } else {
                             gcode_generated[s].unshift("M204 P" + document.getElementById("inputListAcceleration" + s).value + ";\n" +
                                 "M205 J" + document.getElementById("inputListJunction" + s).value + ";\n" +
@@ -469,8 +487,8 @@ $(function() {
                                 "M205 X" + document.getElementById("inputListJerkX" + s).value + " Y" + document.getElementById("inputListJerkY" + s).value + ";\n" +
                                 "M117 St" + s + "/" + a + " Acc" + document.getElementById("inputListAcceleration" + s).value +
                                 " Jx" + document.getElementById("inputListJerkX" + s).value + "Jy" + document.getElementById("inputListJerkY" + s).value + ";\n" +
-                                "G0 F" + mainViewModel.travel_speed + " X" + returningPosX + " Y" + returningPosY +
-                                " Z" + (startZHeight[s] + parseFloat(mainViewModel.variable.nozzle_size) / 2) + ";\n");
+                                "G0 F" + mainViewModel.variable.travel_speed + " X" + returningPosX + " Y" + returningPosY +
+                                " Z" + (startZHeight[s] + parseFloat(mainViewModel.nozzle_size()) / 2) + ";\n");
                         } else {
                             gcode_generated[s].unshift("M204 P" + document.getElementById("inputListAcceleration" + s).value + ";\n" +
                                 "M205 X" + document.getElementById("inputListJerkX" + s).value + " Y" + document.getElementById("inputListJerkY" + s).value + ";\n" +
@@ -483,8 +501,8 @@ $(function() {
                                 "M205 J" + document.getElementById("inputListJunction" + s).value + ";\n" +
                                 "M117 St" + s + "/" + a + " Acc" + document.getElementById("inputListAcceleration" + s).value +
                                 " Junc" + document.getElementById("inputListJunction" + s).value + ";\n" +
-                                "G0 F" + mainViewModel.travel_speed + " X" + returningPosX + " Y" + returningPosY +
-                                " Z" + (startZHeight[s] + parseFloat(mainViewModel.variable.nozzle_size) / 2) + ";\n");
+                                "G0 F" + mainViewModel.variable.travel_speed + " X" + returningPosX + " Y" + returningPosY +
+                                " Z" + (startZHeight[s] + parseFloat(mainViewModel.nozzle_size()) / 2) + ";\n");
                         } else {
                             gcode_generated[s].unshift("M204 P" + document.getElementById("inputListAcceleration" + s).value + ";\n" +
                                 "M205 J" + document.getElementById("inputListJunction" + s).value + ";\n" +
@@ -494,28 +512,28 @@ $(function() {
                     }
                 }
             }
-            if (mainViewModel.variable.relative_positioning) {
+            if (mainViewModel.relative_positioning()) {
                 gcode_generated.unshift("G91;\n")
             }
 
-            mainViewModel.getSettings();
+            mainViewModel.callSettings();
 
-            for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {
+            for (const [key, value] of Object.entries(mainViewModel.settingsCallable)) {
                 start_gcode = start_gcode.replaceAll("[" + key + "]", value);
             }
             gcode_generated.unshift("G28;\n\n" +
-                ";---------ABL METHOD---------\n" + mainViewModel.abl_method + ";\n;---------ABL METHOD---------\n\n" +
+                ";---------ABL METHOD---------\n" + mainViewModel.variable.abl_method + ";\n;---------ABL METHOD---------\n\n" +
                 ";---------START G-CODE---------\n" + start_gcode + ";\n;---------START G-CODE---------\n\n" +
-                "G90 E0;\nG0 F" + mainViewModel.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
-                ";\n" + "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + ";\n")
+                "G92 E0;\nG0 F" + mainViewModel.variable.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
+                ";\n" + "G0 F" + mainViewModel.variable.travel_speed + " Z" + mainViewModel.nozzle_size() / 2 + ";\n")
 
-            for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {
+            for (const [key, value] of Object.entries(mainViewModel.settingsCallable)) {
                 end_gcode = end_gcode.replaceAll("[" + key + "]", value);
             }
             gcode_generated.push(end_gcode);
 
             let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
-            OctoPrint.post(url, {"name": mainViewModel.getFullFilename(mainViewModel.filename), "generated gcode": gcode_generated.flat().join('')})
+            OctoPrint.post(url, {"name": mainViewModel.getFullFilename(mainViewModel.variable.filename), "generated gcode": gcode_generated.flat().join('')})
 
             gcode_generated = [];
             pos_x = [];

@@ -31,12 +31,13 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			bed_size_y="",
 			bed_size_z="",
 			extra_margin="20",
+			knob_levelling_feed_rate="30",
 			origin_check=False,
 			filament_used="PLA",
 			printer_name="",
 			relative_positioning=False,
 			nozzle_size="0.4",
-			filament_diameter="1.75",
+			fil_diameter="1.75",
 			movement_speed="",
 			first_layer_speed="",
 			printing_speed="",
@@ -67,7 +68,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 								 "G92 E0;reset extruder",
 			end_gcode_profile1="G91;relative mode\nG92 E0;reset extruder\nG1 F[retraction_speed] E-[retraction_distance];retract a bit to avoid oozing\n"
 							   "G0 Z10 F[travel_speed];move up\nM140 S0;set bed to 0C\nM104 S0;set hotend to 0C\nM107;turn off fans\nG90;absolute mode\n"
-							   "G0 F[travel_speed] Y[bed_size_y];show the print\nG1 F[retraction_speed] E0;set the filament at the end of the nozzle again",
+							   "G0 F[travel_speed] Y[bed_size_y];show the print",
 
 			first_layer_nozzle_profile2="",
 			regular_nozzle_profile2="",
@@ -215,10 +216,11 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})"""
 
 	def on_event(self, event, payload):
-		if self._settings.get_boolean(["auto_print"]):
-			if event == "FileAdded":
-				if payload['name'] == self.filename + ".gcode":
-					self._printer.select_file(self.filename + ".gcode", sd=False, printAfterSelect=True)
+		if event == "FileAdded":
+			if payload['name'] == self.filename + ".gcode":
+				self._plugin_manager.send_plugin_message("calibrationcompanion", {"fileReceived": payload['name']})
+				if self._settings.get_boolean(["auto_print"]):
+					self._printer.select_file(payload['name'], sd=False, printAfterSelect=True)
 
 	@octoprint.plugin.BlueprintPlugin.route("/downloadFile", methods=["POST"])
 	def myEcho(self):

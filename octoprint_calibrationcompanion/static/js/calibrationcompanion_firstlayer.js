@@ -11,6 +11,7 @@ $(function() {
 
         self.profile_selection_square = ko.observable();
         self.extra_margin = ko.observable();
+        self.knob_levelling_feed_rate = ko.observable();
         self.regular_nozzle_square = ko.observable();
         self.regular_bed_square = ko.observable();
         self.fan_speed_square = ko.observable();
@@ -30,6 +31,7 @@ $(function() {
             pluginSettings = self.settingsViewModel.settings.plugins.calibrationcompanion;
             self.profile_selection_square(pluginSettings.profile_selection_square());
             self.extra_margin(pluginSettings.extra_margin());
+            self.knob_levelling_feed_rate(pluginSettings.knob_levelling_feed_rate())
             self.regular_nozzle_square(pluginSettings.regular_nozzle_square());
             self.regular_bed_square(pluginSettings.regular_bed_square());
             self.fan_speed_square(pluginSettings.fan_speed_square());
@@ -42,16 +44,11 @@ $(function() {
             self.start_gcode_square(pluginSettings.start_gcode_square());
             self.end_gcode_square(pluginSettings.end_gcode_square());
         }
-
-        self.onAfterBinding = function() {
-            mainViewModel.resetProcedure();
-            //console.log(mainViewModel.bed_center_x + " " + mainViewModel.bed_center_y)
-        }
-
-        let restrictedInputsSquare = ["#extra-margin", "#regular-nozzle-square", "#regular-bed-square", "#fan-speed-square",
-            "#regular-speed-square", "#travel-speed-square", "#retraction-dist-square", "#retraction-speed-square", "#flow-square", "#abl-method-square", "#start-gcode-square"];
-        let saveInputsSquare = ["extra_margin", "regular_nozzle_square", "regular_bed_square", "fan_speed_square",
-            "regular_speed_square", "travel_speed_square", "retraction_dist_square", "retraction_speed_square", "flow_square", "abl_method_square", "start_gcode_square"];
+        
+        let restrictedInputsSquare = ["#extra-margin", "#regular-nozzle-square", "#regular-bed-square", "#fan-speed-square", "#regular-speed-square", "#travel-speed-square",
+            "#retraction-dist-square", "#retraction-speed-square", "#flow-square", "#abl-method-square", "#start-gcode-square", "#end-gcode-square"];
+        let saveInputsSquare = ["extra_margin", "regular_nozzle_square", "regular_bed_square", "fan_speed_square", "regular_speed_square", "travel_speed_square",
+            "retraction_dist_square", "retraction_speed_square", "flow_square", "abl_method_square", "start_gcode_square", "end_gcode_square"];
         let restrictedInputsProfile = ["abl-method-square", "end-gcode-square", "novalue", "fan-speed-square", "novalue",
             "novalue", "flow-square", "regular-bed-square", "regular-nozzle-square", "regular-speed-square", "retraction-dist-square",
             "retraction-speed-square", "start-gcode-square", "travel-speed-square"];
@@ -59,73 +56,100 @@ $(function() {
             "novalue", "flow", "regular_bed", "regular_nozzle", "regular_speed", "retraction_dist",
             "retraction_speed", "start_gcode", "travel_speed"];
         let saveSettingsProfile, saveSettingsSquare, saveSettingsProfileSquare;
+        
+        self.onAfterBinding = function() {
+            mainViewModel.resetProcedure();
+            $(restrictedInputsSquare.join(",")).each(function() {
+                let element = this
+                let div = this.parentNode.parentNode.parentNode;
+                let id = element.id
+                saveSettingsSquare = saveInputsSquare[restrictedInputsSquare.indexOf('#' + this.id)]
+                saveSettingsProfileSquare = element.value;
+                if (restrictedInputsSquare.indexOf('#' + id) <= 5 || restrictedInputsSquare.indexOf('#' + id) === 7) {
+                    mainViewModel.checkValue(element, div, mainViewModel.allowedArrayClassic)
+                } else if (restrictedInputsSquare.indexOf('#' + id) === 6 && restrictedInputsSquare.indexOf('#' + id) === 8) {
+                    mainViewModel.checkValue(element, div, mainViewModel.allowedArrayComma)
+                }
+            });
+        }
+
+        let settingName, settingValue;
 
         document.getElementById("load-profile-square").onclick = function() {
+            settingName = [];
+            settingValue = [];
             if (self.profile_selection_square() !== "") {
-                mainViewModel.startLoading();
+                mainViewModel.firstTime = Date.now();
+                mainViewModel.startLoading()
                 for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                     if (restrictedSettingsProfile[x] !== "novalue") {
+                        let element = document.getElementById(restrictedInputsProfile[x]);
                         saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_square();
                         saveSettingsSquare = restrictedSettingsProfile[x] + "_square";
                         saveSettingsProfileSquare = pluginSettings[saveSettingsProfile]()
-                        document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileSquare; // loading setting
-                        mainViewModel.saveSettingsTab((saveSettingsSquare), saveSettingsProfileSquare)
+                        element.value = saveSettingsProfileSquare; // loading setting
+                        settingName.push(saveSettingsSquare);
+                        settingValue.push(saveSettingsProfileSquare);
+                        mainViewModel.sortToCheck(element, "loaded");
                     }
                 }
-                mainViewModel.stopLoading();
+                mainViewModel.saveSettingsLoading(settingName, settingValue, "loaded and saved")
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }
         }
 
-        let extra_margin, filename;
+        let extra_margin, feed_rate, filename;
         let gcode_generated = [];
 
         $('#knob, #step2').on("click", function() {
+            if (this.id === 'knob') {
+                $('#knob').button('loading');
+            }
             extra_margin = document.getElementById("extra-margin").value;
-            filename = "knob_levelling";
+            feed_rate = self.knob_levelling_feed_rate()*60;
+            filename = "knoblevelling";
             gcode_generated =
                 "; Bed leveling Ender 3 by ingenioso3D\n" +
                 "; Modified by elproducts CHEP FilamentFriday.com\n" +
                 "; Modified for the Octoprint Calibration Companion plugin purpose\n" +
                 "G90\n" +
                 "G28 ; Home all axis\n" +
-                "G0 Z1 F2000\n" +
                 "\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + extra_margin + " Y" + extra_margin + " F1000; Move to Position 1\n" +
+                "G0 X" + extra_margin + " Y" + extra_margin + " F" + feed_rate + "; Move to Position 1\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z10 ; Lift Z axis\n" +
-                "G0 X" + extra_margin + " Y" + (mainViewModel.variable.bed_size_y - extra_margin) + " ; Move to Position 2\n" +
+                "G0 X" + extra_margin + " Y" + (mainViewModel.bed_size_y() - extra_margin) + " F" + feed_rate + " ; Move to Position 2\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + (mainViewModel.variable.bed_size_y - extra_margin) + " Y" + (mainViewModel.variable.bed_size_y - extra_margin) + " ; Move to Position 3\n" +
+                "G0 X" + (mainViewModel.bed_size_y() - extra_margin) + " Y" + (mainViewModel.bed_size_y() - extra_margin) + " F" + feed_rate + " ; Move to Position 3\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + (mainViewModel.variable.bed_size_y - extra_margin) + " Y" + extra_margin + " ; Move to Position 4\n" +
+                "G0 X" + (mainViewModel.bed_size_y() - extra_margin) + " Y" + extra_margin + " F" + feed_rate + " ; Move to Position 4\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + mainViewModel.bed_center_x + " Y" + mainViewModel.bed_center_y + " ; Move to Position 5\n" +
+                "G0 X" + mainViewModel.bed_center_x + " Y" + mainViewModel.bed_center_y + " F" + feed_rate + " ; Move to Position 5\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + extra_margin + " Y" + (mainViewModel.variable.bed_size_y- extra_margin) + " ; Move to Position 2\n" +
+                "G0 X" + extra_margin + " Y" + (mainViewModel.bed_size_y()- extra_margin) + " F" + feed_rate + " ; Move to Position 2\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + (mainViewModel.variable.bed_size_y - extra_margin) + " Y" + (mainViewModel.variable.bed_size_y - extra_margin) + " ; Move to Position 3\n" +
+                "G0 X" + (mainViewModel.bed_size_y() - extra_margin) + " Y" + (mainViewModel.bed_size_y() - extra_margin) + " F" + feed_rate + " ; Move to Position 3\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + (mainViewModel.variable.bed_size_y - extra_margin) + " Y" + extra_margin + " ; Move to Position 4\n" +
+                "G0 X" + (mainViewModel.bed_size_y() - extra_margin) + " Y" + extra_margin + " F" + feed_rate + " ; Move to Position 4\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + extra_margin + " Y" + extra_margin + " F1000; Move to Position 1\n" +
+                "G0 X" + extra_margin + " Y" + extra_margin + " F" + feed_rate + "; Move to Position 1\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "\n" +
@@ -133,7 +157,7 @@ $(function() {
                 "M84 ; disable motors"
 
             let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
-            OctoPrint.post(url, {"name": filename, "generated gcode": gcode_generated})
+            OctoPrint.post(url, {"name": mainViewModel.printer_name() + "_" + filename, "generated gcode": gcode_generated})
 
             gcode_generated = [];
         })
@@ -149,48 +173,57 @@ $(function() {
 
         let squares_position_x, squares_position_y;
 
-        document.getElementById("calibration-square").onclick = function() {
-
+        document.getElementById("calibration-squares").onclick = function() {
+            let array = [];
+            let el = document.getElementById("layer-calibrationcompanion").getElementsByClassName("control-group");
+            for (let x=0; x<el.length; x++) {
+                array[x] = el[x].attributes[0].nodeValue;
+                if (array[x].includes("error")) {
+                    self.PNotify = new PNotify(mainViewModel.PNotifyData.errorMessage)
+                    return
+                }
+            }
+            $('#calibration-squares').button('loading');
             let start_gcode, end_gcode;
 
-            if (!mainViewModel.variable.origin_check) {
-                squares_position_x = [parseFloat(self.extra_margin()) + 10, mainViewModel.variable.bed_size_x - self.extra_margin() - 30 - 10, parseFloat(self.extra_margin()) + 10, mainViewModel.variable.bed_size_x - self.extra_margin() - 30 - 10, mainViewModel.bed_center_x - 30 / 2];
-                squares_position_y = [mainViewModel.variable.bed_size_y - self.extra_margin() - 10, mainViewModel.variable.bed_size_y - self.extra_margin() - 10, parseFloat(self.extra_margin()) + 30 + 10, parseFloat(self.extra_margin()) + 30 + 10, mainViewModel.bed_center_y + 30 / 2];
+            if (!mainViewModel.origin_check()) {
+                squares_position_x = [parseFloat(self.extra_margin()) + 10, mainViewModel.bed_size_x() - self.extra_margin() - 30 - 10, parseFloat(self.extra_margin()) + 10, mainViewModel.bed_size_x() - self.extra_margin() - 30 - 10, mainViewModel.bed_center_x - 30 / 2];
+                squares_position_y = [mainViewModel.bed_size_y() - self.extra_margin() - 10, mainViewModel.bed_size_y() - self.extra_margin() - 10, parseFloat(self.extra_margin()) + 30 + 10, parseFloat(self.extra_margin()) + 30 + 10, mainViewModel.bed_center_y + 30 / 2];
             } else {
-                squares_position_x = [mainViewModel.bed_center_x - 30 / 2, mainViewModel.variable.bed_size_x/2 - self.extra_margin() - 30 - 10, mainViewModel.bed_center_x - 30 / 2, -mainViewModel.variable.bed_size_x/2 + parseFloat(self.extra_margin()) + 10, mainViewModel.bed_center_x - 30 / 2];
-                squares_position_y = [mainViewModel.variable.bed_size_y/2 - self.extra_margin() - 10, mainViewModel.bed_center_y + 30 / 2, -mainViewModel.variable.bed_size_y/2 + parseFloat(self.extra_margin()) + 30 + 10, mainViewModel.bed_center_y + 30 / 2, mainViewModel.bed_center_y + 30 / 2];
+                squares_position_x = [mainViewModel.bed_center_x - 30 / 2, mainViewModel.bed_size_x()/2 - self.extra_margin() - 30 - 10, mainViewModel.bed_center_x - 30 / 2, -mainViewModel.bed_size_x()/2 + parseFloat(self.extra_margin()) + 10, mainViewModel.bed_center_x - 30 / 2];
+                squares_position_y = [mainViewModel.bed_size_y()/2 - self.extra_margin() - 10, mainViewModel.bed_center_y + 30 / 2, -mainViewModel.bed_size_y()/2 + parseFloat(self.extra_margin()) + 30 + 10, mainViewModel.bed_center_y + 30 / 2, mainViewModel.bed_center_y + 30 / 2];
             }
 
-            mainViewModel.flowCube = false;
+            mainViewModel.variable.flowCube = false;
             mainViewModel.last_feed_rate = 0;
             start_gcode = document.getElementById("start-gcode-square").value;
             end_gcode = document.getElementById("end-gcode-square").value;
-            mainViewModel.regular_nozzle = document.getElementById("regular-nozzle-square").value;
-            mainViewModel.regular_bed = document.getElementById("regular-bed-square").value;
-            mainViewModel.fan_speed = document.getElementById("fan-speed-square").value;
-            mainViewModel.fan_layer = 0;
-            mainViewModel.regular_speed = document.getElementById("regular-speed-square").value * 60;
-            mainViewModel.first_layer_speed = mainViewModel.regular_speed;
-            mainViewModel.travel_speed = document.getElementById("travel-speed-square").value * 60;
-            mainViewModel.retraction_distance = document.getElementById("retraction-dist-square").value;
-            mainViewModel.retraction_speed = document.getElementById("retraction-speed-square").value * 60;
-            mainViewModel.flow = document.getElementById("flow-square").value;
-            mainViewModel.abl_method = document.getElementById("abl-method-square").value;
-            mainViewModel.filename = "calibration_squares";
+            mainViewModel.variable.regular_nozzle = document.getElementById("regular-nozzle-square").value;
+            mainViewModel.variable.regular_bed = document.getElementById("regular-bed-square").value;
+            mainViewModel.variable.fan_speed = document.getElementById("fan-speed-square").value;
+            mainViewModel.variable.fan_layer = 0;
+            mainViewModel.variable.regular_speed = document.getElementById("regular-speed-square").value * 60;
+            mainViewModel.variable.first_layer_speed = mainViewModel.regular_speed;
+            mainViewModel.variable.travel_speed = document.getElementById("travel-speed-square").value * 60;
+            mainViewModel.variable.retraction_distance = document.getElementById("retraction-dist-square").value;
+            mainViewModel.variable.retraction_speed = document.getElementById("retraction-speed-square").value * 60;
+            mainViewModel.variable.flow = document.getElementById("flow-square").value;
+            mainViewModel.variable.abl_method = document.getElementById("abl-method-square").value;
+            mainViewModel.variable.filename = "squares";
 
             for (let sq = 1; sq <= 5; sq++) {
                 let boolean = [true]
-                mainViewModel.first_z_pos = String(mainViewModel.variable.nozzle_size / 2);
+                mainViewModel.first_z_pos = String(mainViewModel.nozzle_size() / 2);
                 first_x_absolute_pos = squares_position_x[sq - 1];
                 first_y_absolute_pos = squares_position_y[sq - 1];
-                if (!mainViewModel.variable.relative_positioning) {
+                if (!mainViewModel.relative_positioning()) {
                     mainViewModel.first_x_pos = first_x_absolute_pos;
                     mainViewModel.first_y_pos = first_y_absolute_pos;
                 }
                 startFeedRate[sq] = mainViewModel.feed_rate;
-                firstLayerCoord(parseFloat(mainViewModel.variable.nozzle_size));
+                firstLayerCoord(parseFloat(mainViewModel.nozzle_size()));
                 for (let z = 0; z <= relative_pos_x.length; z++) {
-                    if (mainViewModel.variable.relative_positioning) {
+                    if (mainViewModel.relative_positioning()) {
                         pos_x[z] = relative_pos_x[z]
                         pos_y[z] = relative_pos_y[z]
                     } else {
@@ -199,7 +232,7 @@ $(function() {
                         pos_y[z] = mainViewModel.yAbsolute[z]
                     }
                 }
-                if (mainViewModel.variable.relative_positioning) {
+                if (mainViewModel.relative_positioning()) {
                     returningPosX = (squares_position_x[sq] + mainViewModel.getReturningPosition(relative_pos_x) - squares_position_x[sq-1]).toFixed(3);
                     returningPosY = (squares_position_y[sq] + mainViewModel.getReturningPosition(relative_pos_y) - squares_position_y[sq-1]).toFixed(3);
                 } else {
@@ -210,53 +243,53 @@ $(function() {
                 for (let x = 0; x < relative_pos_x.length; x++) {
                     if (GStatus[x] !== "null") {
                         if (GStatus[x] === "G0") {
-                            gcode_generated[sq][x] = GStatus[x] + " F" + mainViewModel.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + ";\n";
+                            gcode_generated[sq][x] = GStatus[x] + " F" + mainViewModel.variable.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + ";\n";
                         } else {
                             mainViewModel.extruded_length_calculation_relative(relative_pos_x[x], relative_pos_y[x])
-                            gcode_generated[sq][x] = GStatus[x] + " F" + mainViewModel.regular_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " E" + mainViewModel.feed_rate + ";\n";
+                            gcode_generated[sq][x] = GStatus[x] + " F" + mainViewModel.variable.regular_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " E" + mainViewModel.feed_rate + ";\n";
                         }
                     } else {
                         if (GStatus[x] === "G0") {
-                            gcode_generated[sq][x] = GStatus[x] + " F" + mainViewModel.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + ";\n";
+                            gcode_generated[sq][x] = GStatus[x] + " F" + mainViewModel.variable.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + ";\n";
                         } else {
                             mainViewModel.extruded_length_calculation_relative(relative_pos_x[x], relative_pos_y[x])
-                            gcode_generated[sq][x] = GStatus[x] + " F" + mainViewModel.regular_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + " E" + mainViewModel.feed_rate + ";\n";
+                            gcode_generated[sq][x] = GStatus[x] + " F" + mainViewModel.variable.regular_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + " E" + mainViewModel.feed_rate + ";\n";
                         }
                     }
                 }
                 if (sq < 5) {
-                    if (!mainViewModel.variable.relative_positioning) {
-                        gcode_generated[sq].push("\nG1 F" + mainViewModel.retraction_speed + " E" + (mainViewModel.feed_rate - mainViewModel.retraction_distance) + ";\n" +
-                            "GO F" + mainViewModel.regular_speed + " Z10\n" +
-                            "G0 F" + mainViewModel.regular_speed + " X" + squares_position_x[sq] + " Y" + squares_position_y[sq] + ";\n" +
-                            "GO F" + mainViewModel.regular_speed + " Z" + mainViewModel.variable.nozzle_size/2 + ";\n" +
-                            "G1 F" + mainViewModel.retraction_speed + " E" + mainViewModel.feed_rate + ";\n\n");
+                    if (!mainViewModel.relative_positioning()) {
+                        gcode_generated[sq].push("\nG1 F" + mainViewModel.variable.retraction_speed + " E" + (mainViewModel.feed_rate - mainViewModel.variable.retraction_distance) + ";\n" +
+                            "GO F" + mainViewModel.variable.regular_speed + " Z10\n" +
+                            "G0 F" + mainViewModel.variable.regular_speed + " X" + squares_position_x[sq] + " Y" + squares_position_y[sq] + ";\n" +
+                            "GO F" + mainViewModel.variable.regular_speed + " Z" + mainViewModel.nozzle_size()/2 + ";\n" +
+                            "G1 F" + mainViewModel.variable.retraction_speed + " E" + mainViewModel.feed_rate + ";\n\n");
                     } else {
-                        gcode_generated[sq].push("\nG1 F" + mainViewModel.retraction_speed + " E-" + mainViewModel.retraction_distance + ";\n" +
-                            "GO F" + mainViewModel.regular_speed + " Z10\n" +
-                            "G0 F" + mainViewModel.regular_speed + " X" + returningPosX + " Y" + returningPosY + ";\n" +
-                            "GO F" + mainViewModel.regular_speed + " Z-10;\n" +
-                            "G1 F" + mainViewModel.retraction_speed + " E" + mainViewModel.retraction_distance + ";\n");
+                        gcode_generated[sq].push("\nG1 F" + mainViewModel.variable.retraction_speed + " E-" + mainViewModel.variable.retraction_distance + ";\n" +
+                            "GO F" + mainViewModel.variable.regular_speed + " Z10\n" +
+                            "G0 F" + mainViewModel.variable.regular_speed + " X" + returningPosX + " Y" + returningPosY + ";\n" +
+                            "GO F" + mainViewModel.variable.regular_speed + " Z-10;\n" +
+                            "G1 F" + mainViewModel.variable.retraction_speed + " E" + mainViewModel.variable.retraction_distance + ";\n");
                     }
                 }
             }
-            if (mainViewModel.variable.relative_positioning) {
+            if (mainViewModel.relative_positioning()) {
                 gcode_generated.splice(0, 1);
                 gcode_generated.unshift("G91;\n")
             }
 
-            mainViewModel.getSettings();
+            mainViewModel.callSettings();
 
-            for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {
+            for (const [key, value] of Object.entries(mainViewModel.settingsCallable)) {
                 start_gcode = start_gcode.replaceAll("[" + key + "]", value);
             }
             gcode_generated.unshift("G28;\n\n" +
-                ";---------ABL METHOD---------\n" + mainViewModel.abl_method + ";\n;---------ABL METHOD---------\n\n" +
+                ";---------ABL METHOD---------\n" + mainViewModel.variable.abl_method + ";\n;---------ABL METHOD---------\n\n" +
                 ";---------START G-CODE---------\n" + start_gcode + ";\n;---------START G-CODE---------\n\n" +
-                "G90 E0;\nG0 F" + mainViewModel.travel_speed + " X" + squares_position_x[0] + " Y" + squares_position_y[0] +
-                ";\n" + "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + ";\n")
+                "G92 E0;\nG0 F" + mainViewModel.variable.travel_speed + " X" + squares_position_x[0] + " Y" + squares_position_y[0] +
+                ";\n" + "G0 F" + mainViewModel.variable.travel_speed + " Z" + mainViewModel.nozzle_size() / 2 + ";\n")
 
-            for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {
+            for (const [key, value] of Object.entries(mainViewModel.settingsCallable)) {
                 end_gcode = end_gcode.replaceAll("[" + key + "]", value);
             }
             gcode_generated.push(end_gcode);
@@ -264,7 +297,7 @@ $(function() {
 
             let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
             OctoPrint.post(url, {
-                "name": mainViewModel.getFullFilename(mainViewModel.filename),
+                "name": mainViewModel.getFullFilename(mainViewModel.variable.filename),
                 "generated gcode": gcode_generated.flat().join('')
             })
             gcode_generated = [];
@@ -301,7 +334,12 @@ $(function() {
         }
 
         document.getElementById("step1").addEventListener("click", function(){
+            if (self.knob_levelling_feed_rate()<=0) {
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.noTravelSpeed)
+                return
+            }
             z_offset = 0;
+            OctoPrint.settings.savePluginSettings('calibrationcompanion', {'procedureStarted' : true})
             OctoPrint.control.sendGcode(['M851', 'M851 Z0', 'G28', 'M500', 'G90', 'G0 X' + mainViewModel.bed_center_x + ' Y' + mainViewModel.bed_center_y + ' F2000', 'G0 Z0.1', 'M211 S0'])
             document.getElementById("step1").disabled = true
             document.getElementById("step2").disabled = false

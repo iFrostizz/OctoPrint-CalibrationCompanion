@@ -20,15 +20,15 @@ $(function () {
         self.abl_method_retra = ko.observable();
         self.abl_method_temp = ko.observable();
         self.nozzle_size = ko.observable();
-        self.filament_diameter = ko.observable();
+        self.fil_diameter = ko.observable();
         self.auto_print = ko.observable();
 
         self.variable = {};
         self.PNotifyData = {};
 
-        let restrictedIdClassic = ["#bedSizeX", "#bedSizeY", "#bedSizeZ"];
+        //let restrictedIdClassic = ["#bed-size-x", "#bed-size-y", "#bed-size-z"];
         self.allowedArrayClassic = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-        let restrictedIdComma = ["#filamentDiameter"];
+        //let restrictedIdComma = ["#fil-diameter"];
         self.allowedArrayComma = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
         let restrictedIdText = ["#printerName"];
         self.allowedArrayText = ['a', 'A', 'b', 'B', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H',
@@ -37,9 +37,9 @@ $(function () {
                                 'w', 'W', 'x', 'X', 'y', 'Y', 'z', 'Z'];
 
 
-        let restrictedInputs = ["#printerName", "#filamentUsed", "#filamentDiameter", "#bedSizeX", "#bedSizeY", "#bedSizeZ", "#nozzleSize"];
-        let restrictedNoVerifInputs = ["null", "#filamentUsed", "null", "null", "null", "null", "#nozzleSize"]
-        let saveInputs = ["printer_name", "filament_used", "filament_diameter", "bed_size_x", "bed_size_y", "bed_size_z", "nozzle_size"];
+        //let restrictedInputs = ["#printerName", "#filament-used", "#fil-diameter", "#bed-size-x", "#bed-size-y", "#bed-size-z", "#nozzle-size"];
+        let restrictedNoVerifInputs = ["null", "#filament-used", "null", "null", "null", "null", "#nozzle-size"]
+        let saveInputs = ["printer_name", "filament_used", "fil_diameter", "bed_size_x", "bed_size_y", "bed_size_z", "nozzle_size"];
 
         let restrictedCheckbox = ["#relativePositioning", "#originCheck", "#autoPrint"];
         let saveCheckbox = ["relative_positioning", "origin_check", "auto_print"];
@@ -55,32 +55,72 @@ $(function () {
             self.printer_name(self.settingsViewModel.settings.plugins.calibrationcompanion.printer_name());
             self.relative_positioning(self.settingsViewModel.settings.plugins.calibrationcompanion.relative_positioning());
             self.nozzle_size(self.settingsViewModel.settings.plugins.calibrationcompanion.nozzle_size());
-            self.filament_diameter(self.settingsViewModel.settings.plugins.calibrationcompanion.filament_diameter());
+            self.fil_diameter(self.settingsViewModel.settings.plugins.calibrationcompanion.fil_diameter());
             self.auto_print(self.settingsViewModel.settings.plugins.calibrationcompanion.auto_print());
         }
 
         self.onAfterBinding = function() {
-            $(restrictedNoVerifInputs.join(",")).each(function () {
-                saveSettingsSetup(this);
-            });
-            $(restrictedIdClassic.join(",")).each(function() {
-                self.checkValue(this, this.parentNode.parentNode.parentNode, self.allowedArrayClassic);
-            });
-            $(restrictedIdComma.join(",")).each(function() {
-                self.checkValue(this, this.parentNode.parentNode.parentNode, self.allowedArrayComma);
-            });
-            $(restrictedIdText.join(",")).each(function() {
-                self.checkValue(this, this.parentNode.parentNode, self.allowedArrayText);
-            });
             $(restrictedCheckbox.join(",")).each(function() {
-                saveSettingsSetupCheckbox(this);
+                computeCheckbox(this);
             });
         }
+        
+        $('#temp-tower').button()
+        $('#retra-tower').button()
+        $('#calibration-squares').button()
+        $('#knob').button()
+        $('#flow-cube').button()
+        $('#accel-tower').button()
+        
+        self.onDataUpdaterPluginMessage = function(plugin, message) {
+            if (plugin !== "calibrationcompanion" || typeof message.fileReceived !== "string") {
+                return
+            }
+            let receivedFilename = message.fileReceived;
+            let filename = receivedFilename.substring(receivedFilename.lastIndexOf("_")+1, receivedFilename.lastIndexOf(".gcode"))
+            console.log(filename)
+            self.PNotify = new PNotify({
+                title: 'Calibration Companion',
+                text: 'The file ' + receivedFilename + " has been added to the file manager!",
+                type: 'info',
+                hide: true,
+                buttons: {
+                    closer: true,
+                    sticker: false
+                },
+            })
+            switch (filename) {
+                case "temptower":
+                    $('#temp-tower').button('reset')
+                    break;
+                case "retratower":
+                    $('#retra-tower').button('reset')
+                    break;
+                case "squares":
+                    $('#calibration-squares').button('reset')
+                    break;
+                case "knoblevelling":
+                    $('#knob').button('reset')
+                    break;
+                case "flowcube":
+                    $('#flow-cube').button('reset')
+                    break;
+                case "acceltower":
+                    $('#accel-tower').button('reset')
+                    break;
+            }
+        }
+
+        $("#bed-size-x").on("input", function () {
+            if (self.origin_check()) {
+                document.getElementById("bed-size-y").value = this.value;
+            }
+        });
 
         self.PNotifyData = {
             zHeightWarning: {
                 title: 'Calibration Companion',
-                text: 'Maximum height was reached, please check your Printer Height Z',
+                text: 'Maximum height was reached, please check your Printer Height Z.',
                 type: 'alert',
                 hide: true,
                 buttons: {
@@ -110,7 +150,7 @@ $(function () {
             },
             noProfileMessage: {
                 title: 'Calibration Companion',
-                text: 'Please choose one profile',
+                text: 'Please choose one profile.',
                 type: 'alert',
                 hide: true,
                 buttons: {
@@ -118,49 +158,37 @@ $(function () {
                     sticker: false
                 },
             },
-        }
-
-        let readyState;
-        OctoPrint.printer.getFullState().done(function(response) {
-            readyState = response.sd.ready;
-        });
-
-        $("#bedSizeX").on("input", function () {
-            if (self.variable.origin_check) {
-                document.getElementById("bedSizeY").value = this.value;
+            noTravelSpeed: {
+                title: 'Calibration Companion',
+                text: 'Please set your "Travel speed" above.',
+                type: 'alert',
+                hide: true,
+                buttons: {
+                    closer: true,
+                    sticker: false
+                },
             }
-        });
-
-        $(restrictedIdClassic.join(",")).on("input", function() {
-            self.checkValue(this, this.parentNode.parentNode.parentNode, self.allowedArrayClassic);
-        });
-
-        $(restrictedIdComma.join(",")).on("input", function() {
-            self.checkValue(this, this.parentNode.parentNode.parentNode, self.allowedArrayComma);
-        });
-
-        $(restrictedIdText.join(",")).on("input", function() {
-            self.checkValue(this, this.parentNode.parentNode, self.allowedArrayText);
-        });
+        }
 
         self.checkValue = function(element, div, array) {
             let id = element.id;
             let value = element.value;
             let booleanArray = [];
             value.split('').forEach(elementLoop => booleanArray.push(array.includes(elementLoop)));
-            let finalBoolean = !booleanArray.some((elementLoop) => elementLoop === false)
-            if (finalBoolean) {
+            let containsError = booleanArray.some((elementLoop) => elementLoop === false)
+            //console.log(id + " " + value)
+            if (!containsError) {
                 self.removeError(div)
-                saveSettingsSetup(element)
                 if (value.length <= 0) {
-                    self.removeWarning(div);
-                } else if (id === "bedSizeX" || id === "bedSizeY") {
+                    self.removeWarning(div); // Reset button
+                } else if (id === "bed-size-x" || id === "bed-size-y") {
+                    calculateBedCenter();
                     if (value < 100) {
                         self.addWarning(div);
                     } else {
                         self.removeWarning(div);
                     }
-                } else if (id === "bedSizeZ") {
+                } else if (id === "bed-size-z") {
                     if (value < 50) {
                         self.addWarning(div);
                     } else {
@@ -224,7 +252,7 @@ $(function () {
                     }
                 }
             } else {
-                self.checkError(div);
+                self.addError(div);
             }
         }
 
@@ -234,85 +262,150 @@ $(function () {
         self.removeWarning = function(div) {
             div.className = "control-group";
         }
-        self.checkError = function(div) {
+        self.addError = function(div) {
             div.className = "control-group error";
         }
         self.removeError = function(div) {
             div.className = "control-group";
         }
 
-        let allowedArrayClassicInput = ["first-layer-nozzle-", "regular-nozzle-", "regular-bed-", "fan-speed-", "fan-layer-", "first-layer-speed-",
-            "regular-speed-", "travel-speed-"];
-        let allowedArrayCommaInput = ["retraction-dist-", "retraction-speed-", "flow-"];
+        let allowedArrayClassicInput = ["first-layer-nozzle-", "regular-nozzle-", "regular-bed-", "fan-speed-",
+            "retraction-speed-", "fan-layer-", "first-layer-speed-", "regular-speed-", "travel-speed-", "bed-size-", "knob-levelling-feed-"];
+        let allowedArrayCommaInput = ["retraction-dist-", "flow-", "fil-", "filament-path-", "actual-estep-", "measured-"];
+        let allowedArrayInput = ["nozzle-", "filament-", "abl-method-", "start-gcode-", "end-gcode-"];
+        let allowedArrayTextInput = ["printer-"];
+
+        let settingTab, noError;
 
         $(document).on("input", function(e) {
-            let id = e.target.id;
             let element = e.target;
+            self.sortToCheck(element, "saved");
+        });
+        
+        self.sortToCheck = function(element, action) {
+            //console.log(self.variable);
+            let id = element.id;
+            let settingName = id.replaceAll("-", "_")
+            let value = element.value;
+            //self.getSettings() // Call Object function
+            settingTab = id.substr(id.lastIndexOf("-")+1);
             if (allowedArrayClassicInput.includes(id.substr(0, id.lastIndexOf("-")+1))) {
                 self.checkValue(element, element.parentNode.parentNode.parentNode, self.allowedArrayClassic);
+                noError = !(element.parentNode.parentNode.parentNode.className === "control-group error");
+                if (settingTab !== "profile" && noError && action === "saved") {
+                    self.firstTime = Date.now();
+                    self.startLoading();
+                    self.saveOneSettingLoading(settingName, value, action)
+                    /*if (self.settingsSquare.hasOwnProperty(settingName)) { // if is in setup
+                        self.variable[settingName] = value;
+                    }*/
+                }
             } else if (allowedArrayCommaInput.includes(id.substr(0, id.lastIndexOf("-")+1))) {
                 self.checkValue(element, element.parentNode.parentNode.parentNode, self.allowedArrayComma);
+                noError = !(element.parentNode.parentNode.parentNode.className === "control-group error");
+                if (settingTab !== "profile" && noError && action === "saved") {
+                    self.firstTime = Date.now();
+                    self.startLoading();
+                    self.saveOneSettingLoading(settingName, value, action)
+                    /*if (self.settingsSquare.hasOwnProperty(settingName)) { // if is in setup
+                        self.variable[settingName] = value;
+                    }*/
+                }
+            } else if (allowedArrayInput.includes(id.substr(0, id.lastIndexOf("-")+1))) {
+                if (settingTab !== "profile" && action === "saved") {
+                    self.firstTime = Date.now();
+                    self.startLoading();
+                    self.saveOneSettingLoading(settingName, value, action)
+                    /*if (self.settingsSquare.hasOwnProperty(settingName)) { // if is in setup
+                        self.variable[settingName] = value;
+                    }*/
+                }
+            } else if (allowedArrayTextInput.includes(id.substr(0, id.lastIndexOf("-")+1))) {
+                self.checkValue(element, element.parentNode.parentNode.parentNode, self.allowedArrayText);
+                noError = !(element.parentNode.parentNode.parentNode.className === "control-group error");
+                if (settingTab !== "profile" && action === "saved") {
+                    self.firstTime = Date.now();
+                    self.startLoading();
+                    self.saveOneSettingLoading(settingName, value, action)
+                }
+            } else if (id === "extra-margin" && action === "saved") {
+                self.checkValue(element, element.parentNode.parentNode.parentNode, self.allowedArrayClassic);
+                noError = !(element.parentNode.parentNode.parentNode.className === "control-group error");
+                if (noError) {
+                    self.firstTime = Date.now();
+                    self.startLoading();
+                    self.saveOneSettingLoading("extra_margin", value, action)
+                }
             }
-        });
+        }
 
-        document.getElementById("nozzleSize").onchange = function() {
+        document.getElementById("nozzle-size").onchange = function() {
             self.resetAccel();
             self.resetRetra();
             self.resetTemp();
         }
 
-        $(restrictedNoVerifInputs.join(",")).on("input", function() {
-            saveSettingsSetup(this);
-        });
-
-        let bed_size_verif = ["#bedSizeX, #bedSizeY"];
-        /*$(bed_size_verif.join(",")).on("input", function() {
-            $(restrictedCheckbox.join(",")).each(function() {
-                saveSettingsSetupCheckbox(this);
-            });
-        })*/
-
         $(restrictedCheckbox.join(",")).on("input", function() {
-            saveSettingsSetupCheckbox(this);
+            self.firstTime = Date.now();
+            self.startLoading();
+            [saveSettingsCheckbox, element] = computeCheckbox(this);
+            self.saveOneSettingLoading(saveSettingsCheckbox, element.checked, "saved")
         })
-
-        function saveSettingsSetup(element) {
-            let saveSettings = saveInputs[restrictedInputs.indexOf('#' + element.id)];
-            self.variable[saveSettings] = element.value;
-            self.saveSettingsTab(saveSettings, element.value);
-        }
-
-        function saveSettingsSetupCheckbox(element) {
+        
+        function computeCheckbox(element) {
             let saveSettingsCheckbox = saveCheckbox[restrictedCheckbox.indexOf('#' + element.id)];
-            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
-                [saveSettingsCheckbox]: element.checked
-            })
-            self.variable[saveSettingsCheckbox] = element.checked;
-            self.saveSettingsTab(saveSettingsCheckbox, element.checked)
             if (saveSettingsCheckbox === "origin_check") {
                 if (element.checked) {
-                    document.getElementById("bedSizeY").disabled = true;
-                    self.bed_center_x = 0;
-                    self.bed_center_y = 0;
+                    $('#bed-size-y')[0].disabled = true;
+                    $('#bed-size-y')[0].value = $('#bed-size-x')[0].value;
                 } else {
-                    document.getElementById("bedSizeY").disabled = false;
-                    self.bed_center_x = Math.round(self.variable.bed_size_x / 2);
-                    self.bed_center_y = Math.round(self.variable.bed_size_y / 2);
+                    document.getElementById("bed-size-y").disabled = false;
                 }
+            }
+            calculateBedCenter();
+            return[saveSettingsCheckbox, element];
+        }
+        
+        function calculateBedCenter() {
+            if (self.origin_check()) {
+                self.bed_center_x = 0;
+                self.bed_center_y = 0;
+            } else {
+                self.bed_center_x = Math.round(self.bed_size_x() / 2);
+                self.bed_center_y = Math.round(self.bed_size_y() / 2);
             }
         }
 
         let spinner = document.getElementById("spinner-loading-save")
 
-        self.saveSettingsTab = function(settingName, value) {
+        self.saveOneSettingLoading = function(settingName, value, action) {
             OctoPrint.settings.savePluginSettings('calibrationcompanion', {
                 [settingName]: value
-            }).done(self.stopLoading())
+            }).done(function() {
+                if (spinner.style.visibility === "visible") {
+                    let millisNow = Date.now();
+                    let millisNeeded = millisNow - self.firstTime;
+                    console.info("Calibration Companion: Settings " + action + " ! Time taken: " + millisNeeded + " ms.");
+                    self.lastTime = Date.now();
+                    self.stopLoading();
+                }
+                console.log(settingName)
+                if (self.saveInputsEsteps.includes(settingName)) {
+                    console.log(settingName)
+                    self.final_estep_calculation();
+                }
+            })
         }
 
-        self.saveSettingsNoLoading = function(settingName, value) {
-            OctoPrint.settings.savePluginSettings('calibrationcompanion', {
-                [settingName]: value
+        self.saveSettingsLoading = function(settingName, value, action) {
+            const reducedSettings = settingName.reduce((acc,curr,idx)=> (acc[curr]=value[idx],acc),{});
+            OctoPrint.settings.savePluginSettings('calibrationcompanion', reducedSettings).done(function() {
+                let millisNow = Date.now();
+                let millisNeeded = millisNow - self.firstTime;
+                console.info("Calibration Companion: Settings " + action + " ! Time taken: " + millisNeeded + " ms.");
+                self.lastTime = Date.now();
+                self.stopLoading()
+                $("#save-profile").button('reset')
             })
         }
 
@@ -322,10 +415,6 @@ $(function () {
         self.stopLoading = function() {
             spinner.style.visibility = "hidden"
         }
-
-        $(restrictedCheckbox.join(",")).on("click", function() {
-            saveSettingsSetupCheckbox(this);
-        });
 
         self.whitespace = document.createElement("span");
         self.whitespace.className = "whitespace"
@@ -343,16 +432,16 @@ $(function () {
         }
 
         self.getFullFilename = function(filename) {
-            return self.variable.printer_name + "_" + self.variable.filament_used + "_" + self.variable.nozzle_size + "_" + filename;
+            return self.printer_name() + "_" + self.filament_used() + "_" + self.nozzle_size() + "_" + filename;
         }
 
-        let procedureStarted = false
+        /*let procedureStarted = false
 
         document.getElementById("step1").onclick = function() {
             procedureStarted = true
             OctoPrint.settings.savePluginSettings('calibrationcompanion', {'procedureStarted' : true})
-            //OctoPrint.settings.savePluginSettings('calibrationcompanion', {'current_z_offset' : "undefined"})
-        }
+            OctoPrint.settings.savePluginSettings('calibrationcompanion', {'current_z_offset' : "undefined"})
+        }*/
 
         /*self.onServerDisconnect = function() {
             if (procedureStarted) {
@@ -412,24 +501,24 @@ $(function () {
         let feed_rate_relative = 0;
 
         function feed_rate_calculation_diagonal(extruded_length) {
-            let layer_height = self.variable.nozzle_size / 2;
-            let layer_width = self.variable.nozzle_size;
-            if (self.variable.relative_positioning) {
-                feed_rate_relative = Math.round((self.flow/100) * 100000 * (layer_height * layer_width * extruded_length) / ((Math.PI / 4) * Math.pow(self.variable.filament_diameter, 2))) / 100000;
+            let layer_height = self.nozzle_size() / 2;
+            let layer_width = self.nozzle_size();
+            if (self.relative_positioning()) {
+                feed_rate_relative = Math.round((self.variable.flow/100) * 100000 * (layer_height * layer_width * extruded_length) / ((Math.PI / 4) * Math.pow(self.fil_diameter(), 2))) / 100000;
             } else {
-                feed_rate_relative = Math.round((self.flow/100) * 100000 * (layer_height * layer_width * extruded_length) / ((Math.PI / 4) * Math.pow(self.variable.filament_diameter, 2))) / 100000 + self.last_feed_rate;
+                feed_rate_relative = Math.round((self.variable.flow/100) * 100000 * (layer_height * layer_width * extruded_length) / ((Math.PI / 4) * Math.pow(self.fil_diameter(), 2))) / 100000 + self.last_feed_rate;
                 self.last_feed_rate = feed_rate_relative
             }
             self.feed_rate = feed_rate_relative.toFixed(5)
             return self.feed_rate
         }
         function feed_rate_calculation_flow_cube(extruded_length) {
-            let layer_height = self.variable.nozzle_size / 2;
-            let layer_width = self.variable.nozzle_size;
-            if (self.variable.relative_positioning) {
-                feed_rate_relative = Math.round((self.flow/100) * 100000 * (((layer_width - layer_height) * layer_height + (Math.PI * Math.pow(layer_height / 2, 2))) * extruded_length) / ((Math.PI / 4) * Math.pow(self.variable.filament_diameter, 2))) / 100000;
+            let layer_height = self.nozzle_size() / 2;
+            let layer_width = self.nozzle_size();
+            if (self.relative_positioning()) {
+                feed_rate_relative = Math.round((self.variable.flow/100) * 100000 * (((layer_width - layer_height) * layer_height + (Math.PI * Math.pow(layer_height / 2, 2))) * extruded_length) / ((Math.PI / 4) * Math.pow(self.fil_diameter(), 2))) / 100000;
             } else {
-                feed_rate_relative = Math.round((self.flow/100) * 100000 * (((layer_width - layer_height) * layer_height + (Math.PI * Math.pow(layer_height / 2, 2))) * extruded_length) / ((Math.PI / 4) * Math.pow(self.variable.filament_diameter, 2))) / 100000 + self.last_feed_rate;
+                feed_rate_relative = Math.round((self.variable.flow/100) * 100000 * (((layer_width - layer_height) * layer_height + (Math.PI * Math.pow(layer_height / 2, 2))) * extruded_length) / ((Math.PI / 4) * Math.pow(self.fil_diameter(), 2))) / 100000 + self.last_feed_rate;
                 self.last_feed_rate = feed_rate_relative
             }
             self.feed_rate = feed_rate_relative.toFixed(5)
@@ -454,7 +543,7 @@ $(function () {
                 zAbsolute = [];
                 xLastAbsolute = xAbsolute[0] = self.first_x_pos;
                 yLastAbsolute = yAbsolute[0] = self.first_y_pos;
-                zLastAbsolute = zAbsolute[0] = parseFloat(self.first_z_pos) + parseFloat(self.variable.nozzle_size)/2;
+                zLastAbsolute = zAbsolute[0] = parseFloat(self.first_z_pos) + parseFloat(self.nozzle_size())/2;
             }
                 if (xRelative === "null") {
                     xAbsolute[z + 1] = "null";
@@ -482,28 +571,28 @@ $(function () {
             return [(self.xAbsolute = xAbsolute), (self.yAbsolute = yAbsolute), (self.zAbsolute = zAbsolute)]
         }
 
-        self.getSettings = function() {
-            self.settingsSquare = {
-                "printer_name": self.variable.printer_name,
-                "filament_used": self.variable.filament_used,
-                "filament_diameter": self.variable.filament_diameter,
-                "nozzle_size": self.variable.nozzle_size,
-                "bed_size_x": self.variable.bed_size_x,
-                "bed_size_y": self.variable.bed_size_y,
-                "bed_size_z": self.variable.bed_size_z,
-
-                "first_layer_nozzle": self.regular_nozzle,
-                "regular_nozzle": self.regular_nozzle,
-                "regular_bed": self.regular_bed,
-                "fan_speed": self.fan_speed,
-                "fan_layer": self.fan_layer,
-                "first_layer_speed": self.first_layer_speed,
-                "regular_speed": self.regular_speed,
-                "travel_speed": self.travel_speed,
-                "retraction_distance": self.retraction_distance,
-                "retraction_speed": self.retraction_speed,
-                "flow": self.flow,
-                "abl_method": self.abl_method
+        self.callSettings = function() {
+            self.settingsCallable = {
+                "printer_name": self.printer_name(),
+                "filament_used": self.filament_used(),
+                "fil_diameter": self.fil_diameter(),
+                "nozzle_size": self.nozzle_size(),
+                "bed_size_x": self.bed_size_x(),
+                "bed_size_y": self.bed_size_y(),
+                "bed_size_z": self.bed_size_z(),
+            
+                "first_layer_nozzle": self.variable.regular_nozzle,
+                "regular_nozzle": self.variable.regular_nozzle,
+                "regular_bed": self.variable.regular_bed,
+                "fan_speed": self.variable.fan_speed,
+                "fan_layer": self.variable.fan_layer,
+                "first_layer_speed": self.variable.first_layer_speed,
+                "regular_speed": self.variable.regular_speed,
+                "travel_speed": self.variable.travel_speed,
+                "retraction_distance": self.variable.retraction_distance,
+                "retraction_speed": self.variable.retraction_speed,
+                "flow": self.variable.flow,
+                "abl_method": self.variable.abl_method
             };
         }
     }
@@ -528,7 +617,7 @@ $(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
 
-    $('.nav-tabs').button()
+    $("#save-profile").button()
 
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel,

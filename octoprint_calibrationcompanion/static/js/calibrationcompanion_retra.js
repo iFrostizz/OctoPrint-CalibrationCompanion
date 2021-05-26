@@ -66,27 +66,77 @@ $(function() {
             self.start_gcode_retra(pluginSettings.start_gcode_retra());
             self.end_gcode_retra(pluginSettings.end_gcode_retra());
         }
+        
+        let restrictedInputsRetra = ["#first-layer-nozzle-retra", "#regular-nozzle-retra", "#regular-bed-retra", "#fan-speed-retra", "#fan-layer-retra",
+            "#first-layer-speed-retra", "#regular-speed-retra", "#travel-speed-retra", "#flow-retra", "#abl-method-retra", "#start-gcode-retra", "#end-gcode-retra"];
+        let saveInputsRetra = ["first_layer_nozzle_retra", "regular_nozzle_retra", "regular_bed_retra", "fan_speed_retra", "fan_layer_retra",
+            "first_layer_speed_retra", "regular_speed_retra", "travel_speed_retra", "flow_retra", "abl_method_retra", "start_gcode_retra", "end_gcode_retra"];
+        let restrictedInputsProfile = ["abl-method-retra", "end-gcode-retra", "fan-layer-retra", "fan-speed-retra", "first-layer-nozzle-retra",
+            "first-layer-speed-retra", "flow-retra", "regular-bed-retra", "regular-nozzle-retra", "regular-speed-retra", "novalue",
+            "novalue", "start-gcode-retra", "travel-speed-retra"];
+        let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
+            "first_layer_speed", "flow", "regular_bed", "regular_nozzle", "regular_speed", "novalue",
+            "novalue", "start_gcode", "travel_speed"];
+        let saveSettingsProfile, saveSettingsRetra, saveSettingsProfileRetra;
 
         self.onAfterBinding = function () {
-            if (mainViewModel.variable.nozzle_size === "0.6") {
+            $(restrictedInputsRetra.join(",")).each(function() {
+                let element = this
+                let div = this.parentNode.parentNode.parentNode;
+                let id = element.id
+                saveSettingsRetra = saveInputsRetra[restrictedInputsRetra.indexOf('#' + this.id)]
+                saveSettingsProfileRetra = element.value;
+                if (restrictedInputsRetra.indexOf('#' + id) <= 7) {
+                    mainViewModel.checkValue(element, div, mainViewModel.allowedArrayClassic)
+                } else if (restrictedInputsRetra.indexOf('#' + id) === 8) {
+                    mainViewModel.checkValue(element, div, mainViewModel.allowedArrayComma)
+                }
+            });
+            if (mainViewModel.nozzle_size() === "0.6") {
                 stageHeightRetra = 4.2;
                 baseHeight = 1.8;
             } else {
                 stageHeightRetra = 4;
                 baseHeight = 2;
             }
-            mainViewModel.spanValRetra = Math.round(baseHeight/(mainViewModel.variable.nozzle_size/2));
+            mainViewModel.spanValRetra = Math.round(baseHeight/(mainViewModel.nozzle_size()/2));
+        }
+        
+        let settingName, settingValue;
+
+        document.getElementById("load-profile-retra").onclick = function() {
+            settingName = [];
+            settingValue = [];
+            if (self.profile_selection_retra() !== "") {
+                mainViewModel.firstTime = Date.now();
+                mainViewModel.startLoading()
+                for (let x = 0; x < restrictedSettingsProfile.length; x++) {
+                    if (restrictedSettingsProfile[x] !== "novalue") {
+                        let element = document.getElementById(restrictedInputsProfile[x]);
+                        saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_retra();
+                        saveSettingsRetra = restrictedSettingsProfile[x] + "_retra";
+                        saveSettingsProfileRetra = pluginSettings[saveSettingsProfile]()
+                        element.value = saveSettingsProfileRetra; // loading setting
+                        settingName.push(saveSettingsRetra);
+                        settingValue.push(saveSettingsProfileRetra);
+                        mainViewModel.sortToCheck(element, "loaded");
+                    }
+                }
+                mainViewModel.saveSettingsLoading(settingName, settingValue, "loaded and saved")
+            } else {
+                self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
+            }
         }
 
         self.addRetraction = function () {
-            if (mainViewModel.variable.nozzle_size === "0.6") {
+            if (mainViewModel.nozzle_size() === "0.6") {
                 stageHeightRetra = 4.2;
                 baseHeight = 1.8;
             } else {
                 stageHeightRetra = 4;
                 baseHeight = 2;
             }
-            if (mainViewModel.variable.bed_size_z > mainViewModel.spanValRetra * (mainViewModel.variable.nozzle_size/2)) {
+            if (mainViewModel.bed_size_z() > mainViewModel.spanValRetra * (mainViewModel.nozzle_size()/2)) {
                 oldR = r;
                 r++;
                 myParent = document.getElementById("retraStage");
@@ -182,7 +232,7 @@ $(function() {
                 layerHeightRetra[r].className = "layerHeightRetra"
                 layerHeightRetra[r].textContent = mainViewModel.spanValRetra + 1;
                 myBase[r].appendChild(layerHeightRetra[r])
-                mainViewModel.spanValRetra = Math.ceil(mainViewModel.spanValRetra + stageHeightRetra / (mainViewModel.variable.nozzle_size / 2));
+                mainViewModel.spanValRetra = Math.ceil(mainViewModel.spanValRetra + stageHeightRetra / (mainViewModel.nozzle_size() / 2));
 
                 myParent.insertBefore(myBase[r], myBase[r - 1]);
 
@@ -200,7 +250,7 @@ $(function() {
         self.removeRetraction = function () {
             oldR = r;
             if (Math.sign(r) === 1) {
-                mainViewModel.spanValRetra = Math.round(mainViewModel.spanValRetra - stageHeightRetra / (mainViewModel.variable.nozzle_size / 2));
+                mainViewModel.spanValRetra = Math.round(mainViewModel.spanValRetra - stageHeightRetra / (mainViewModel.nozzle_size() / 2));
                 myBase[r].remove();
                 r--;
             } else {
@@ -226,42 +276,6 @@ $(function() {
             }
         });
 
-        let restrictedInputsRetra = ["#first-layer-nozzle-retra", "#regular-nozzle-retra", "#regular-bed-retra", "#fan-speed-retra", "#fan-layer-retra",
-            "#first-layer-speed-retra", "#regular-speed-retra", "#travel-speed-retra", "#flow-retra", "#abl-method-retra", "#start-gcode-retra"];
-        let saveInputsRetra = ["first_layer_nozzle_retra", "regular_nozzle_retra", "regular_bed_retra", "fan_speed_retra", "fan_layer_retra",
-            "first_layer_speed_retra", "regular_speed_retra", "travel_speed_retra", "flow_retra", "abl_method_retra", "start_gcode_retra"];
-        let restrictedInputsProfile = ["abl-method-retra", "end-gcode-retra", "fan-layer-retra", "fan-speed-retra", "first-layer-nozzle-retra",
-            "first-layer-speed-retra", "flow-retra", "regular-bed-retra", "regular-nozzle-retra", "regular-speed-retra", "novalue",
-            "novalue", "start-gcode-retra", "travel-speed-retra"];
-        let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
-            "first_layer_speed", "flow", "regular_bed", "regular_nozzle", "regular_speed", "novalue",
-            "novalue", "start_gcode", "travel_speed"];
-        let saveSettingsProfile, saveSettingsRetra, saveSettingsProfileRetra;
-
-        $(restrictedInputsRetra.join(",")).on("input", function() {
-            saveSettingsRetra = saveInputsRetra[restrictedInputsRetra.indexOf('#' + this.id)]
-            saveSettingsProfileRetra = this.value;
-            mainViewModel.saveSettingsTab((saveSettingsRetra), saveSettingsProfileRetra)
-        });
-
-        document.getElementById("load-profile-retra").onclick = function() {
-            if (self.profile_selection_retra() !== "") {
-                mainViewModel.startLoading();
-                for (let x = 0; x < restrictedSettingsProfile.length; x++) {
-                    if (restrictedSettingsProfile[x] !== "novalue") {
-                        saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_retra();
-                        saveSettingsRetra = restrictedSettingsProfile[x] + "_retra";
-                        saveSettingsProfileRetra = pluginSettings[saveSettingsProfile]()
-                        document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileRetra; // loading setting
-                        mainViewModel.saveSettingsNoLoading((saveSettingsRetra), saveSettingsProfileRetra)
-                    }
-                }
-                mainViewModel.stopLoading();
-            } else {
-                self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
-            }
-        }
-
         let GStatus, layerStatus, EStatus;
         let relative_pos_x, relative_pos_y, relative_pos_z;
         let gcode_generated = [];
@@ -277,7 +291,8 @@ $(function() {
         let startZHeight = [];
 
         let printing_speed, l, start_gcode, end_gcode;
-        document.getElementById("retraction-tower").onclick = function () {
+        document.getElementById("retra-tower").onclick = function () {
+            $('#retra-tower').button('loading');
             if (r === 0) {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noStageMessage)
                 return;
@@ -296,30 +311,30 @@ $(function() {
             mainViewModel.last_feed_rate = 0;
             start_gcode = document.getElementById("start-gcode-retra").value;
             end_gcode = document.getElementById("end-gcode-retra").value;
-            mainViewModel.first_layer_nozzle = document.getElementById("first-layer-nozzle-retra").value;
-            mainViewModel.regular_nozzle = document.getElementById("regular-nozzle-retra").value;
-            mainViewModel.regular_bed = document.getElementById("regular-bed-retra").value;
-            mainViewModel.fan_speed = document.getElementById("fan-speed-retra").value;
-            mainViewModel.fan_layer = document.getElementById("fan-layer-retra").value;
-            mainViewModel.first_layer_speed = document.getElementById("first-layer-speed-retra").value * 60;
-            mainViewModel.regular_speed = document.getElementById("regular-speed-retra").value * 60;
-            mainViewModel.travel_speed = document.getElementById("travel-speed-retra").value * 60;
-            mainViewModel.retraction_speed = document.getElementById("inputListRetraSpeed1").value * 60;
-            mainViewModel.retraction_distance = document.getElementById("inputListRetraDist1").value;
-            mainViewModel.flow = document.getElementById("flow-retra").value;
-            mainViewModel.abl_method = document.getElementById("abl-method-retra").value;
-            mainViewModel.filename = "retra_tower";
+            mainViewModel.variable.first_layer_nozzle = document.getElementById("first-layer-nozzle-retra").value;
+            mainViewModel.variable.regular_nozzle = document.getElementById("regular-nozzle-retra").value;
+            mainViewModel.variable.regular_bed = document.getElementById("regular-bed-retra").value;
+            mainViewModel.variable.fan_speed = document.getElementById("fan-speed-retra").value;
+            mainViewModel.variable.fan_layer = document.getElementById("fan-layer-retra").value;
+            mainViewModel.variable.first_layer_speed = document.getElementById("first-layer-speed-retra").value * 60;
+            mainViewModel.variable.regular_speed = document.getElementById("regular-speed-retra").value * 60;
+            mainViewModel.variable.travel_speed = document.getElementById("travel-speed-retra").value * 60;
+            mainViewModel.variable.retraction_speed = document.getElementById("inputListRetraSpeed1").value * 60;
+            mainViewModel.variable.retraction_distance = document.getElementById("inputListRetraDist1").value;
+            mainViewModel.variable.flow = document.getElementById("flow-retra").value;
+            mainViewModel.variable.abl_method = document.getElementById("abl-method-retra").value;
+            mainViewModel.variable.filename = "retratower";
             for (let s = 0; s <= r; s++) {
                 let boolean = [true]
                 if (s === 0) {
                     mainViewModel.first_x_pos = String(mainViewModel.bed_center_x + 32 / 2);
                     mainViewModel.first_y_pos = String(mainViewModel.bed_center_y + 8 / 2);
-                    mainViewModel.first_z_pos = String((mainViewModel.variable.nozzle_size/2)*l);
+                    mainViewModel.first_z_pos = String((mainViewModel.nozzle_size()/2)*l);
                     first_x_absolute_pos = mainViewModel.first_x_pos;
                     first_y_absolute_pos = mainViewModel.first_y_pos;
-                    retraBaseTowerCoord(parseFloat(mainViewModel.variable.nozzle_size));
+                    retraBaseTowerCoord(parseFloat(mainViewModel.nozzle_size()));
                     for (let z = 0; z<=relative_pos_x.length; z++) {
-                        if (mainViewModel.variable.relative_positioning) {
+                        if (mainViewModel.relative_positioning()) {
                             pos_x[z] = relative_pos_x[z]
                             pos_y[z] = relative_pos_y[z]
                             pos_z[z] = relative_pos_z[z]
@@ -330,52 +345,52 @@ $(function() {
                             pos_z[z] = mainViewModel.zAbsolute[z];
                         }
                     }
-                    if (mainViewModel.variable.relative_positioning) {
-                        if (mainViewModel.variable.nozzle_size === "0.4") {
-                            returningPosX = mainViewModel.getReturningPosition(relative_pos_x) - 32 + 1.5 * mainViewModel.variable.nozzle_size;
+                    if (mainViewModel.relative_positioning()) {
+                        if (mainViewModel.nozzle_size() === "0.4") {
+                            returningPosX = mainViewModel.getReturningPosition(relative_pos_x) - 32 + 1.5 * mainViewModel.nozzle_size();
                             returningPosY = mainViewModel.getReturningPosition(relative_pos_y) - 8 / 2 + 4 / 2;
-                        } else if (mainViewModel.variable.nozzle_size === "0.6") {
-                            returningPosX = mainViewModel.getReturningPosition(relative_pos_x) - 2.8 + 1.5 * mainViewModel.variable.nozzle_size;
+                        } else if (mainViewModel.nozzle_size() === "0.6") {
+                            returningPosX = mainViewModel.getReturningPosition(relative_pos_x) - 2.8 + 1.5 * mainViewModel.nozzle_size();
                             returningPosY = mainViewModel.getReturningPosition(relative_pos_y) - 8 / 2 + 4.5 / 2;
-                        } else if (mainViewModel.variable.nozzle_size === "0.8") {
-                            returningPosX = mainViewModel.getReturningPosition(relative_pos_x) - 2.8 + 1.5 * mainViewModel.variable.nozzle_size;
+                        } else if (mainViewModel.nozzle_size() === "0.8") {
+                            returningPosX = mainViewModel.getReturningPosition(relative_pos_x) - 2.8 + 1.5 * mainViewModel.nozzle_size();
                             returningPosY = mainViewModel.getReturningPosition(relative_pos_y) - 8 / 2 + 4.5 / 2;
                         }
                     } else {
                         pos_x.splice(0, 1);
                         pos_y.splice(0, 1);
                         pos_z.splice(0, 1);
-                        if (mainViewModel.variable.nozzle_size === "0.4") {
-                            returningPosX = parseFloat(pos_x[pos_x.length-1]) + mainViewModel.getReturningPosition(relative_pos_x) - 32 + 1.5 * mainViewModel.variable.nozzle_size;
+                        if (mainViewModel.nozzle_size() === "0.4") {
+                            returningPosX = parseFloat(pos_x[pos_x.length-1]) + mainViewModel.getReturningPosition(relative_pos_x) - 32 + 1.5 * mainViewModel.nozzle_size();
                             returningPosY = parseFloat(pos_y[pos_y.length-1]) + mainViewModel.getReturningPosition(relative_pos_y) - 8 / 2 + 4 / 2;
-                        } else if (mainViewModel.variable.nozzle_size === "0.6") {
-                            returningPosX = parseFloat(pos_x[pos_x.length-1]) + mainViewModel.getReturningPosition(relative_pos_x) - 2.8 + 1.5 * mainViewModel.variable.nozzle_size;
+                        } else if (mainViewModel.nozzle_size() === "0.6") {
+                            returningPosX = parseFloat(pos_x[pos_x.length-1]) + mainViewModel.getReturningPosition(relative_pos_x) - 2.8 + 1.5 * mainViewModel.nozzle_size();
                             returningPosY = parseFloat(pos_y[pos_y.length-1]) + mainViewModel.getReturningPosition(relative_pos_y) - 8 / 2 + 4.5 / 2;
-                        } else if (mainViewModel.variable.nozzle_size === "0.8") {
-                            returningPosX = parseFloat(pos_x[pos_x.length-1]) + mainViewModel.getReturningPosition(relative_pos_x) - 32 + 1.5 * mainViewModel.variable.nozzle_size;
+                        } else if (mainViewModel.nozzle_size() === "0.8") {
+                            returningPosX = parseFloat(pos_x[pos_x.length-1]) + mainViewModel.getReturningPosition(relative_pos_x) - 32 + 1.5 * mainViewModel.nozzle_size();
                             returningPosY = parseFloat(pos_y[pos_y.length-1]) + mainViewModel.getReturningPosition(relative_pos_y) - 8 / 2 + 4.5 / 2;
                         }
                     }
                 } else {
-                    startZHeight[s] = parseFloat(mainViewModel.zLastAbsolute) + parseFloat(mainViewModel.variable.nozzle_size)/2
+                    startZHeight[s] = parseFloat(mainViewModel.zLastAbsolute) + parseFloat(mainViewModel.nozzle_size())/2
                     startFeedRate[s] = mainViewModel.feed_rate
-                    retraTowerCoord(parseFloat(mainViewModel.variable.nozzle_size));
+                    retraTowerCoord(parseFloat(mainViewModel.nozzle_size()));
                     for (let z = 0; z<=relative_pos_x.length; z++) {
-                        if (mainViewModel.variable.relative_positioning) {
+                        if (mainViewModel.relative_positioning()) {
                             pos_x[z] = relative_pos_x[z]
                             pos_y[z] = relative_pos_y[z]
                             pos_z[z] = relative_pos_z[z]
                         } else {
                             mainViewModel.first_x_pos = returningPosX
                             mainViewModel.first_y_pos = returningPosY
-                            mainViewModel.first_z_pos = (mainViewModel.variable.nozzle_size/2)*l
+                            mainViewModel.first_z_pos = (mainViewModel.nozzle_size()/2)*l
                             mainViewModel.getAbsoluteCoordinate(relative_pos_x[z], relative_pos_y[z], relative_pos_z[z], boolean[z])
                             pos_x[z] = mainViewModel.xAbsolute[z]
                             pos_y[z] = mainViewModel.yAbsolute[z]
                             pos_z[z] = mainViewModel.zAbsolute[z]
                         }
                     }
-                    if (!mainViewModel.variable.relative_positioning) {
+                    if (!mainViewModel.relative_positioning()) {
                         pos_x.splice(0, 1);
                         pos_y.splice(0, 1);
                         pos_z.splice(0, 1);
@@ -384,17 +399,17 @@ $(function() {
                 gcode_generated[s] = [];
                 for (let x = 0; x < relative_pos_x.length; x++) {
                     if (l <= 1) {
-                        printing_speed = mainViewModel.first_layer_speed;
+                        printing_speed = mainViewModel.variable.first_layer_speed;
                     } else {
-                        printing_speed = mainViewModel.regular_speed;
+                        printing_speed = mainViewModel.variable.regular_speed;
                     }
                     if (GStatus[x] !== "null") {
                             if (pos_z[x] === "null") {
                                 if (GStatus[x] === "G0") {
-                                    gcode_generated[s][x] = GStatus[x] + " F" + mainViewModel.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + ";\n";
+                                    gcode_generated[s][x] = GStatus[x] + " F" + mainViewModel.variable.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + ";\n";
                                 } else {
                                     if (EStatus[x] !== "null") {
-                                        if (mainViewModel.variable.relative_positioning) {
+                                        if (mainViewModel.relative_positioning()) {
                                             if (EStatus[x] === "retract" && s >= 1) {
                                                 gcode_generated[s][x] = "G1 F" + document.getElementById("inputListRetraSpeed" + s).value * 60 + " E-" + document.getElementById("inputListRetraDist" + s).value + ";\n";
                                             } else if (EStatus[x] === "extrude" && s >= 1) {
@@ -422,20 +437,20 @@ $(function() {
                                 }
                             } else {
                                 if (GStatus[x] === "G0") {
-                                    gcode_generated[s][x] = GStatus[x] + " F" + mainViewModel.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + ";\n";
+                                    gcode_generated[s][x] = GStatus[x] + " F" + mainViewModel.variable.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + ";\n";
                                 } else {
                                     mainViewModel.extruded_length_calculation_relative(relative_pos_x[x], relative_pos_y[x])
                                     gcode_generated[s][x] = GStatus[x] + " F" + printing_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + " E" + mainViewModel.feed_rate + ";\n";
                                 }
                         }
                     } else if (layerStatus[x] === "LAYER") {
-                            if (l >= 1 && l <= mainViewModel.fan_layer) {
+                            if (l >= 1 && l <= mainViewModel.variable.fan_layer) {
                                 if (l === 1) {
-                                    gcode_generated[s][x] = "M104 S" + mainViewModel.regular_nozzle + ";\n" + ";LAYER:" + l + "\n" +
-                                        "M106 S" + Math.round(l * (mainViewModel.fan_speed * (255 / 100) * 10) / mainViewModel.fan_layer) / 10 + ";\n";
+                                    gcode_generated[s][x] = "M104 S" + mainViewModel.variable.regular_nozzle + ";\n" + ";LAYER:" + l + "\n" +
+                                        "M106 S" + Math.round(l * (mainViewModel.variable.fan_speed * (255 / 100) * 10) / mainViewModel.variable.fan_layer) / 10 + ";\n";
                                 } else {
                                     gcode_generated[s][x] = ";LAYER:" + l + "\n" +
-                                        "M106 S" + Math.round(l * (mainViewModel.fan_speed * (255 / 100) * 10) / mainViewModel.fan_layer) / 10 + ";\n";
+                                        "M106 S" + Math.round(l * (mainViewModel.variable.fan_speed * (255 / 100) * 10) / mainViewModel.variable.fan_layer) / 10 + ";\n";
                                 }
                             } else {
                                 gcode_generated[s][x] = ";LAYER:" + l + "\n"
@@ -444,58 +459,58 @@ $(function() {
                         }
                     }
                 if (s === 1) {
-                    if (mainViewModel.variable.relative_positioning) {
+                    if (mainViewModel.relative_positioning()) {
                         gcode_generated[s].unshift("M117 St" + s + "/" + r + " ReD" + document.getElementById("inputListRetraDist" + s).value + " ReS" + document.getElementById("inputListRetraSpeed" + s).value + ";\n" +
                             "G1 F" + document.getElementById("inputListRetraSpeed" + s).value * 60 + " E-" + document.getElementById("inputListRetraDist" + s).value + ";\n" +
-                            "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + "\n" +
-                            "G0 F" + mainViewModel.travel_speed + " X" + returningPosX + " Y" + returningPosY + ";\n" +
+                            "G0 F" + mainViewModel.variable.travel_speed + " Z" + mainViewModel.nozzle_size() / 2 + "\n" +
+                            "G0 F" + mainViewModel.variable.travel_speed + " X" + returningPosX + " Y" + returningPosY + ";\n" +
                             "G1 F" + document.getElementById("inputListRetraSpeed" + s).value * 60 + " E" + document.getElementById("inputListRetraDist" + s).value + ";\n");
                     } else {
                         gcode_generated[s].unshift("M117 St" + s + "/" + r + " ReD" + document.getElementById("inputListRetraDist" + s).value + " ReS" + document.getElementById("inputListRetraSpeed" + s).value + ";\n" +
                             "G1 F" + document.getElementById("inputListRetraSpeed" + s).value * 60 + " E" + (parseFloat(startFeedRate[s]) - document.getElementById("inputListRetraDist" + s).value).toFixed(5) + ";\n" +
-                            "G0 F" + mainViewModel.travel_speed + " Z" + (startZHeight[s] + parseFloat(mainViewModel.variable.nozzle_size)/2) + "\n" +
-                            "G0 F" + mainViewModel.travel_speed + " X" + returningPosX + " Y" + returningPosY + ";\n" +
+                            "G0 F" + mainViewModel.variable.travel_speed + " Z" + (startZHeight[s] + parseFloat(mainViewModel.nozzle_size())/2) + "\n" +
+                            "G0 F" + mainViewModel.variable.travel_speed + " X" + returningPosX + " Y" + returningPosY + ";\n" +
                             "G1 F" + document.getElementById("inputListRetraSpeed" + s).value * 60 + " E" + parseFloat(startFeedRate[s]) + ";\n");
                     }
                 }
                 if (s >= 2) {
-                    if (mainViewModel.variable.relative_positioning) {
+                    if (mainViewModel.relative_positioning()) {
                         gcode_generated[s].unshift("M117 St" + s + "/" + r + " ReD" + document.getElementById("inputListRetraDist" + s).value + " ReS" + document.getElementById("inputListRetraSpeed" + s).value + ";\n" +
                             "G1 F" + document.getElementById("inputListRetraSpeed" + s).value * 60 + " E-" + document.getElementById("inputListRetraDist" + s).value + ";\n" +
-                            "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + "\n" +
-                            "G0 F" + mainViewModel.travel_speed + " X" + mainViewModel.getReturningPosition(relative_pos_x) + " Y" + mainViewModel.getReturningPosition(relative_pos_y) + ";\n" +
+                            "G0 F" + mainViewModel.variable.travel_speed + " Z" + mainViewModel.nozzle_size() / 2 + "\n" +
+                            "G0 F" + mainViewModel.variable.travel_speed + " X" + mainViewModel.getReturningPosition(relative_pos_x) + " Y" + mainViewModel.getReturningPosition(relative_pos_y) + ";\n" +
                             "G1 F" + document.getElementById("inputListRetraSpeed" + s).value * 60 + " E" + document.getElementById("inputListRetraDist" + s).value + ";\n");
                     } else {
                         gcode_generated[s].unshift("M117 St" + s + "/" + r + " ReD" + document.getElementById("inputListRetraDist" + s).value + " ReS" + document.getElementById("inputListRetraSpeed" + s).value + ";\n" +
                             "G1 F" + document.getElementById("inputListRetraSpeed" + s).value * 60 + " E" + (parseFloat(startFeedRate[s]) - document.getElementById("inputListRetraDist" + s).value).toFixed(5) + ";\n" +
-                            "G0 F" + mainViewModel.travel_speed + " Z" + (startZHeight[s] + parseFloat(mainViewModel.variable.nozzle_size)/2) + "\n" +
-                            "G0 F" + mainViewModel.travel_speed + " X" + (parseFloat(pos_x[pos_x.length-1])+parseFloat(mainViewModel.getReturningPosition(relative_pos_x))).toFixed(3) + " Y" + (parseFloat(pos_y[pos_y.length-1])+parseFloat(mainViewModel.getReturningPosition(relative_pos_y))).toFixed(3) + ";\n" +
+                            "G0 F" + mainViewModel.variable.travel_speed + " Z" + (startZHeight[s] + parseFloat(mainViewModel.nozzle_size())/2) + "\n" +
+                            "G0 F" + mainViewModel.variable.travel_speed + " X" + (parseFloat(pos_x[pos_x.length-1])+parseFloat(mainViewModel.getReturningPosition(relative_pos_x))).toFixed(3) + " Y" + (parseFloat(pos_y[pos_y.length-1])+parseFloat(mainViewModel.getReturningPosition(relative_pos_y))).toFixed(3) + ";\n" +
                             "G1 F" + document.getElementById("inputListRetraSpeed" + s).value * 60 + " E" + parseFloat(startFeedRate[s]) + ";\n");
                     }
                 }
             }
-            if (mainViewModel.variable.relative_positioning) {
+            if (mainViewModel.relative_positioning()) {
                 gcode_generated.unshift("G91;\n")
             }
 
-            mainViewModel.getSettings();
+            mainViewModel.callSettings();
 
-            for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {
+            for (const [key, value] of Object.entries(mainViewModel.settingsCallable)) {
                 start_gcode = start_gcode.replaceAll("[" + key + "]", value);
             }
             gcode_generated.unshift("G28;\n\n" +
-                ";---------ABL METHOD---------\n" + mainViewModel.abl_method + ";\n;---------ABL METHOD---------\n\n" +
+                ";---------ABL METHOD---------\n" + mainViewModel.variable.abl_method + ";\n;---------ABL METHOD---------\n\n" +
                 ";---------START G-CODE---------\n" + start_gcode + ";\n;---------START G-CODE---------\n\n" +
-                "G90 E0;\nG0 F" + mainViewModel.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
-                ";\n" + "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + ";\n")
+                "G92 E0;\nG0 F" + mainViewModel.variable.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
+                ";\n" + "G0 F" + mainViewModel.variable.travel_speed + " Z" + mainViewModel.nozzle_size() / 2 + ";\n")
 
-            for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {
+            for (const [key, value] of Object.entries(mainViewModel.settingsCallable)) {
                 end_gcode = end_gcode.replaceAll("[" + key + "]", value);
             }
             gcode_generated.push(end_gcode);
 
             let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
-            OctoPrint.post(url, {"name": mainViewModel.getFullFilename(mainViewModel.filename), "generated gcode": gcode_generated.flat().join('')})
+            OctoPrint.post(url, {"name": mainViewModel.getFullFilename(mainViewModel.variable.filename), "generated gcode": gcode_generated.flat().join('')})
 
             gcode_generated = [];
             pos_x = [];
