@@ -206,8 +206,8 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			currentEsteps = re.findall(r"[-+]?\d*\.\d+|\d+", line)[4]
 			self._settings.set(["current_e_steps"], currentEsteps)
 			self._settings.save()
-		else:
-			return line  # Avoid blocking the communication
+
+		return line  # Avoid blocking the communication
 		"""elif "PID Autotune start" in line:
 			self.iteration = 0
 			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})
