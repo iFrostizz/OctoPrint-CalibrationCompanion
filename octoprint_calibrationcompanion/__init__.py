@@ -209,7 +209,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 		elif "PID Autotune start" in line:
 			self.iteration = 0
 			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})
-		elif "Kp: " in line:
+		elif "bias: " in line:
 			self.iteration += 1
 			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})
 		return line  # Avoid blocking the communication
