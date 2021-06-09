@@ -206,14 +206,13 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			currentEsteps = re.findall(r"[-+]?\d*\.\d+|\d+", line)[4]
 			self._settings.set(["current_e_steps"], currentEsteps)
 			self._settings.save()
-
-		return line  # Avoid blocking the communication
-		"""elif "PID Autotune start" in line:
+		elif "PID Autotune start" in line:
 			self.iteration = 0
 			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})
 		elif "Kp: " in line:
 			self.iteration += 1
-			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})"""
+			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})
+		return line  # Avoid blocking the communication
 
 	def on_event(self, event, payload):
 		if event == "FileAdded":

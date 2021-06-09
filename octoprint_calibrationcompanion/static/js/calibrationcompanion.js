@@ -176,7 +176,6 @@ $(function () {
             let booleanArray = [];
             value.split('').forEach(elementLoop => booleanArray.push(array.includes(elementLoop)));
             let containsError = booleanArray.some((elementLoop) => elementLoop === false)
-            //console.log(id + " " + value)
             if (!containsError) {
                 self.removeError(div)
                 if (value.length <= 0) {
