@@ -26,20 +26,13 @@ $(function () {
         self.variable = {};
         self.PNotifyData = {};
 
-        //let restrictedIdClassic = ["#bed-size-x", "#bed-size-y", "#bed-size-z"];
         self.allowedArrayClassic = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-        //let restrictedIdComma = ["#fil-diameter"];
         self.allowedArrayComma = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
         let restrictedIdText = ["#printerName"];
         self.allowedArrayText = ['a', 'A', 'b', 'B', 'd', 'D', 'e', 'E', 'f', 'F', 'g', 'G', 'h', 'H',
                                 'i', 'I', 'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n', 'N', 'o', 'O',
                                 'p', 'P', 'q', 'Q', 'r', 'R', 's', 'S', 't', 'T', 'u', 'U', 'v', 'V',
                                 'w', 'W', 'x', 'X', 'y', 'Y', 'z', 'Z'];
-
-
-        //let restrictedInputs = ["#printerName", "#filament-used", "#fil-diameter", "#bed-size-x", "#bed-size-y", "#bed-size-z", "#nozzle-size"];
-        let restrictedNoVerifInputs = ["null", "#filament-used", "null", "null", "null", "null", "#nozzle-size"]
-        let saveInputs = ["printer_name", "filament_used", "fil_diameter", "bed_size_x", "bed_size_y", "bed_size_z", "nozzle_size"];
 
         let restrictedCheckbox = ["#relativePositioning", "#originCheck", "#autoPrint"];
         let saveCheckbox = ["relative_positioning", "origin_check", "auto_print"];

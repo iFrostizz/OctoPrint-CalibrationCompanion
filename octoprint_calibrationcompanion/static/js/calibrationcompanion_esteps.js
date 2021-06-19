@@ -29,10 +29,10 @@ $(function() {
 
         self.get_esteps = function() {
             OctoPrint.control.sendGcode(["M92"])
+            
             OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                document.getElementById("actual-estep").value = response["current_e_steps"]
-                self.actual_estep_value(response["current_e_steps"])
-                //console.log(self.actual_estep_value())
+                document.getElementById("actual-estep-value").value = response["current_e_steps"];
+                self.actual_estep_value(response["current_e_steps"]);
                 mainViewModel.final_estep_calculation();
             })
         }
@@ -73,7 +73,6 @@ $(function() {
         });*/
 
         mainViewModel.final_estep_calculation = function() {
-            console.log(self.actual_estep_value() + " " + self.filament_path_distance() + " " + self.measured_distance())
             final_estep_value = (self.actual_estep_value() * (self.filament_path_distance()/(parseFloat(self.filament_path_distance())+20-self.measured_distance()))).toFixed(2)
             self.final_estep_value(final_estep_value)
         }

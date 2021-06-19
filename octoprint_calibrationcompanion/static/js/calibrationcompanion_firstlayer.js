@@ -340,7 +340,7 @@ $(function() {
             }
             z_offset = 0;
             OctoPrint.settings.savePluginSettings('calibrationcompanion', {'procedureStarted' : true})
-            OctoPrint.control.sendGcode(['M851', 'M851 Z0', 'G28', 'M500', 'G90', 'G0 X' + mainViewModel.bed_center_x + ' Y' + mainViewModel.bed_center_y + ' F2000', 'G0 Z0.1', 'M211 S0'])
+            OctoPrint.control.sendGcode(['M851', 'M851 Z0', 'M500', 'G28', 'G90', 'G0 X' + mainViewModel.bed_center_x + ' Y' + mainViewModel.bed_center_y + ' F2000', 'G0 Z0.1', 'M211 S0'])
             document.getElementById("step1").disabled = true
             document.getElementById("step2").disabled = false
             document.getElementById("step3").disabled = true

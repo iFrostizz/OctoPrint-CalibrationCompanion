@@ -50,7 +50,6 @@ $(function() {
             if (plugin !== "calibrationcompanion" || typeof message.cycleIteration !== "number"){
                 return
             }
-            console.log((100*message.cycleIteration)/self.cycles_amount())
             setProgressBarPercentage((100*message.cycleIteration)/self.cycles_amount());
         }
 
@@ -58,8 +57,11 @@ $(function() {
             if (typeof value === "number") {
                 if (value > 100) {
                     value = 100
+                    document.getElementById("pid-progress-bar").parentNode.className = "progress progress-striped";
                 } else if (value < 0) {
                     value = 0
+                } else {
+                    document.getElementById("pid-progress-bar").parentNode.className = "progress progress-striped active";
                 }
             document.getElementById("pid-progress-bar").style.width = value + "%";
             } else {
