@@ -23,17 +23,17 @@ $(function() {
         }
 
         self.onAfterBinding = function() {
-            self.final_estep_calculation();
+            mainViewModel.final_estep_calculation();
             //self.final_estep_value(final_estep_value)
         }
 
         self.get_esteps = function() {
             OctoPrint.control.sendGcode(["M92"])
+            
             OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                document.getElementById("actual-estep").value = response["current_e_steps"]
-                self.actual_estep_value(response["current_e_steps"])
-                //console.log(self.actual_estep_value())
-                self.final_estep_calculation();
+                document.getElementById("actual-estep-value").value = response["current_e_steps"];
+                self.actual_estep_value(response["current_e_steps"]);
+                mainViewModel.final_estep_calculation();
             })
         }
 
@@ -50,35 +50,31 @@ $(function() {
         }
 
         let restrictedInputsEsteps = ["#filament-path-distance", "#measured-distance", "#actual-estep"];
-        let saveInputsEsteps = ["filament_path_distance", "measured_distance", "actual_estep_value"];
+        mainViewModel.saveInputsEsteps = ["filament_path_distance", "measured_distance", "actual_estep_value"];
 
-        $(restrictedInputsEsteps.join(",")).on("input", function() {
+        /*$(restrictedInputsEsteps.join(",")).on("input", function() {
             let saveSettingsEsteps = saveInputsEsteps[restrictedInputsEsteps.indexOf('#' + this.id)]
+            let array = [];
+            mainViewModel.final_estep_calculation()
             OctoPrint.settings.savePluginSettings('calibrationcompanion', {
                 [saveSettingsEsteps]: this.value}).done(function () {
-                self.final_estep_calculation()
+                
             })
-        });
+        });*/
 
         let final_estep_value;
         /*$("#actual-estep").on("input", function() {
             self.actual_estep_value($(this).val())
-            self.final_estep_calculation();
+            mainViewModel.final_estep_calculation();
         });
         $("#measured-distance").on("input", function() {
             self.measured_distance($(this).val())
-            self.final_estep_calculation();
+            mainViewModel.final_estep_calculation();
         });*/
 
-        let actual_estep_value, filament_path_distance, measured_distance;
-        self.final_estep_calculation = function() {
-            OctoPrint.settings.getPluginSettings('calibrationcompanion').done(function (response) {
-                actual_estep_value = response["actual_estep_value"];
-                filament_path_distance = response["filament_path_distance"];
-                measured_distance = response["measured_distance"];
-                final_estep_value = (actual_estep_value * (filament_path_distance/(parseFloat(filament_path_distance)+20-measured_distance))).toFixed(2)
-                self.final_estep_value(final_estep_value)
-            })
+        mainViewModel.final_estep_calculation = function() {
+            final_estep_value = (self.actual_estep_value() * (self.filament_path_distance()/(parseFloat(self.filament_path_distance())+20-self.measured_distance()))).toFixed(2)
+            self.final_estep_value(final_estep_value)
         }
 
         self.apply_final_estep = function() {

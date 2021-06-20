@@ -11,17 +11,6 @@
     width: 100px;
 }
 
-/*#setup-calibrationcompanion {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-}
-
-#1, #2, #3 {
-  flex-basis: 45%;
-  margin-top: 20px;
-}*/
-
 span.whitespace {
     display: inline-block;
     width: 50px;

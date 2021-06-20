@@ -11,7 +11,9 @@ $(function() {
         self.profile_selection_flow = ko.observable();
         self.first_layer_nozzle_flow = ko.observable();
         self.regular_nozzle_flow = ko.observable();
+        self.first_layer_bed_flow = ko.observable();
         self.regular_bed_flow = ko.observable();
+        self.first_layer_bed_flow = ko.observable();
         self.fan_speed_flow = ko.observable();
         self.fan_layer_flow = ko.observable();
         self.first_layer_speed_flow = ko.observable();
@@ -30,7 +32,9 @@ $(function() {
             self.profile_selection_flow(pluginSettings.profile_selection_flow());
             self.first_layer_nozzle_flow(pluginSettings.first_layer_nozzle_flow());
             self.regular_nozzle_flow(pluginSettings.regular_nozzle_flow());
+            self.first_layer_bed_flow(pluginSettings.first_layer_bed_flow());
             self.regular_bed_flow(pluginSettings.regular_bed_flow());
+            self.first_layer_bed_flow(pluginSettings.first_layer_bed_flow());
             self.fan_speed_flow(pluginSettings.fan_speed_flow());
             self.fan_layer_flow(pluginSettings.fan_layer_flow());
             self.first_layer_speed_flow(pluginSettings.first_layer_speed_flow());
@@ -43,35 +47,54 @@ $(function() {
             self.end_gcode_flow(pluginSettings.start_gcode_flow());
         }
 
-        let restrictedInputsFlow = ["#first-layer-nozzle-flow", "#regular-nozzle-flow", "#regular-bed-flow", "#fan-speed-flow", "#fan-layer-flow", "#first-layer-speed-flow",
-            "#regular-speed-flow", "#travel-speed-flow", "#retraction-dist-flow", "#retraction-speed-flow", "#abl-method-flow", "#start-gcode-flow"];
-        let saveInputsFlow = ["first_layer_nozzle_flow", "regular_nozzle_flow", "regular_bed_flow", "fan_speed_flow", "fan_layer_flow", "first_layer_speed_flow",
-            "regular_speed_flow", "travel_speed_flow", "retraction_dist_flow", "retraction_speed_flow", "abl_method_flow", "start_gcode_flow"];
+        let restrictedInputsFlow = ["#first-layer-nozzle-flow", "#regular-nozzle-flow", "#first-layer-bed-flow", "#regular-bed-flow", "#fan-speed-flow", "#fan-layer-flow", "#first-layer-speed-flow",
+            "#regular-speed-flow", "#travel-speed-flow", "#retraction-dist-flow", "#retraction-speed-flow", "#abl-method-flow", "#start-gcode-flow", "#end-gcode-flow"];
+        let saveInputsFlow = ["first_layer_nozzle_flow", "regular_nozzle_flow", "first_layer_bed_flow", "regular_bed_flow", "fan_speed_flow", "fan_layer_flow", "first_layer_speed_flow",
+            "regular_speed_flow", "travel_speed_flow", "retraction_dist_flow", "retraction_speed_flow", "abl_method_flow", "start_gcode_flow", "end_gcode_flow"];
         let restrictedInputsProfile = ["abl-method-flow", "end-gcode-flow", "fan-layer-flow", "fan-speed-flow", "first-layer-nozzle-flow",
             "first-layer-speed-flow", "novalue", "regular-bed-flow", "regular-nozzle-flow", "regular-speed-flow", "retraction-dist-flow",
-            "retraction-speed-flow", "start-gcode-flow", "travel-speed-flow"];
+            "retraction-speed-flow", "start-gcode-flow", "travel-speed-flow", "first-layer-bed-flow"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "novalue", "regular_bed", "regular_nozzle", "regular_speed", "retraction_dist",
-            "retraction_speed", "start_gcode", "travel_speed"];
+            "retraction_speed", "start_gcode", "travel_speed", "first_layer_bed"];
         let saveSettingsProfile, saveSettingsFlow, saveSettingsProfileFlow;
-
-        $(restrictedInputsFlow.join(",")).on("input", function() {
-            saveSettingsFlow = saveInputsFlow[restrictedInputsFlow.indexOf('#' + this.id)]
-            saveSettingsProfileFlow = this.value;
-            mainViewModel.saveSettingsTab((saveSettingsFlow), saveSettingsProfileFlow)
-        });
+        
+        self.onAfterBinding = function() {
+            $(restrictedInputsFlow.join(",")).each(function() {
+                let element = this
+                let div = this.parentNode.parentNode.parentNode;
+                let id = element.id
+                saveSettingsFlow = saveInputsFlow[restrictedInputsFlow.indexOf('#' + this.id)]
+                saveSettingsProfileFlow = element.value;
+                if (restrictedInputsFlow.indexOf('#' + id) <= 7 || restrictedInputsFlow.indexOf('#' + id) === 9) {
+                    mainViewModel.checkValue(element, div, mainViewModel.allowedArrayClassic)
+                } else if (restrictedInputsFlow.indexOf('#' + id) === 8) {
+                    mainViewModel.checkValue(element, div, mainViewModel.allowedArrayComma)
+                }
+            });
+        }
+        
+        let settingName, settingValue;
 
         document.getElementById("load-profile-flow").onclick = function() {
+            settingName = [];
+            settingValue = [];
             if (self.profile_selection_flow() !== "") {
+                mainViewModel.firstTime = Date.now();
+                mainViewModel.startLoading()
                 for (let x = 0; x < restrictedSettingsProfile.length; x++) {
                     if (restrictedSettingsProfile[x] !== "novalue") {
+                        let element = document.getElementById(restrictedInputsProfile[x]);
                         saveSettingsProfile = restrictedSettingsProfile[x] + "_" + self.profile_selection_flow();
                         saveSettingsFlow = restrictedSettingsProfile[x] + "_flow";
                         saveSettingsProfileFlow = pluginSettings[saveSettingsProfile]()
-                        document.getElementById(restrictedInputsProfile[x]).value = saveSettingsProfileFlow; // loading setting
-                        mainViewModel.saveSettingsTab((saveSettingsFlow), saveSettingsProfileFlow)
+                        element.value = saveSettingsProfileFlow; // loading setting
+                        settingName.push(saveSettingsFlow);
+                        settingValue.push(saveSettingsProfileFlow);
+                        mainViewModel.sortToCheck(element, "loaded");
                     }
                 }
+                mainViewModel.saveSettingsLoading(settingName, settingValue, "loaded and saved")
             } else {
                 self.PNotify = new PNotify(mainViewModel.PNotifyData.noProfileMessage)
             }
@@ -91,33 +114,44 @@ $(function() {
 
         let printing_speed, l, start_gcode, end_gcode;
         document.getElementById("flow-cube").onclick = function () {
+            let array = [];
+            let el = document.getElementById("flow-calibrationcompanion").getElementsByClassName("control-group");
+            for (let x=0; x<el.length; x++) {
+                array[x] = el[x].attributes[0].nodeValue;
+                if (array[x].includes("error")) {
+                    self.PNotify = new PNotify(mainViewModel.PNotifyData.errorMessage)
+                    return
+                }
+            }
+            $('#flow-cube').button('loading');
             mainViewModel.flowCube = true
             l = 0;
             mainViewModel.last_feed_rate = 0;
             start_gcode = document.getElementById("start-gcode-flow").value;
             end_gcode = document.getElementById("end-gcode-flow").value;
-            mainViewModel.first_layer_nozzle = document.getElementById("first-layer-nozzle-flow").value;
-            mainViewModel.regular_nozzle = document.getElementById("regular-nozzle-flow").value;
-            mainViewModel.regular_bed = document.getElementById("regular-bed-flow").value;
-            mainViewModel.fan_speed = document.getElementById("fan-speed-flow").value;
-            mainViewModel.fan_layer = document.getElementById("fan-layer-flow").value;
-            mainViewModel.first_layer_speed = document.getElementById("first-layer-speed-flow").value * 60;
-            mainViewModel.regular_speed = document.getElementById("regular-speed-flow").value * 60;
-            mainViewModel.travel_speed = document.getElementById("travel-speed-flow").value * 60;
-            mainViewModel.retraction_distance = document.getElementById("retraction-dist-flow").value;
-            mainViewModel.retraction_speed = document.getElementById("retraction-speed-flow").value * 60;
-            mainViewModel.flow = 100;
-            mainViewModel.abl_method = document.getElementById("abl-method-flow").value;
-            mainViewModel.filename = "flow_cube";
+            mainViewModel.variable.first_layer_nozzle = document.getElementById("first-layer-nozzle-flow").value;
+            mainViewModel.variable.regular_nozzle = document.getElementById("regular-nozzle-flow").value;
+            mainViewModel.variable.regular_bed = document.getElementById("regular-bed-flow").value;
+            mainViewModel.variable.first_layer_bed = document.getElementById("first-layer-bed-flow").value;
+            mainViewModel.variable.fan_speed = document.getElementById("fan-speed-flow").value;
+            mainViewModel.variable.fan_layer = document.getElementById("fan-layer-flow").value;
+            mainViewModel.variable.first_layer_speed = document.getElementById("first-layer-speed-flow").value * 60;
+            mainViewModel.variable.regular_speed = document.getElementById("regular-speed-flow").value * 60;
+            mainViewModel.variable.travel_speed = document.getElementById("travel-speed-flow").value * 60;
+            mainViewModel.variable.retraction_distance = document.getElementById("retraction-dist-flow").value;
+            mainViewModel.variable.retraction_speed = document.getElementById("retraction-speed-flow").value * 60;
+            mainViewModel.variable.flow = 100;
+            mainViewModel.variable.abl_method = document.getElementById("abl-method-flow").value;
+            mainViewModel.variable.filename = "flowcube";
             let boolean = [true]
             mainViewModel.first_x_pos = String(mainViewModel.bed_center_x + 20 / 2);
             mainViewModel.first_y_pos = String(mainViewModel.bed_center_y + 20 / 2);
-            mainViewModel.first_z_pos = String((mainViewModel.variable.nozzle_size / 2) * l);
+            mainViewModel.first_z_pos = String((mainViewModel.nozzle_size() / 2) * l);
             first_x_absolute_pos = mainViewModel.first_x_pos;
             first_y_absolute_pos = mainViewModel.first_y_pos;
-            flowCubeCoord(parseFloat(mainViewModel.variable.nozzle_size));
+            flowCubeCoord(parseFloat(mainViewModel.nozzle_size()));
             for (let z = 0; z <= relative_pos_x.length; z++) {
-                if (mainViewModel.variable.relative_positioning) {
+                if (mainViewModel.relative_positioning()) {
                     pos_x[z] = relative_pos_x[z]
                     pos_y[z] = relative_pos_y[z]
                     pos_z[z] = relative_pos_z[z]
@@ -128,7 +162,7 @@ $(function() {
                     pos_z[z] = mainViewModel.zAbsolute[z]
                 }
             }
-            if (!mainViewModel.variable.relative_positioning) {
+            if (!mainViewModel.relative_positioning()) {
                 pos_x.splice(0, 1);
                 pos_y.splice(0, 1);
                 pos_z.splice(0, 1);
@@ -136,58 +170,58 @@ $(function() {
             gcode_generated = [];
             for (let x = 0; x < relative_pos_x.length; x++) {
                     if (l <= 1) {
-                        printing_speed = mainViewModel.first_layer_speed;
+                        printing_speed = mainViewModel.variable.first_layer_speed;
                     } else {
-                        printing_speed = mainViewModel.regular_speed;
+                        printing_speed = mainViewModel.variable.regular_speed;
                     }
                     if (GStatus[x] !== "null") {
                         if (pos_z[x] === "null") {
                             if (GStatus[x] === "G0") {
-                                gcode_generated[x] = GStatus[x] + " F" + mainViewModel.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + ";\n";
+                                gcode_generated[x] = GStatus[x] + " F" + mainViewModel.variable.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + ";\n";
                             } else {
                                 mainViewModel.extruded_length_calculation_relative(relative_pos_x[x], relative_pos_y[x])
                                 gcode_generated[x] = GStatus[x] + " F" + printing_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " E" + mainViewModel.feed_rate + ";\n";
                             }
                         } else {
                             if (GStatus[x] === "G0") {
-                                gcode_generated[x] = GStatus[x] + " F" + mainViewModel.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + ";\n";
+                                gcode_generated[x] = GStatus[x] + " F" + mainViewModel.variable.travel_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + ";\n";
                             } else {
                                 mainViewModel.extruded_length_calculation_relative(relative_pos_x[x], relative_pos_y[x])
                                 gcode_generated[x] = GStatus[x] + " F" + printing_speed + " X" + pos_x[x] + " Y" + pos_y[x] + " Z" + pos_z[x] + " E" + mainViewModel.feed_rate + ";\n";
                             }
                         }
                     } else if (layerStatus[x] === "LAYER") {
-                        if (l >= 1 && l <= mainViewModel.fan_layer) {
+                        if (l >= 1 && l <= mainViewModel.variable.fan_layer) {
                                 gcode_generated[x] = ";LAYER:" + l + "\n" +
-                                    "M106 S" + Math.round(l * (mainViewModel.fan_speed * (255 / 100) * 10) / mainViewModel.fan_layer) / 10 + ";\n";
+                                    "M106 S" + Math.round(l * (mainViewModel.variable.fan_speed * (255 / 100) * 10) / mainViewModel.variable.fan_layer) / 10 + ";\n";
                         } else {
                             gcode_generated[x] = ";LAYER:" + l + "\n"
                         }
                         l++;
                     }
                 }
-            if (mainViewModel.variable.relative_positioning) {
+            if (mainViewModel.relative_positioning()) {
                 gcode_generated.unshift("G91;\n")
             }
 
-            mainViewModel.getSettings();
+            mainViewModel.callSettings();
 
-            for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {
+            for (const [key, value] of Object.entries(mainViewModel.settingsCallable)) {
                 start_gcode = start_gcode.replaceAll("[" + key + "]", value);
             }
             gcode_generated.unshift("G28;\n\n" +
                 ";---------ABL METHOD---------\n" + mainViewModel.abl_method + ";\n;---------ABL METHOD---------\n\n" +
                 ";---------START G-CODE---------\n" + start_gcode + ";\n;---------START G-CODE---------\n\n" +
-                "G0 F" + mainViewModel.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
-                ";\n" + "G0 F" + mainViewModel.travel_speed + " Z" + mainViewModel.variable.nozzle_size / 2 + ";\n")
+                "G92 E0;\nG0 F" + mainViewModel.variable.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
+                ";\n" + "G0 F" + mainViewModel.variable.travel_speed + " Z" + mainViewModel.nozzle_size() / 2 + ";\n")
 
-            for (const [key, value] of Object.entries(mainViewModel.settingsSquare)) {
+            for (const [key, value] of Object.entries(mainViewModel.settingsCallable)) {
                 end_gcode = end_gcode.replaceAll("[" + key + "]", value);
             }
             gcode_generated.push(end_gcode);
 
             let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
-            OctoPrint.post(url, {"name": mainViewModel.getFullFilename(mainViewModel.filename), "generated gcode": gcode_generated.flat().join('')})
+            OctoPrint.post(url, {"name": mainViewModel.getFullFilename(mainViewModel.variable.filename), "generated gcode": gcode_generated.flat().join('')})
 
             gcode_generated = [];
             pos_x = [];

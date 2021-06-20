@@ -21,7 +21,7 @@ $(function() {
 
         self.pid_autotune_routine = function() {
             if (self.nozzle_pid_temp().split(" ").join("").length !== 0 || self.bed_pid_temp().split(" ").join("").length !== 0 && self.cycles_amount().split(" ").join("").length !== 0) {
-                //setProgressBarPercentage(0);
+                setProgressBarPercentage(0);
                 pidAlert();
                 if (self.nozzle_pid_temp().split(" ").join("").length !== 0) { //Works even if the user write empty spaces
                     OctoPrint.control.sendGcode(["M303 E0 C" + self.cycles_amount() + " S" + self.nozzle_pid_temp(), 'M500']); //Sends the autotune PID regarding the user nozzle temperature
@@ -50,16 +50,18 @@ $(function() {
             if (plugin !== "calibrationcompanion" || typeof message.cycleIteration !== "number"){
                 return
             }
-            console.log((100*message.cycleIteration)/self.cycles_amount())
-            //setProgressBarPercentage((100*message.cycleIteration)/self.cycles_amount());
+            setProgressBarPercentage((100*message.cycleIteration)/self.cycles_amount());
         }
 
         function setProgressBarPercentage(value) {
             if (typeof value === "number") {
                 if (value > 100) {
                     value = 100
+                    document.getElementById("pid-progress-bar").parentNode.className = "progress progress-striped";
                 } else if (value < 0) {
                     value = 0
+                } else {
+                    document.getElementById("pid-progress-bar").parentNode.className = "progress progress-striped active";
                 }
             document.getElementById("pid-progress-bar").style.width = value + "%";
             } else {

@@ -31,12 +31,13 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			bed_size_y="",
 			bed_size_z="",
 			extra_margin="20",
+			knob_levelling_feed_rate="30",
 			origin_check=False,
 			filament_used="PLA",
 			printer_name="",
 			relative_positioning=False,
 			nozzle_size="0.4",
-			filament_diameter="1.75",
+			fil_diameter="1.75",
 			movement_speed="",
 			first_layer_speed="",
 			printing_speed="",
@@ -51,6 +52,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 
 			first_layer_nozzle_profile1="205",
 			regular_nozzle_profile1="200",
+			first_layer_bed_profile1="65",
 			regular_bed_profile1="60",
 			fan_speed_profile1="50",
 			fan_layer_profile1="5",
@@ -67,10 +69,11 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 								 "G92 E0;reset extruder",
 			end_gcode_profile1="G91;relative mode\nG92 E0;reset extruder\nG1 F[retraction_speed] E-[retraction_distance];retract a bit to avoid oozing\n"
 							   "G0 Z10 F[travel_speed];move up\nM140 S0;set bed to 0C\nM104 S0;set hotend to 0C\nM107;turn off fans\nG90;absolute mode\n"
-							   "G0 F[travel_speed] Y[bed_size_y];show the print\nG1 F[retraction_speed] E0;set the filament at the end of the nozzle again",
+							   "G0 F[travel_speed] Y[bed_size_y];show the print",
 
 			first_layer_nozzle_profile2="",
 			regular_nozzle_profile2="",
+			first_layer_bed_profile2="",
 			regular_bed_profile2="",
 			fan_speed_profile2="",
 			fan_layer_profile2="",
@@ -81,11 +84,17 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			retraction_speed_profile2="",
 			flow_profile2="",
 			abl_method_profile2="",
-			start_gcode_profile2="",
-			end_gcode_profile2="",
+			start_gcode_profile2="G90;absolute mode\nG0 F[travel_speed] X100 Y100 Z10;place the nozzle for heating\n"
+								 "M140 S[regular_bed];set bed to [regular_bed]C\nM190 S[regular_bed];wait for bed to [regular_bed]C\n"
+								 "M104 S[regular_nozzle];set hotend to [regular_nozzle]C\nM109 S[regular_nozzle];wait hotend to [regular_nozzle]C\n"
+								 "G92 E0;reset extruder",
+			end_gcode_profile2="G91;relative mode\nG92 E0;reset extruder\nG1 F[retraction_speed] E-[retraction_distance];retract a bit to avoid oozing\n"
+							   "G0 Z10 F[travel_speed];move up\nM140 S0;set bed to 0C\nM104 S0;set hotend to 0C\nM107;turn off fans\nG90;absolute mode\n"
+							   "G0 F[travel_speed] Y[bed_size_y];show the print\nG1 F[retraction_speed] E0;set the filament at the end of the nozzle again",
 
 			first_layer_nozzle_profile3="",
 			regular_nozzle_profile3="",
+			first_layer_bed_profile3="",
 			regular_bed_profile3="",
 			fan_speed_profile3="",
 			fan_layer_profile3="",
@@ -96,11 +105,17 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			retraction_speed_profile3="",
 			flow_profile3="",
 			abl_method_profile3="",
-			start_gcode_profile3="",
-			end_gcode_profile3="",
+			start_gcode_profile3="G90;absolute mode\nG0 F[travel_speed] X100 Y100 Z10;place the nozzle for heating\n"
+								 "M140 S[regular_bed];set bed to [regular_bed]C\nM190 S[regular_bed];wait for bed to [regular_bed]C\n"
+								 "M104 S[regular_nozzle];set hotend to [regular_nozzle]C\nM109 S[regular_nozzle];wait hotend to [regular_nozzle]C\n"
+								 "G92 E0;reset extruder",
+			end_gcode_profile3="G91;relative mode\nG92 E0;reset extruder\nG1 F[retraction_speed] E-[retraction_distance];retract a bit to avoid oozing\n"
+							   "G0 Z10 F[travel_speed];move up\nM140 S0;set bed to 0C\nM104 S0;set hotend to 0C\nM107;turn off fans\nG90;absolute mode\n"
+							   "G0 F[travel_speed] Y[bed_size_y];show the print\nG1 F[retraction_speed] E0;set the filament at the end of the nozzle again",
 
 			first_layer_nozzle_accel="",
 			regular_nozzle_accel="",
+			first_layer_bed_accel="",
 			regular_bed_accel="",
 			fan_speed_accel="",
 			fan_layer_accel="",
@@ -138,6 +153,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 
 			first_layer_nozzle_retra="",
 			regular_nozzle_retra="",
+			first_layer_bed_retra="",
 			regular_bed_retra="",
 			fan_speed_retra="",
 			fan_layer_retra="",
@@ -155,6 +171,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 
 			first_layer_nozzle_temp="",
 			regular_bed_temp="",
+			first_layer_bed_temp="",
 			fan_speed_temp="",
 			fan_layer_temp="",
 			first_layer_speed_temp="",
@@ -169,6 +186,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 
 			first_layer_nozzle_flow="",
 			regular_nozzle_flow="",
+			first_layer_bed_flow="",
 			regular_bed_flow="",
 			fan_speed_flow="",
 			fan_layer_flow="",
@@ -195,20 +213,20 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			currentEsteps = re.findall(r"[-+]?\d*\.\d+|\d+", line)[4]
 			self._settings.set(["current_e_steps"], currentEsteps)
 			self._settings.save()
-		else:
-			return line  # Avoid blocking the communication
-		"""elif "PID Autotune start" in line:
+		elif "PID Autotune start" in line:
 			self.iteration = 0
 			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})
-		elif "Kp: " in line:
+		elif "bias: " in line:
 			self.iteration += 1
-			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})"""
+			self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})
+		return line  # Avoid blocking the communication
 
 	def on_event(self, event, payload):
-		if self._settings.get_boolean(["auto_print"]):
-			if event == "FileAdded":
-				if payload['name'] == self.filename + ".gcode":
-					self._printer.select_file(self.filename + ".gcode", sd=False, printAfterSelect=True)
+		if event == "FileAdded":
+			if payload['name'] == self.filename + ".gcode":
+				self._plugin_manager.send_plugin_message("calibrationcompanion", {"fileReceived": payload['name']})
+				if self._settings.get_boolean(["auto_print"]):
+					self._printer.select_file(payload['name'], sd=False, printAfterSelect=True)
 
 	@octoprint.plugin.BlueprintPlugin.route("/downloadFile", methods=["POST"])
 	def myEcho(self):
