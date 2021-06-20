@@ -9,6 +9,7 @@ $(function() {
 
         self.first_layer_nozzle_profile1 = ko.observable();
         self.regular_nozzle_profile1 = ko.observable();
+        self.first_layer_bed_profile1 = ko.observable();
         self.regular_bed_profile1 = ko.observable();
         self.fan_speed_profile1 = ko.observable();
         self.fan_layer_profile1 = ko.observable();
@@ -24,6 +25,7 @@ $(function() {
 
         self.first_layer_nozzle_profile2 = ko.observable();
         self.regular_nozzle_profile2 = ko.observable();
+        self.first_layer_bed_profile2 = ko.observable();
         self.regular_bed_profile2 = ko.observable();
         self.fan_speed_profile2 = ko.observable();
         self.fan_layer_profile2 = ko.observable();
@@ -39,6 +41,7 @@ $(function() {
 
         self.first_layer_nozzle_profile3 = ko.observable();
         self.regular_nozzle_profile3 = ko.observable();
+        self.first_layer_bed_profile3 = ko.observable();
         self.regular_bed_profile3 = ko.observable();
         self.fan_speed_profile3 = ko.observable();
         self.fan_layer_profile3 = ko.observable();
@@ -63,6 +66,7 @@ $(function() {
             self.profile_selection(pluginSettings.profile_selection());
             self.first_layer_nozzle_profile1(pluginSettings.first_layer_nozzle_profile1());
             self.regular_nozzle_profile1(pluginSettings.regular_nozzle_profile1());
+            self.first_layer_bed_profile1(pluginSettings.first_layer_bed_profile1());
             self.regular_bed_profile1(pluginSettings.regular_bed_profile1());
             self.fan_speed_profile1(pluginSettings.fan_speed_profile1());
             self.fan_layer_profile1(pluginSettings.fan_layer_profile1());
@@ -77,6 +81,7 @@ $(function() {
 
             self.first_layer_nozzle_profile2(pluginSettings.first_layer_nozzle_profile2());
             self.regular_nozzle_profile2(pluginSettings.regular_nozzle_profile2());
+            self.first_layer_bed_profile2(pluginSettings.first_layer_bed_profile2());
             self.regular_bed_profile2(pluginSettings.regular_bed_profile2());
             self.fan_speed_profile2(pluginSettings.fan_speed_profile2());
             self.fan_layer_profile2(pluginSettings.fan_layer_profile2());
@@ -91,6 +96,7 @@ $(function() {
 
             self.first_layer_nozzle_profile3(pluginSettings.first_layer_nozzle_profile3());
             self.regular_nozzle_profile3(pluginSettings.regular_nozzle_profile3());
+            self.first_layer_bed_profile3(pluginSettings.first_layer_bed_profile3());
             self.regular_bed_profile3(pluginSettings.regular_bed_profile3());
             self.fan_speed_profile3(pluginSettings.fan_speed_profile3());
             self.fan_layer_profile3(pluginSettings.fan_layer_profile3());
@@ -106,11 +112,11 @@ $(function() {
 
         let restrictedInputsProfile = ["abl-method-profile", "end-gcode-profile", "fan-layer-profile", "fan-speed-profile", "first-layer-nozzle-profile",
             "first-layer-speed-profile", "flow-profile", "regular-bed-profile", "regular-nozzle-profile", "regular-speed-profile", "retraction-dist-profile",
-            "retraction-speed-profile", "start-gcode-profile", "travel-speed-profile"];
+            "retraction-speed-profile", "start-gcode-profile", "travel-speed-profile", "first-layer-bed-profile"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "flow", "regular_bed", "regular_nozzle", "regular_speed", "retraction_dist",
-            "retraction_speed", "start_gcode", "travel_speed"];
-        let restrictedInputsProfileClassic = ["first-layer-nozzle-profile", "regular-nozzle-profile", "regular-bed-profile", "fan-speed-profile",
+            "retraction_speed", "start_gcode", "travel_speed", "first_layer_bed"];
+        let restrictedInputsProfileClassic = ["first-layer-nozzle-profile", "regular-nozzle-profile", "first-layer-bed-profile", "regular-bed-profile", "fan-speed-profile",
             "fan-layer-profile", "first-layer-speed-profile", "regular-speed-profile", "travel-speed-profile"];
         let restrictedInputsProfileComma = ["retraction-dist-profile", "retraction-speed-profile", "flow-profile"];
         let saveSettingsProfile

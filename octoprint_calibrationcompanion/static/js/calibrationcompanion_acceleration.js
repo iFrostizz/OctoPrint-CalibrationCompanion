@@ -10,6 +10,7 @@ $(function() {
         self.profile_selection_accel = ko.observable();
         self.first_layer_nozzle_accel = ko.observable();
         self.regular_nozzle_accel = ko.observable();
+        self.first_layer_bed_accel = ko.observable();
         self.regular_bed_accel = ko.observable();
         self.fan_speed_accel = ko.observable();
         self.fan_layer_accel = ko.observable();
@@ -28,34 +29,35 @@ $(function() {
         self.onBeforeBinding = function() {
             pluginSettings = self.settingsViewModel.settings.plugins.calibrationcompanion;
             self.profile_selection_accel(pluginSettings.profile_selection_accel());
-            self.first_layer_nozzle_accel(pluginSettings.first_layer_nozzle_accel())
-            self.regular_nozzle_accel(pluginSettings.regular_nozzle_accel())
-            self.regular_bed_accel(pluginSettings.regular_bed_accel())
-            self.fan_speed_accel(pluginSettings.fan_speed_accel())
-            self.fan_layer_accel(pluginSettings.fan_layer_accel())
-            self.first_layer_speed_accel(pluginSettings.first_layer_speed_accel())
-            self.regular_speed_accel(pluginSettings.regular_speed_accel())
-            self.travel_speed_accel(pluginSettings.travel_speed_accel())
-            self.retraction_dist_accel(pluginSettings.retraction_dist_accel())
-            self.retraction_speed_accel(pluginSettings.retraction_speed_accel())
-            self.flow_accel(pluginSettings.flow_accel())
-            self.abl_method_accel(pluginSettings.abl_method_accel())
-            self.start_gcode_accel(pluginSettings.start_gcode_accel())
-            self.end_gcode_accel(pluginSettings.end_gcode_accel())
+            self.first_layer_nozzle_accel(pluginSettings.first_layer_nozzle_accel());
+            self.first_layer_bed_accel(pluginSettings.first_layer_bed_accel());
+            self.regular_nozzle_accel(pluginSettings.regular_nozzle_accel());
+            self.regular_bed_accel(pluginSettings.regular_bed_accel());
+            self.fan_speed_accel(pluginSettings.fan_speed_accel());
+            self.fan_layer_accel(pluginSettings.fan_layer_accel());
+            self.first_layer_speed_accel(pluginSettings.first_layer_speed_accel());
+            self.regular_speed_accel(pluginSettings.regular_speed_accel());
+            self.travel_speed_accel(pluginSettings.travel_speed_accel());
+            self.retraction_dist_accel(pluginSettings.retraction_dist_accel());
+            self.retraction_speed_accel(pluginSettings.retraction_speed_accel());
+            self.flow_accel(pluginSettings.flow_accel());
+            self.abl_method_accel(pluginSettings.abl_method_accel());
+            self.start_gcode_accel(pluginSettings.start_gcode_accel());
+            self.end_gcode_accel(pluginSettings.end_gcode_accel());
         }
 
         let stageHeightAccel;
         
-        let restrictedInputsAccel = ["#first-layer-nozzle-accel", "#regular-nozzle-accel", "#regular-bed-accel", "#fan-speed-accel", "#fan-layer-accel", "#first-layer-speed-accel",
+        let restrictedInputsAccel = ["#first-layer-nozzle-accel", "#regular-nozzle-accel", "#first-layer-bed-accel", "#regular-bed-accel", "#fan-speed-accel", "#fan-layer-accel", "#first-layer-speed-accel",
             "#regular-speed-accel", "#travel-speed-accel", "#retraction-speed-accel", "#retraction-dist-accel", "#flow-accel", "#abl-method-accel", "#start-gcode-accel", "#end-gcode-accel"];
-        let saveInputsAccel = ["first_layer_nozzle_accel", "regular_nozzle_accel", "regular_bed_accel", "fan_speed_accel", "fan_layer_accel", "first_layer_speed_accel",
+        let saveInputsAccel = ["first_layer_nozzle_accel", "regular_nozzle_accel", "first_layer_bed_accel", "regular_bed_accel", "fan_speed_accel", "fan_layer_accel", "first_layer_speed_accel",
             "regular_speed_accel", "travel_speed_accel", "retraction_speed_accel", "retraction_dist_accel", "flow_accel", "abl_method_accel", "start_gcode_accel", "end_gcode_accel"];
         let restrictedInputsProfile = ["abl-method-accel", "end-gcode-accel", "fan-layer-accel", "fan-speed-accel", "first-layer-nozzle-accel",
             "first-layer-speed-accel", "flow-accel", "regular-bed-accel", "regular-nozzle-accel", "regular-speed-accel", "retraction-dist-accel",
-            "retraction-speed-accel", "start-gcode-accel", "travel-speed-accel"];
+            "retraction-speed-accel", "start-gcode-accel", "travel-speed-accel", "first-layer-bed-accel"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "flow", "regular_bed", "regular_nozzle", "regular_speed", "retraction_dist",
-            "retraction_speed", "start_gcode", "travel_speed"];
+            "retraction_speed", "start_gcode", "travel_speed", "first_layer_bed"];
         let saveSettingsProfile, saveSettingsAccel, saveSettingsProfileAccel;
 
         self.onAfterBinding = function() {
@@ -345,6 +347,7 @@ $(function() {
             end_gcode = document.getElementById("end-gcode-accel").value;
             mainViewModel.variable.first_layer_nozzle = document.getElementById("first-layer-nozzle-accel").value;
             mainViewModel.variable.regular_nozzle = document.getElementById("regular-nozzle-accel").value;
+            mainViewModel.variable.first_layer_bed = document.getElementById("first-layer-bed-accel").value;
             mainViewModel.variable.regular_bed = document.getElementById("regular-bed-accel").value;
             mainViewModel.variable.fan_speed = document.getElementById("fan-speed-accel").value;
             mainViewModel.variable.fan_layer = document.getElementById("fan-layer-accel").value;
@@ -511,7 +514,7 @@ $(function() {
                 }
             }
             if (mainViewModel.relative_positioning()) {
-                gcode_generated.unshift("G91;\n")
+                gcode_generated.unshift("G91;\n");
             }
 
             mainViewModel.callSettings();
@@ -523,7 +526,7 @@ $(function() {
                 ";---------ABL METHOD---------\n" + mainViewModel.variable.abl_method + ";\n;---------ABL METHOD---------\n\n" +
                 ";---------START G-CODE---------\n" + start_gcode + ";\n;---------START G-CODE---------\n\n" +
                 "G92 E0;\nG0 F" + mainViewModel.variable.travel_speed + " X" + first_x_absolute_pos + " Y" + first_y_absolute_pos +
-                ";\n" + "G0 F" + mainViewModel.variable.travel_speed + " Z" + mainViewModel.nozzle_size() / 2 + ";\n")
+                ";\n" + "G0 F" + mainViewModel.variable.travel_speed + " Z" + mainViewModel.nozzle_size() / 2 + ";\n");
 
             for (const [key, value] of Object.entries(mainViewModel.settingsCallable)) {
                 end_gcode = end_gcode.replaceAll("[" + key + "]", value);
@@ -531,7 +534,7 @@ $(function() {
             gcode_generated.push(end_gcode);
 
             let url = OctoPrint.getBlueprintUrl('calibrationcompanion') + "downloadFile";
-            OctoPrint.post(url, {"name": mainViewModel.getFullFilename(mainViewModel.variable.filename), "generated gcode": gcode_generated.flat().join('')})
+            OctoPrint.post(url, {"name": mainViewModel.getFullFilename(mainViewModel.variable.filename), "generated gcode": gcode_generated.flat().join('')});
 
             gcode_generated = [];
             pos_x = [];

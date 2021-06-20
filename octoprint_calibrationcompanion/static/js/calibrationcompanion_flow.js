@@ -11,7 +11,9 @@ $(function() {
         self.profile_selection_flow = ko.observable();
         self.first_layer_nozzle_flow = ko.observable();
         self.regular_nozzle_flow = ko.observable();
+        self.first_layer_bed_flow = ko.observable();
         self.regular_bed_flow = ko.observable();
+        self.first_layer_bed_flow = ko.observable();
         self.fan_speed_flow = ko.observable();
         self.fan_layer_flow = ko.observable();
         self.first_layer_speed_flow = ko.observable();
@@ -30,7 +32,9 @@ $(function() {
             self.profile_selection_flow(pluginSettings.profile_selection_flow());
             self.first_layer_nozzle_flow(pluginSettings.first_layer_nozzle_flow());
             self.regular_nozzle_flow(pluginSettings.regular_nozzle_flow());
+            self.first_layer_bed_flow(pluginSettings.first_layer_bed_flow());
             self.regular_bed_flow(pluginSettings.regular_bed_flow());
+            self.first_layer_bed_flow(pluginSettings.first_layer_bed_flow());
             self.fan_speed_flow(pluginSettings.fan_speed_flow());
             self.fan_layer_flow(pluginSettings.fan_layer_flow());
             self.first_layer_speed_flow(pluginSettings.first_layer_speed_flow());
@@ -43,16 +47,16 @@ $(function() {
             self.end_gcode_flow(pluginSettings.start_gcode_flow());
         }
 
-        let restrictedInputsFlow = ["#first-layer-nozzle-flow", "#regular-nozzle-flow", "#regular-bed-flow", "#fan-speed-flow", "#fan-layer-flow", "#first-layer-speed-flow",
+        let restrictedInputsFlow = ["#first-layer-nozzle-flow", "#regular-nozzle-flow", "#first-layer-bed-flow", "#regular-bed-flow", "#fan-speed-flow", "#fan-layer-flow", "#first-layer-speed-flow",
             "#regular-speed-flow", "#travel-speed-flow", "#retraction-dist-flow", "#retraction-speed-flow", "#abl-method-flow", "#start-gcode-flow", "#end-gcode-flow"];
-        let saveInputsFlow = ["first_layer_nozzle_flow", "regular_nozzle_flow", "regular_bed_flow", "fan_speed_flow", "fan_layer_flow", "first_layer_speed_flow",
+        let saveInputsFlow = ["first_layer_nozzle_flow", "regular_nozzle_flow", "first_layer_bed_flow", "regular_bed_flow", "fan_speed_flow", "fan_layer_flow", "first_layer_speed_flow",
             "regular_speed_flow", "travel_speed_flow", "retraction_dist_flow", "retraction_speed_flow", "abl_method_flow", "start_gcode_flow", "end_gcode_flow"];
         let restrictedInputsProfile = ["abl-method-flow", "end-gcode-flow", "fan-layer-flow", "fan-speed-flow", "first-layer-nozzle-flow",
             "first-layer-speed-flow", "novalue", "regular-bed-flow", "regular-nozzle-flow", "regular-speed-flow", "retraction-dist-flow",
-            "retraction-speed-flow", "start-gcode-flow", "travel-speed-flow"];
+            "retraction-speed-flow", "start-gcode-flow", "travel-speed-flow", "first-layer-bed-flow"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "novalue", "regular_bed", "regular_nozzle", "regular_speed", "retraction_dist",
-            "retraction_speed", "start_gcode", "travel_speed"];
+            "retraction_speed", "start_gcode", "travel_speed", "first_layer_bed"];
         let saveSettingsProfile, saveSettingsFlow, saveSettingsProfileFlow;
         
         self.onAfterBinding = function() {
@@ -128,6 +132,7 @@ $(function() {
             mainViewModel.variable.first_layer_nozzle = document.getElementById("first-layer-nozzle-flow").value;
             mainViewModel.variable.regular_nozzle = document.getElementById("regular-nozzle-flow").value;
             mainViewModel.variable.regular_bed = document.getElementById("regular-bed-flow").value;
+            mainViewModel.variable.first_layer_bed = document.getElementById("first-layer-bed-flow").value;
             mainViewModel.variable.fan_speed = document.getElementById("fan-speed-flow").value;
             mainViewModel.variable.fan_layer = document.getElementById("fan-layer-flow").value;
             mainViewModel.variable.first_layer_speed = document.getElementById("first-layer-speed-flow").value * 60;

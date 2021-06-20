@@ -10,6 +10,7 @@ $(function() {
         self.profile_selection_temp = ko.observable();
         self.first_layer_nozzle_temp = ko.observable();
         self.regular_bed_temp = ko.observable();
+        self.first_layer_bed_temp = ko.observable();
         self.fan_speed_temp = ko.observable();
         self.fan_layer_temp = ko.observable();
         self.first_layer_speed_temp = ko.observable();
@@ -44,6 +45,7 @@ $(function() {
             self.profile_selection_temp(pluginSettings.profile_selection_temp());
             self.first_layer_nozzle_temp(pluginSettings.first_layer_nozzle_temp());
             self.regular_bed_temp(pluginSettings.regular_bed_temp());
+            self.first_layer_bed_temp(pluginSettings.first_layer_bed_temp());
             self.fan_speed_temp(pluginSettings.fan_speed_temp());
             self.fan_layer_temp(pluginSettings.fan_layer_temp());
             self.first_layer_speed_temp(pluginSettings.first_layer_speed_temp());
@@ -57,16 +59,16 @@ $(function() {
             self.end_gcode_temp(pluginSettings.end_gcode_temp());
         }
         
-        let restrictedInputsTemp = ["#first-layer-nozzle-temp", "#regular-bed-temp", "#fan-speed-temp", "#fan-layer-temp", "#first-layer-speed-temp",
+        let restrictedInputsTemp = ["#first-layer-nozzle-temp", "#regular-bed-temp", "#first-layer-bed-temp", "#fan-speed-temp", "#fan-layer-temp", "#first-layer-speed-temp",
             "#regular-speed-temp", "#travel-speed-temp", "#retraction-dist-temp", "#retraction-speed-temp", "#flow-temp", "#abl-method-temp", "#start-gcode-temp"];
-        let saveInputsTemp = ["first_layer_nozzle_temp", "regular_bed_temp", "fan_speed_temp", "fan_layer_temp", "first_layer_speed_temp",
+        let saveInputsTemp = ["first_layer_nozzle_temp", "regular_bed_temp", "first_layer_bed_temp", "fan_speed_temp", "fan_layer_temp", "first_layer_speed_temp",
             "regular_speed_temp", "travel_speed_temp", "retraction_dist_temp", "retraction_speed_temp", "flow_temp", "abl_method_temp", "start_gcode_temp"];
         let restrictedInputsProfile = ["abl-method-temp", "end-gcode-temp", "fan-layer-temp", "fan-speed-temp", "first-layer-nozzle-temp",
             "first-layer-speed-temp", "flow-temp", "regular-bed-temp", "novalue", "regular-speed-temp", "retraction-dist-temp",
-            "retraction-speed-temp", "start-gcode-temp", "travel-speed-temp"];
+            "retraction-speed-temp", "start-gcode-temp", "travel-speed-temp", "first-layer-bed-temp"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "flow", "regular_bed", "novalue", "regular_speed", "retraction_dist",
-            "retraction_speed", "start_gcode", "travel_speed"];
+            "retraction_speed", "start_gcode", "travel_speed", "first_layer_bed"];
         let saveSettingsProfile, saveSettingsTemp, saveSettingsProfileTemp;
 
         self.onAfterBinding = function () {
@@ -242,6 +244,7 @@ $(function() {
             end_gcode = document.getElementById("end-gcode-temp").value;
             mainViewModel.variable.first_layer_nozzle = document.getElementById("inputListTemp1").value;
             mainViewModel.variable.regular_nozzle = mainViewModel.variable.first_layer_nozzle;
+            mainViewModel.variable.first_layer_bed = document.getElementById("first-layer-bed-temp").value;
             mainViewModel.variable.regular_bed = document.getElementById("regular-bed-temp").value;
             mainViewModel.variable.fan_speed = document.getElementById("fan-speed-temp").value;
             mainViewModel.variable.fan_layer = document.getElementById("fan-layer-temp").value;
@@ -387,9 +390,9 @@ $(function() {
             OctoPrint.post(url, {
                 "name": mainViewModel.getFullFilename(mainViewModel.variable.filename),
                 "generated gcode": gcode_generated.flat().join('')
-            }).fail(function(e) {
+            })/*.fail(function(e) {
                 console.log(e)
-            });
+            });*/
 
             gcode_generated = [];
             pos_x = [];

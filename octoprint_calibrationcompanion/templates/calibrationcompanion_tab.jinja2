@@ -106,8 +106,8 @@
                                             <option value="0.4">0.4</option>
                                             <option value="0.6">0.6</option>
                                             <option value="0.8">0.8</option>
-                                            <option value="1.0">1.0</option>
-                                            <option value="1.2">1.2</option>
+                                            <!--<option value="1.0">1.0</option>
+                                            <option value="1.2">1.2</option>-->
                                         </select>
                                     </div>
                                 </div>
@@ -186,6 +186,15 @@
                         <div class="controls">
                             <div class="input-append">
                                 <input type="text" class="midsizeTextbox" id="regular-nozzle-profile">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="first-layer-bed-profile"><strong>1<sup>st</sup> layer bed Temperature</strong></label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-bed-profile">
                                 <span class="add-on">°C</span>
                             </div>
                         </div>
@@ -647,6 +656,15 @@
                         </div>
                     </div>
                     <div class="control-group">
+                        <label class="control-label" for="first-layer-bed-flow"><strong>1<sup>st</sup> layer bed Temperature</strong></label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-bed-flow" data-bind="value: first_layer_bed_flow">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
                         <label class="control-label" for="regular-bed-flow"><strong>Bed Temperature</strong></label>
                         <div class="controls">
                             <div class="input-append">
@@ -817,7 +835,16 @@
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label" for="regular-bed-flow"><strong>Bed Temperature</strong></label>
+                        <label class="control-label" for="first-layer-bed-retra"><strong>1<sup>st</sup> layer bed Temperature</strong></label>
+                        <div class="controls">
+                            <div class="input-append">
+                                <input type="text" class="midsizeTextbox" id="first-layer-bed-retra" data-bind="value: first_layer_bed_retra">
+                                <span class="add-on">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="regular-bed-retra"><strong>Bed Temperature</strong></label>
                         <div class="controls">
                             <div class="input-append">
                                 <input type="text" class="midsizeTextbox" id="regular-bed-retra" data-bind="value: regular_bed_retra">
@@ -971,6 +998,15 @@
                                 <div class="controls">
                                     <div class="input-append">
                                         <input type="text" class="midsizeTextbox" id="first-layer-nozzle-temp" data-bind="value: first_layer_nozzle_temp">
+                                        <span class="add-on">°C</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="first-layer-bed-temp"><strong>1<sup>st</sup> layer bed Temperature</strong></label>
+                                <div class="controls">
+                                    <div class="input-append">
+                                        <input type="text" class="midsizeTextbox" id="first-layer-bed-temp" data-bind="value: first_layer_bed_temp">
                                         <span class="add-on">°C</span>
                                     </div>
                                 </div>
@@ -1159,6 +1195,15 @@
                                 <div class="controls">
                                     <div class="input-append">
                                         <input type="text" class="midsizeTextbox" id="regular-nozzle-accel" data-bind="value: regular_nozzle_accel">
+                                        <span class="add-on">°C</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="first-layer-bed-accel"><strong>1<sup>st</sup> layer bed Temperature</strong></label>
+                                <div class="controls">
+                                    <div class="input-append">
+                                        <input type="text" class="midsizeTextbox" id="first-layer-bed-accel" data-bind="value: first_layer_bed_accel">
                                         <span class="add-on">°C</span>
                                     </div>
                                 </div>

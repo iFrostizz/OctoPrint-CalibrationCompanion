@@ -11,6 +11,7 @@ $(function() {
         self.first_layer_nozzle_retra = ko.observable();
         self.regular_nozzle_retra = ko.observable();
         self.regular_bed_retra = ko.observable();
+        self.first_layer_bed_retra = ko.observable();
         self.fan_speed_retra = ko.observable();
         self.fan_layer_retra = ko.observable();
         self.first_layer_speed_retra = ko.observable();
@@ -56,6 +57,7 @@ $(function() {
             self.first_layer_nozzle_retra(pluginSettings.first_layer_nozzle_retra());
             self.regular_nozzle_retra(pluginSettings.regular_nozzle_retra());
             self.regular_bed_retra(pluginSettings.regular_bed_retra());
+            self.first_layer_bed_retra(pluginSettings.first_layer_bed_retra());
             self.fan_speed_retra(pluginSettings.fan_speed_retra());
             self.fan_layer_retra(pluginSettings.fan_layer_retra());
             self.first_layer_speed_retra(pluginSettings.first_layer_speed_retra());
@@ -67,16 +69,16 @@ $(function() {
             self.end_gcode_retra(pluginSettings.end_gcode_retra());
         }
         
-        let restrictedInputsRetra = ["#first-layer-nozzle-retra", "#regular-nozzle-retra", "#regular-bed-retra", "#fan-speed-retra", "#fan-layer-retra",
+        let restrictedInputsRetra = ["#first-layer-nozzle-retra", "#regular-nozzle-retra", "#first-layer-bed-retra", "#regular-bed-retra", "#fan-speed-retra", "#fan-layer-retra",
             "#first-layer-speed-retra", "#regular-speed-retra", "#travel-speed-retra", "#flow-retra", "#abl-method-retra", "#start-gcode-retra", "#end-gcode-retra"];
-        let saveInputsRetra = ["first_layer_nozzle_retra", "regular_nozzle_retra", "regular_bed_retra", "fan_speed_retra", "fan_layer_retra",
+        let saveInputsRetra = ["first_layer_nozzle_retra", "regular_nozzle_retra", "first_layer_bed", "regular_bed_retra", "fan_speed_retra", "fan_layer_retra",
             "first_layer_speed_retra", "regular_speed_retra", "travel_speed_retra", "flow_retra", "abl_method_retra", "start_gcode_retra", "end_gcode_retra"];
         let restrictedInputsProfile = ["abl-method-retra", "end-gcode-retra", "fan-layer-retra", "fan-speed-retra", "first-layer-nozzle-retra",
             "first-layer-speed-retra", "flow-retra", "regular-bed-retra", "regular-nozzle-retra", "regular-speed-retra", "novalue",
-            "novalue", "start-gcode-retra", "travel-speed-retra"];
+            "novalue", "start-gcode-retra", "travel-speed-retra", "first-layer-bed-retra"];
         let restrictedSettingsProfile = ["abl_method", "end_gcode", "fan_layer", "fan_speed", "first_layer_nozzle",
             "first_layer_speed", "flow", "regular_bed", "regular_nozzle", "regular_speed", "novalue",
-            "novalue", "start_gcode", "travel_speed"];
+            "novalue", "start_gcode", "travel_speed", "first_layer_bed"];
         let saveSettingsProfile, saveSettingsRetra, saveSettingsProfileRetra;
 
         self.onAfterBinding = function () {
@@ -313,6 +315,7 @@ $(function() {
             end_gcode = document.getElementById("end-gcode-retra").value;
             mainViewModel.variable.first_layer_nozzle = document.getElementById("first-layer-nozzle-retra").value;
             mainViewModel.variable.regular_nozzle = document.getElementById("regular-nozzle-retra").value;
+            mainViewModel.variable.first_layer_bed = document.getElementById("first-layer-bed-retra").value;
             mainViewModel.variable.regular_bed = document.getElementById("regular-bed-retra").value;
             mainViewModel.variable.fan_speed = document.getElementById("fan-speed-retra").value;
             mainViewModel.variable.fan_layer = document.getElementById("fan-layer-retra").value;

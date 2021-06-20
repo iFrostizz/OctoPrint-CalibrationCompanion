@@ -70,8 +70,7 @@ $(function () {
                 return
             }
             let receivedFilename = message.fileReceived;
-            let filename = receivedFilename.substring(receivedFilename.lastIndexOf("_")+1, receivedFilename.lastIndexOf(".gcode"))
-            console.log(filename)
+            let filename = receivedFilename.substring(receivedFilename.lastIndexOf("_")+1, receivedFilename.lastIndexOf(".gcode"));
             self.PNotify = new PNotify({
                 title: 'Calibration Companion',
                 text: 'The file ' + receivedFilename + " has been added to the file manager!",
@@ -261,7 +260,7 @@ $(function () {
             div.className = "control-group";
         }
 
-        let allowedArrayClassicInput = ["first-layer-nozzle-", "regular-nozzle-", "regular-bed-", "fan-speed-",
+        let allowedArrayClassicInput = ["first-layer-nozzle-", "regular-nozzle-", "first-layer-bed-", "regular-bed-", "fan-speed-",
             "retraction-speed-", "fan-layer-", "first-layer-speed-", "regular-speed-", "travel-speed-", "bed-size-", "knob-levelling-feed-"];
         let allowedArrayCommaInput = ["retraction-dist-", "flow-", "fil-", "filament-path-", "actual-estep-", "measured-"];
         let allowedArrayInput = ["nozzle-", "filament-", "abl-method-", "start-gcode-", "end-gcode-"];
@@ -275,7 +274,6 @@ $(function () {
         });
         
         self.sortToCheck = function(element, action) {
-            //console.log(self.variable);
             let id = element.id;
             let settingName = id.replaceAll("-", "_")
             let value = element.value;
@@ -381,9 +379,7 @@ $(function () {
                     self.lastTime = Date.now();
                     self.stopLoading();
                 }
-                console.log(settingName)
                 if (self.saveInputsEsteps.includes(settingName)) {
-                    console.log(settingName)
                     self.final_estep_calculation();
                 }
             })
@@ -573,8 +569,9 @@ $(function () {
                 "bed_size_y": self.bed_size_y(),
                 "bed_size_z": self.bed_size_z(),
             
-                "first_layer_nozzle": self.variable.regular_nozzle,
+                "first_layer_nozzle": self.variable.first_layer_nozzle,
                 "regular_nozzle": self.variable.regular_nozzle,
+                "first_layer_bed": self.variable.first_layer_bed,
                 "regular_bed": self.variable.regular_bed,
                 "fan_speed": self.variable.fan_speed,
                 "fan_layer": self.variable.fan_layer,
