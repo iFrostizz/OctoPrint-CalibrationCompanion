@@ -26,6 +26,8 @@ This is the temperature tower file I used for the temperature tab: https://www.t
 
 Thanks to Critters for providing me his bed levelling procedure.
 
+Thanks to ingenioso3D, and elproducts CHEP FilamentFriday.com for the "knoblevelling" file.
+
 Thanks to the Cura software, that sliced my models perfectly. GitHub here: https://github.com/Ultimaker/Cura
 
 ### Known issues
