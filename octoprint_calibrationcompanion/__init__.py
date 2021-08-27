@@ -224,6 +224,9 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
         elif "Kp:" in line and self._settings.get_boolean(["auto_apply"]):
             self._plugin_manager.send_plugin_message("calibrationcompanion", {
                 "pidConstants": re.findall("\d+\.\d+", line)})
+        elif "PID Autotune finished!" in line:
+            self._plugin_manager.send_plugin_message("calibrationcompanion", {
+                "status": "finished"})
         return line  # Avoid blocking the communication
 
     def on_event(self, event, payload):

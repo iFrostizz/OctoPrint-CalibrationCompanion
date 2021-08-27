@@ -9,6 +9,8 @@ $(function() {
         self.bed_pid_temp = ko.observable();
         self.cycles_amount = ko.observable();
         self.auto_apply = ko.observable();
+        
+        let auto_apply;
 
         self.variable = {};
 
@@ -22,54 +24,42 @@ $(function() {
         }
         
         self.onAfterBinding = function() {
-            $('#autoApply').value = (self.auto_apply())
+            $('#autoApply').value = self.auto_apply()
+            auto_apply = Boolean(self.auto_apply())
         }
         
         $('#autoApply').on("input", () => {
             mainViewModel.firstTime = Date.now();
             mainViewModel.startLoading()
-            mainViewModel.saveOneSettingLoading("auto_apply", $('#autoApply')[0].checked, "saved")
+            auto_apply = $('#autoApply')[0].checked
+            mainViewModel.saveOneSettingLoading("auto_apply", auto_apply, "saved")
         })
         
         let extruderIndex = 0;
         let cycles;
 
-        self.pid_autotune_routine = function() {
-            if (typeof self.cycles_amount() === "number") {
-                if (self.cycles_amount().split(" ").join("").length > 3) {
-                    cycles = self.cycles_amount()
-                    if (self.nozzle_pid_temp().split(" ").join("").length !== 0 || self.bed_pid_temp().split(" ").join("").length !== 0) {
-                        setProgressBarPercentage(0);
-                        let message = "PID Autotune running. Please don't perform any action during the PID Autotune process as they are going to be queued after it is finished."
-                        PNotifyShowMessage(message, false, 'alert');
-                        if (self.nozzle_pid_temp().split(" ").join("").length !== 0) { //Works even if the user write empty spaces
-                            OctoPrint.control.sendGcode(["M303 E0 C" + cycles + " S" + self.nozzle_pid_temp(), 'M500']); //Sends the autotune PID regarding the user nozzle temperature
-                            setProgressBarPercentage(0); // Set progress bar back to 0
-                            OctoPrint.control.sendGcode(["M106 S0"]) //Turns off the fans if activated
-                            extruderIndex = 0
-                            if (self.auto_apply()) {
-                                setPidValues(lastPidConstants);
-                            }
-                        }
-                        if (self.bed_pid_temp().split(" ").join("").length !== 0) {
-                            OctoPrint.control.sendGcode(["M303 E-1 C" + cycles + " S" + self.bed_pid_temp(), 'M500']) //Sends the autotune PID regarding the user bed temperature
-                            setProgressBarPercentage(0); // Set progress bar back to 0
-                            extruderIndex = -1
-                            if (self.auto_apply()) {
-                                setPidValues(lastPidConstants);
-                            }
-                        }
+        self.pid_autotune_routine = async function() {
+            if (parseInt(self.cycles_amount()) > 0) {
+                cycles = self.cycles_amount()
+                if (self.nozzle_pid_temp().split(" ").join("").length !== 0 || self.bed_pid_temp().split(" ").join("").length !== 0) {
+                    setProgressBarPercentage(0);
+                    let message = "PID Autotune running. Please don't perform any action during the PID Autotune process as they are going to be queued after it is finished."
+                    PNotifyShowMessage(message, false, 'alert');
+                    if (self.nozzle_pid_temp().split(" ").join("").length !== 0) { //Works even if the user write empty spaces
+                        OctoPrint.control.sendGcode(["M303 E0 C" + cycles + " S" + self.nozzle_pid_temp(), "M500", "M106 S0"]); //Sends the autotune PID regarding the user nozzle temperature
+                        setProgressBarPercentage(0); // Set progress bar back to 0
+                        extruderIndex = 0;
                     }
-                } else {
-                    let message = "cycles_amount should be equal or over 3. got " + self.cycles_amount() + " instead."
-                    PNotifyShowMessage(message, true, 'error')
+                    if (self.bed_pid_temp().split(" ").join("").length !== 0) {
+                        OctoPrint.control.sendGcode(["M303 E-1 C" + cycles + " S" + self.bed_pid_temp(), 'M500']) //Sends the autotune PID regarding the user bed temperature
+                        setProgressBarPercentage(0); // Set progress bar back to 0
+                        extruderIndex = -1;
+                    }
                 }
             } else {
-                let message = "cycles_amount should be a number. got " + typeof self.cycles_amount() + " instead."
+                let message = "cycles_amount should be equal or over 3. got " + self.cycles_amount() + " instead."
                 PNotifyShowMessage(message, true, 'error')
             }
-        
-            
         }
         
         function PNotifyShowMessage(message, hideBoolean, typeOfMessage) {
@@ -88,13 +78,19 @@ $(function() {
         let lastPidConstants;
 
         self.onDataUpdaterPluginMessage = function(plugin, message) { // Cycles >= 3
-            if (plugin !== "calibrationcompanion"){
+            if (plugin !== "calibrationcompanion") {
                 return
             }
             if (typeof message.cycleIteration === "number") {
-                setProgressBarPercentage((100*message.cycleIteration)/cycles);
-            } else if (message.pidConstants.length === 3) {
-                lastPidConstants = message.pidConstants
+                setProgressBarPercentage((100 * message.cycleIteration) / cycles);
+            } else if (message.pidConstants !== undefined) {
+                if (message.pidConstants.length === 3) {
+                    lastPidConstants = message.pidConstants
+                }
+            } else if (message.status !== undefined) {
+                if (message.status === "finished" && auto_apply) {
+                    setPidValues(lastPidConstants);
+                }
             }
         }
         
@@ -115,10 +111,10 @@ $(function() {
                 } else {
                     document.getElementById("pid-progress-bar").parentNode.className = "progress progress-striped active";
                 }
-            document.getElementById("pid-progress-bar").style.width = value + "%";
+                document.getElementById("pid-progress-bar").style.width = value + "%";
             } else {
-                    console.log(value + " is not valid for PID progress bar.");
-                }
+                console.error(value + " is not valid for PID progress bar.");
+            }
         }
 
         self.fan_trigger_on = function() {
