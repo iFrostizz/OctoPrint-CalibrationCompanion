@@ -8,6 +8,7 @@ $(function() {
         self.nozzle_pid_temp = ko.observable();
         self.bed_pid_temp = ko.observable();
         self.cycles_amount = ko.observable();
+        self.auto_apply = ko.observable();
 
         self.variable = {};
 
@@ -17,40 +18,91 @@ $(function() {
             self.nozzle_pid_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.nozzle_pid_temp());
             self.bed_pid_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.bed_pid_temp());
             self.cycles_amount(self.settingsViewModel.settings.plugins.calibrationcompanion.cycles_amount());
+            self.auto_apply(self.settingsViewModel.settings.plugins.calibrationcompanion.auto_apply());
         }
+        
+        self.onAfterBinding = function() {
+            $('#autoApply').value = (self.auto_apply())
+        }
+        
+        $('#autoApply').on("input", () => {
+            mainViewModel.firstTime = Date.now();
+            mainViewModel.startLoading()
+            mainViewModel.saveOneSettingLoading("auto_apply", $('#autoApply')[0].checked, "saved")
+        })
+        
+        let extruderIndex = 0;
+        let cycles;
 
         self.pid_autotune_routine = function() {
-            if (self.nozzle_pid_temp().split(" ").join("").length !== 0 || self.bed_pid_temp().split(" ").join("").length !== 0 && self.cycles_amount().split(" ").join("").length !== 0) {
-                setProgressBarPercentage(0);
-                pidAlert();
-                if (self.nozzle_pid_temp().split(" ").join("").length !== 0) { //Works even if the user write empty spaces
-                    OctoPrint.control.sendGcode(["M303 E0 C" + self.cycles_amount() + " S" + self.nozzle_pid_temp(), 'M500']); //Sends the autotune PID regarding the user nozzle temperature
-                    OctoPrint.control.sendGcode(["M106 S0"]) //Turns off the fans if activated
+            if (typeof self.cycles_amount() === "number") {
+                if (self.cycles_amount().split(" ").join("").length > 3) {
+                    cycles = self.cycles_amount()
+                    if (self.nozzle_pid_temp().split(" ").join("").length !== 0 || self.bed_pid_temp().split(" ").join("").length !== 0) {
+                        setProgressBarPercentage(0);
+                        let message = "PID Autotune running. Please don't perform any action during the PID Autotune process as they are going to be queued after it is finished."
+                        PNotifyShowMessage(message, false, 'alert');
+                        if (self.nozzle_pid_temp().split(" ").join("").length !== 0) { //Works even if the user write empty spaces
+                            OctoPrint.control.sendGcode(["M303 E0 C" + cycles + " S" + self.nozzle_pid_temp(), 'M500']); //Sends the autotune PID regarding the user nozzle temperature
+                            setProgressBarPercentage(0); // Set progress bar back to 0
+                            OctoPrint.control.sendGcode(["M106 S0"]) //Turns off the fans if activated
+                            extruderIndex = 0
+                            if (self.auto_apply()) {
+                                setPidValues(lastPidConstants);
+                            }
+                        }
+                        if (self.bed_pid_temp().split(" ").join("").length !== 0) {
+                            OctoPrint.control.sendGcode(["M303 E-1 C" + cycles + " S" + self.bed_pid_temp(), 'M500']) //Sends the autotune PID regarding the user bed temperature
+                            setProgressBarPercentage(0); // Set progress bar back to 0
+                            extruderIndex = -1
+                            if (self.auto_apply()) {
+                                setPidValues(lastPidConstants);
+                            }
+                        }
+                    }
+                } else {
+                    let message = "cycles_amount should be equal or over 3. got " + self.cycles_amount() + " instead."
+                    PNotifyShowMessage(message, true, 'error')
                 }
-                if (self.bed_pid_temp().split(" ").join("").length !== 0) {
-                    OctoPrint.control.sendGcode(["M303 E-1 C" + self.cycles_amount() + " S" + self.bed_pid_temp(), 'M500']) //Sends the autotune PID regarding the user bed temperature
-                }
+            } else {
+                let message = "cycles_amount should be a number. got " + typeof self.cycles_amount() + " instead."
+                PNotifyShowMessage(message, true, 'error')
             }
+        
+            
         }
-
-        function pidAlert() {
+        
+        function PNotifyShowMessage(message, hideBoolean, typeOfMessage) {
             self.notify = new PNotify({
                 title: 'Calibration Companion',
-                text: "PID Autotune running. Please don't perform any action during the PID Autotune process as they are going to be queued after it is finished.",
-                type: 'alert',
-                hide: false,
+                text: message,
+                type: typeOfMessage,
+                hide: hideBoolean,
                 buttons: {
                     closer: true,
                     sticker: false
                 },
             });
         }
+        
+        let lastPidConstants;
 
-        self.onDataUpdaterPluginMessage = function(plugin, message) {
-            if (plugin !== "calibrationcompanion" || typeof message.cycleIteration !== "number"){
+        self.onDataUpdaterPluginMessage = function(plugin, message) { // Cycles >= 3
+            if (plugin !== "calibrationcompanion"){
                 return
             }
-            setProgressBarPercentage((100*message.cycleIteration)/self.cycles_amount());
+            if (typeof message.cycleIteration === "number") {
+                setProgressBarPercentage((100*message.cycleIteration)/cycles);
+            } else if (message.pidConstants.length === 3) {
+                lastPidConstants = message.pidConstants
+            }
+        }
+        
+        function setPidValues(pidConstants) {
+            const [P, I, D] = [pidConstants[0], pidConstants[1], pidConstants[2]];
+            OctoPrint.control.sendGcode(["M301 E" + extruderIndex + " P" + P + " I" + I + " D" + D, "M500"]);
+            let message = "New PID constants set!\nP:" + P + " I:" + I + " D:" + D + " for extruder: " + extruderIndex
+            PNotifyShowMessage(message, true, 'info');
         }
 
         function setProgressBarPercentage(value) {

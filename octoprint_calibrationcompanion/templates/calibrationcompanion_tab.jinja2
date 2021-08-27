@@ -347,11 +347,24 @@
                     <label class="control-label" for="cyclesAmount"><strong>Cycles</strong></label>
                     <input type="text" class="midsizeTextbox" id="cyclesAmount" data-bind="value: cycles_amount">
                     <button type="button" class="btn btn-primary" data-bind="click:function(){pid_autotune_routine();}">Run PID autotune</button>
+
+                    <br><br><br>
+                    <div class="control-group">
+                    <label class="control-label" for="autoApply"><strong>Auto apply</strong></label>
+                    <div class="controls">
+                        <div class="input-append" onmouseover="$('#aboutAutoApply').tooltip('show')" onmouseleave="$('#aboutAutoApply').tooltip('hide')">
+                            <a id="aboutAutoApply" href="#" data-toggle="tooltip" data-placement="right" title="Apply PID values after process finished">
+                                <input type="checkbox" id="autoApply" data-bind="checked: auto_apply">
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 </form><br>
                 <div class="btn-group" data-toggle="buttons-radio">
                     <button type="button" class="btn btn-primary" data-bind="click:function(){fan_trigger_on();}">Fans on</button>
                     <button type="button" class="btn btn-primary" data-bind="click:function(){fan_trigger_off();}">Fans off</button>
-                </div><br><br>
+                </div>
+                <br><br>
                 <div class="progress progress-striped active">
                     <div class="bar" id="pid-progress-bar"></div>
                 </div>

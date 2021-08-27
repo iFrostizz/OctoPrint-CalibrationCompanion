@@ -346,8 +346,9 @@ $(function () {
             let saveSettingsCheckbox = saveCheckbox[restrictedCheckbox.indexOf('#' + element.id)];
             if (saveSettingsCheckbox === "origin_check") {
                 if (element.checked) {
-                    $('#bed-size-y')[0].disabled = true;
-                    $('#bed-size-y')[0].value = $('#bed-size-x')[0].value;
+                    const bedSizeY = $('#bed-size-y')[0]
+                    bedSizeY.disabled = true;
+                    bedSizeY.value = $('#bed-size-x')[0].value;
                 } else {
                     document.getElementById("bed-size-y").disabled = false;
                 }
