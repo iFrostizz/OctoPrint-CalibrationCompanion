@@ -370,7 +370,7 @@ $(function() {
                             returningPosX = parseFloat(pos_x[pos_x.length-1]) + mainViewModel.getReturningPosition(relative_pos_x) - 2.8 + 1.5 * mainViewModel.nozzle_size();
                             returningPosY = parseFloat(pos_y[pos_y.length-1]) + mainViewModel.getReturningPosition(relative_pos_y) - 8 / 2 + 4.5 / 2;
                         } else if (mainViewModel.nozzle_size() === "0.8") {
-                            returningPosX = parseFloat(pos_x[pos_x.length-1]) + mainViewModel.getReturningPosition(relative_pos_x) - 32 + 1.5 * mainViewModel.nozzle_size();
+                            returningPosX = parseFloat(pos_x[pos_x.length-1]) + mainViewModel.getReturningPosition(relative_pos_x) - 2.8 + 1.5 * mainViewModel.nozzle_size();
                             returningPosY = parseFloat(pos_y[pos_y.length-1]) + mainViewModel.getReturningPosition(relative_pos_y) - 8 / 2 + 4.5 / 2;
                         }
                     }
