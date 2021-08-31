@@ -9,8 +9,6 @@ $(function() {
         self.bed_pid_temp = ko.observable();
         self.cycles_amount = ko.observable();
         self.auto_apply = ko.observable();
-        
-        let auto_apply;
 
         self.variable = {};
 
@@ -25,14 +23,12 @@ $(function() {
         
         self.onAfterBinding = function() {
             $('#autoApply').value = self.auto_apply()
-            auto_apply = Boolean(self.auto_apply())
         }
         
         $('#autoApply').on("input", () => {
             mainViewModel.firstTime = Date.now();
             mainViewModel.startLoading()
-            auto_apply = $('#autoApply')[0].checked
-            mainViewModel.saveOneSettingLoading("auto_apply", auto_apply, "saved")
+            mainViewModel.saveOneSettingLoading("auto_apply", $('#autoApply')[0].checked, "saved")
         })
         
         let extruderIndex = 0;
@@ -75,7 +71,7 @@ $(function() {
             });
         }
         
-        let lastPidConstants;
+        let lastPidPConstants, lastPidIConstants, lastPidDConstants, lastPidConstants;
 
         self.onDataUpdaterPluginMessage = function(plugin, message) { // Cycles >= 3
             if (plugin !== "calibrationcompanion") {
@@ -83,13 +79,30 @@ $(function() {
             }
             if (typeof message.cycleIteration === "number") {
                 setProgressBarPercentage((100 * message.cycleIteration) / cycles);
+            } else if (message.pidPConstant !== undefined) {
+                if (message.pidPConstant.length === 1) {
+                    lastPidPConstants = message.pidPConstant
+                }
+            } else if (message.pidIConstant !== undefined) {
+                if (message.pidIConstant.length === 1) {
+                    lastPidIConstants = message.pidIConstant
+                }
+            } else if (message.pidDConstant !== undefined) {
+                if (message.pidDConstant.length === 1) {
+                    lastPidDConstants = message.pidDConstant
+                }
             } else if (message.pidConstants !== undefined) {
                 if (message.pidConstants.length === 3) {
                     lastPidConstants = message.pidConstants
                 }
             } else if (message.status !== undefined) {
-                if (message.status === "finished" && auto_apply) {
+                if (message.status === "finished" && self.auto_apply()) {
+                    if (lastPidConstants === undefined) {
+                        lastPidConstants = [lastPidPConstants, lastPidIConstants, lastPidDConstants]
+                    }
                     setPidValues(lastPidConstants);
+                    lastPidConstants = undefined;
+                    [lastPidPConstants, lastPidIConstants, lastPidDConstants] = [undefined, undefined, undefined];
                 }
             }
         }

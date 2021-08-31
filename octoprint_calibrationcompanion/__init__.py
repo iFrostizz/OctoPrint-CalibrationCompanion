@@ -221,9 +221,19 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
         elif "bias: " in line:
             self.iteration += 1
             self._plugin_manager.send_plugin_message("calibrationcompanion", {"cycleIteration": self.iteration})
-        elif "Kp:" in line and self._settings.get_boolean(["auto_apply"]):
+        elif any(x in line for x in ['Kp:', 'Ki:', 'Kd:']) and self._settings.get_boolean(["auto_apply"]):
+            self._logger.info("{}".format(re.findall("\d+\.\d+", line)))
             self._plugin_manager.send_plugin_message("calibrationcompanion", {
                 "pidConstants": re.findall("\d+\.\d+", line)})
+        elif "Kp:" in line and self._settings.get_boolean(["auto_apply"]):
+            self._plugin_manager.send_plugin_message("calibrationcompanion", {
+                "pidPConstant": re.findall("\d+\.\d+", line)})
+        elif "Ki:" in line and self._settings.get_boolean(["auto_apply"]):
+            self._plugin_manager.send_plugin_message("calibrationcompanion", {
+                "pidIConstant": re.findall("\d+\.\d+", line)})
+        elif "Kd:" in line and self._settings.get_boolean(["auto_apply"]):
+            self._plugin_manager.send_plugin_message("calibrationcompanion", {
+                "pidDConstant": re.findall("\d+\.\d+", line)})
         elif "PID Autotune finished!" in line:
             self._plugin_manager.send_plugin_message("calibrationcompanion", {
                 "status": "finished"})
