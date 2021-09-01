@@ -108,7 +108,7 @@ $(function() {
         function setPidValues(pidConstants) {
             const [P, I, D] = [pidConstants[0], pidConstants[1], pidConstants[2]];
             if (extruderIndex === -1) {
-                OctoPrint.control.sendGcode(["M301 E" + extruderIndex + " P" + P + " I" + I + " D" + D, "M500", "M140 S0"]);
+                OctoPrint.control.sendGcode(["M304 P" + P + " I" + I + " D" + D, "M500", "M140 S0"]);
             } else if (extruderIndex === 0) {
                 OctoPrint.control.sendGcode(["M301 E" + extruderIndex + " P" + P + " I" + I + " D" + D, "M500", "M104 S0"]);
             } else {
