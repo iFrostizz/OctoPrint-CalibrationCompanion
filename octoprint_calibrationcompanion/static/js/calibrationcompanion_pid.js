@@ -101,8 +101,6 @@ $(function() {
                         lastPidConstants = [lastPidPConstant, lastPidIConstant, lastPidDConstant];
                     }
                     setPidValues(lastPidConstants);
-                    lastPidConstants = undefined;
-                    [lastPidPConstant, lastPidIConstant, lastPidDConstant] = [undefined, undefined, undefined];
                 }
             }
         }
@@ -118,6 +116,8 @@ $(function() {
             }
             let message = "New PID constants set!\nP:" + P + " I:" + I + " D:" + D + " for extruder: " + extruderIndex
             PNotifyShowMessage(message, false, 'info');
+            lastPidConstants = undefined;
+            [lastPidPConstant, lastPidIConstant, lastPidDConstant] = [undefined, undefined, undefined];
         }
 
         function setProgressBarPercentage(value) {
