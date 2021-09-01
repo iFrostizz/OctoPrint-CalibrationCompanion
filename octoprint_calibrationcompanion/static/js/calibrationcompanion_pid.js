@@ -117,7 +117,7 @@ $(function() {
                 OctoPrint.control.sendGcode(["M301 E" + extruderIndex + " P" + P + " I" + I + " D" + D, "M500"]);
             }
             let message = "New PID constants set!\nP:" + P + " I:" + I + " D:" + D + " for extruder: " + extruderIndex
-            PNotifyShowMessage(message, true, 'info');
+            PNotifyShowMessage(message, false, 'info');
         }
 
         function setProgressBarPercentage(value) {
