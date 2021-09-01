@@ -71,7 +71,7 @@ $(function() {
             });
         }
         
-        let lastPidPConstants, lastPidIConstants, lastPidDConstants, lastPidConstants;
+        let lastPidPConstant, lastPidIConstant, lastPidDConstant, lastPidConstants;
 
         self.onDataUpdaterPluginMessage = function(plugin, message) { // Cycles >= 3
             if (plugin !== "calibrationcompanion") {
@@ -81,15 +81,15 @@ $(function() {
                 setProgressBarPercentage((100 * message.cycleIteration) / cycles);
             } else if (message.pidPConstant !== undefined) {
                 if (message.pidPConstant.length === 1) {
-                    lastPidPConstants = message.pidPConstant
+                    lastPidPConstant = message.pidPConstant
                 }
             } else if (message.pidIConstant !== undefined) {
                 if (message.pidIConstant.length === 1) {
-                    lastPidIConstants = message.pidIConstant
+                    lastPidIConstant = message.pidIConstant
                 }
             } else if (message.pidDConstant !== undefined) {
                 if (message.pidDConstant.length === 1) {
-                    lastPidDConstants = message.pidDConstant
+                    lastPidDConstant = message.pidDConstant
                 }
             } else if (message.pidConstants !== undefined) {
                 if (message.pidConstants.length === 3) {
@@ -98,11 +98,11 @@ $(function() {
             } else if (message.status !== undefined) {
                 if (message.status === "finished" && self.auto_apply()) {
                     if (lastPidConstants === undefined) {
-                        lastPidConstants = [lastPidPConstants, lastPidIConstants, lastPidDConstants]
+                        lastPidConstants = [lastPidPConstant, lastPidIConstant, lastPidDConstant];
                     }
                     setPidValues(lastPidConstants);
                     lastPidConstants = undefined;
-                    [lastPidPConstants, lastPidIConstants, lastPidDConstants] = [undefined, undefined, undefined];
+                    [lastPidPConstant, lastPidIConstant, lastPidDConstant] = [undefined, undefined, undefined];
                 }
             }
         }
