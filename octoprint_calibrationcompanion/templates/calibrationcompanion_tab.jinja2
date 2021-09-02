@@ -346,7 +346,7 @@
                     </div>
                     <label class="control-label" for="cyclesAmount"><strong>Cycles</strong></label>
                     <input type="number" class="midsizeTextbox" id="cyclesAmount" data-bind="value: cycles_amount">
-                    <button type="button" class="btn btn-primary" data-bind="click:function(){pid_autotune_routine();}">Run PID autotune</button>
+                    <button type="button" class="btn btn-primary" data-bind="click:function(){pid_autotune_routine();}, enable: controlViewModel.isOperational()">Run PID autotune</button>
 
                     <br><br><br>
                     <div class="control-group">

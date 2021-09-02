@@ -63,12 +63,12 @@ $(function() {
                     let message = "PID Autotune running. Please don't perform any action during the PID Autotune process as they are going to be queued after it is finished."
                     PNotifyShowMessage(message, false, 'alert');
                     if (self.nozzle_pid_temp().split(" ").join("").length !== 0) { //Works even if the user write empty spaces
-                        OctoPrint.control.sendGcode(["M303 E0 C" + cycles + " S" + self.nozzle_pid_temp(), "M500", "M106 S0"]); //Sends the autotune PID regarding the user nozzle temperature
+                        OctoPrint.control.sendGcode(["M303 E0 C" + cycles + " S" + self.nozzle_pid_temp(), "M500", "M106 S0", "M104 S0"]); //Sends the autotune PID regarding the user nozzle temperature
                         setProgressBarPercentage(0); // Set progress bar back to 0
                         extruderIndex = 0;
                     }
                     if (self.bed_pid_temp().split(" ").join("").length !== 0) {
-                        OctoPrint.control.sendGcode(["M303 E-1 C" + cycles + " S" + self.bed_pid_temp(), 'M500']) //Sends the autotune PID regarding the user bed temperature
+                        OctoPrint.control.sendGcode(["M303 E-1 C" + cycles + " S" + self.bed_pid_temp(), 'M500', "M140 S0"]) //Sends the autotune PID regarding the user bed temperature
                         setProgressBarPercentage(0); // Set progress bar back to 0
                         extruderIndex = -1;
                     }
@@ -129,9 +129,9 @@ $(function() {
         function setPidValues(pidConstants) {
             const [P, I, D] = [pidConstants[0], pidConstants[1], pidConstants[2]];
             if (extruderIndex === -1) {
-                OctoPrint.control.sendGcode(["M304 P" + P + " I" + I + " D" + D, "M500", "M140 S0"]);
+                OctoPrint.control.sendGcode(["M304 P" + P + " I" + I + " D" + D, "M500"]);
             } else if (extruderIndex === 0) {
-                OctoPrint.control.sendGcode(["M301 E" + extruderIndex + " P" + P + " I" + I + " D" + D, "M500", "M104 S0"]);
+                OctoPrint.control.sendGcode(["M301 E" + extruderIndex + " P" + P + " I" + I + " D" + D, "M500"]);
             } else {
                 OctoPrint.control.sendGcode(["M301 E" + extruderIndex + " P" + P + " I" + I + " D" + D, "M500"]);
             }
