@@ -335,17 +335,17 @@
                 <form class="form-inline">
                     <label class="control-label" for="nozzlePidTemp"><strong>Nozzle temperature</strong></label>
                     <div class="input-append">
-                        <input type="text" class="midsizeTextbox" id="nozzlePidTemp" data-bind="value: nozzle_pid_temp">
+                        <input type="number" class="midsizeTextbox" id="nozzlePidTemp" data-bind="value: nozzle_pid_temp">
                         <span class="add-on">°C</span>
                     </div>
                     <label class="control-label" for="bedPidTemp"><strong>Bed temperature</strong></label>
-                    <div class="input-append" onmouseover="$('#aboutBedPid').tooltip('show')" onmouseleave="$('#aboutBedPid').tooltip('hide')">
-                        <input type="text" class="midsizeTextbox" id="bedPidTemp" data-bind="value: bed_pid_temp">
-                        <a id="aboutBedPid" href="#" data-toggle="tooltip" data-placement="bottom" title="leave empty if not enabled" style="position: relative; top: 10px; right: 25px;"></a>
+                    <div class="input-append"> <!-- onmouseover="$('#aboutBedPid').tooltip('show')" onmouseleave="$('#aboutBedPid').tooltip('hide')" -->
+                        <input type="number" class="midsizeTextbox" id="bedPidTemp" data-bind="value: bed_pid_temp">
+                        <!-- <a id="aboutBedPid" href="#" data-toggle="tooltip" data-placement="bottom" title="leave empty if not enabled" style="position: relative; top: 10px; right: 25px;"></a> -->
                         <span class="add-on">°C</span>
                     </div>
                     <label class="control-label" for="cyclesAmount"><strong>Cycles</strong></label>
-                    <input type="text" class="midsizeTextbox" id="cyclesAmount" data-bind="value: cycles_amount">
+                    <input type="number" class="midsizeTextbox" id="cyclesAmount" data-bind="value: cycles_amount">
                     <button type="button" class="btn btn-primary" data-bind="click:function(){pid_autotune_routine();}">Run PID autotune</button>
 
                     <br><br><br>

@@ -31,6 +31,27 @@ $(function() {
             mainViewModel.saveOneSettingLoading("auto_apply", $('#autoApply')[0].checked, "saved")
         })
         
+        const nozzlePidTemp = $('#nozzlePidTemp');
+        const bedPidTemp = $('#bedPidTemp');
+        
+        nozzlePidTemp.on("input", () => {
+            if (nozzlePidTemp.val().length > 0) {
+                bedPidTemp.val("");
+                bedPidTemp.prop("disabled", true);
+            } else {
+                bedPidTemp.prop("disabled", false);
+            }
+        })
+        
+        bedPidTemp.on("input", () => {
+            if (bedPidTemp.val().length > 0) {
+                nozzlePidTemp.val("");
+                nozzlePidTemp.prop("disabled", true);
+            } else {
+                nozzlePidTemp.prop("disabled", false);
+            }
+        })
+        
         let extruderIndex = 0;
         let cycles;
 
