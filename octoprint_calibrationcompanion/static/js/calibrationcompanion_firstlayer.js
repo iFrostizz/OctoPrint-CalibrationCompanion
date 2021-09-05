@@ -130,11 +130,11 @@ $(function() {
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + (mainViewModel.bed_size_y() - extra_margin) + " Y" + (mainViewModel.bed_size_y() - extra_margin) + " F" + feed_rate + " ; Move to Position 3\n" +
+                "G0 X" + (mainViewModel.bed_size_x() - extra_margin) + " Y" + (mainViewModel.bed_size_y() - extra_margin) + " F" + feed_rate + " ; Move to Position 3\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + (mainViewModel.bed_size_y() - extra_margin) + " Y" + extra_margin + " F" + feed_rate + " ; Move to Position 4\n" +
+                "G0 X" + (mainViewModel.bed_size_x() - extra_margin) + " Y" + extra_margin + " F" + feed_rate + " ; Move to Position 4\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
@@ -146,11 +146,11 @@ $(function() {
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + (mainViewModel.bed_size_y() - extra_margin) + " Y" + (mainViewModel.bed_size_y() - extra_margin) + " F" + feed_rate + " ; Move to Position 3\n" +
+                "G0 X" + (mainViewModel.bed_size_x() - extra_margin) + " Y" + (mainViewModel.bed_size_y() - extra_margin) + " F" + feed_rate + " ; Move to Position 3\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +
-                "G0 X" + (mainViewModel.bed_size_y() - extra_margin) + " Y" + extra_margin + " F" + feed_rate + " ; Move to Position 4\n" +
+                "G0 X" + (mainViewModel.bed_size_x() - extra_margin) + " Y" + extra_margin + " F" + feed_rate + " ; Move to Position 4\n" +
                 "G0 Z0.1\n" +
                 "M0 ; Pause print\n" +
                 "G0 Z5 ; Lift Z axis\n" +

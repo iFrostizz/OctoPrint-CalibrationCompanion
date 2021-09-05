@@ -1,14 +1,18 @@
 $(function() {
     function calibrationcompanionViewModel_pid(parameters) {
         var self = this;
+        
+        console.log(parameters)
 
         self.settingsViewModel = parameters[0];
-        self.calibrationcompanionViewModel = parameters[1];
+        self.controlViewModel = parameters[1];
+        self.calibrationcompanionViewModel = parameters[2];
 
         self.nozzle_pid_temp = ko.observable();
         self.bed_pid_temp = ko.observable();
         self.cycles_amount = ko.observable();
         self.auto_apply = ko.observable();
+        self.extruderIndex = ko.observable();
 
         self.variable = {};
 
@@ -22,7 +26,7 @@ $(function() {
         }
         
         self.onAfterBinding = function() {
-            $('#autoApply').value = self.auto_apply()
+            $('#autoApply').prop('checked', self.auto_apply())
         }
         
         $('#autoApply').on("input", () => {
@@ -52,7 +56,6 @@ $(function() {
             }
         })
         
-        let extruderIndex = 0;
         let cycles;
 
         self.pid_autotune_routine = async function() {
@@ -64,13 +67,11 @@ $(function() {
                     PNotifyShowMessage(message, false, 'alert');
                     if (self.nozzle_pid_temp().split(" ").join("").length !== 0) { //Works even if the user write empty spaces
                         OctoPrint.control.sendGcode(["M303 E0 C" + cycles + " S" + self.nozzle_pid_temp(), "M500", "M106 S0", "M104 S0"]); //Sends the autotune PID regarding the user nozzle temperature
-                        setProgressBarPercentage(0); // Set progress bar back to 0
-                        extruderIndex = 0;
+                        OctoPrint.settings.savePluginSettings('calibrationcompanion', {'extruderIndex': 0})
                     }
                     if (self.bed_pid_temp().split(" ").join("").length !== 0) {
                         OctoPrint.control.sendGcode(["M303 E-1 C" + cycles + " S" + self.bed_pid_temp(), 'M500', "M140 S0"]) //Sends the autotune PID regarding the user bed temperature
-                        setProgressBarPercentage(0); // Set progress bar back to 0
-                        extruderIndex = -1;
+                        OctoPrint.settings.savePluginSettings('calibrationcompanion', {'extruderIndex': -1})
                     }
                 }
             } else {
@@ -117,7 +118,7 @@ $(function() {
                     lastPidConstants = message.pidConstants
                 }
             } else if (message.status !== undefined) {
-                if (message.status === "finished" && self.auto_apply()) {
+                if (message.status === "finished") {
                     if (lastPidConstants === undefined) {
                         lastPidConstants = [lastPidPConstant, lastPidIConstant, lastPidDConstant];
                     }
@@ -127,15 +128,18 @@ $(function() {
         }
         
         function setPidValues(pidConstants) {
+            setProgressBarPercentage(0); // Set progress bar back to 0
             const [P, I, D] = [pidConstants[0], pidConstants[1], pidConstants[2]];
-            if (extruderIndex === -1) {
-                OctoPrint.control.sendGcode(["M304 P" + P + " I" + I + " D" + D, "M500"]);
-            } else if (extruderIndex === 0) {
-                OctoPrint.control.sendGcode(["M301 E" + extruderIndex + " P" + P + " I" + I + " D" + D, "M500"]);
-            } else {
-                OctoPrint.control.sendGcode(["M301 E" + extruderIndex + " P" + P + " I" + I + " D" + D, "M500"]);
+            if (self.auto_apply()) {
+                if (self.extruderIndex() === -1) {
+                    OctoPrint.control.sendGcode(["M304 P" + P + " I" + I + " D" + D, "M500"]);
+                } else if (self.extruderIndex() === 0) {
+                    OctoPrint.control.sendGcode(["M301 E" + self.extruderIndex() + " P" + P + " I" + I + " D" + D, "M500"]);
+                } else {
+                    OctoPrint.control.sendGcode(["M301 E" + self.extruderIndex() + " P" + P + " I" + I + " D" + D, "M500"]);
+                }
             }
-            let message = "New PID constants set!\nP:" + P + " I:" + I + " D:" + D + " for extruder: " + extruderIndex
+            let message = "New PID constants set!\nP:" + P + " I:" + I + " D:" + D + " for extruder: " + self.extruderIndex();
             PNotifyShowMessage(message, false, 'info');
             lastPidConstants = undefined;
             [lastPidPConstant, lastPidIConstant, lastPidDConstant] = [undefined, undefined, undefined];
@@ -167,7 +171,7 @@ $(function() {
 
     OCTOPRINT_VIEWMODELS.push({
         construct: calibrationcompanionViewModel_pid,
-        dependencies: [  "settingsViewModel", "calibrationcompanionViewModel"  ],
+        dependencies: [  "settingsViewModel", "controlViewModel", "calibrationcompanionViewModel"  ],
         elements: [ "#pid-calibrationcompanion" ]
     });
 });
