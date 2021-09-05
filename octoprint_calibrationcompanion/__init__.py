@@ -45,7 +45,6 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
             auto_print=False,
 
             auto_apply=False,
-            extruderIndex=0,
 
             profile_selection="",
             profile_selection_square="",
@@ -241,15 +240,6 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
                 "status": "finished"})
         return line  # Avoid blocking the communication
 
-    """def get_sent_gcode(self, comm_instance, phase, cmd, cmd_type, gcode, subcode=None, tags=None, *args, **kwargs):
-        if "M303" in cmd:
-            self._logger.info(cmd)
-            EPos = cmd.find('E')
-            if EPos != -1:
-                extruderIndex = cmd[EPos+1]
-                self._logger.info(extruderIndex)
-        return cmd"""
-
     def on_event(self, event, payload):
         if event == "FileAdded":
             if payload['name'] == self.filename + ".gcode":
@@ -328,6 +318,5 @@ def __plugin_load__():
     __plugin_hooks__ = {
         "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
         "octoprint.server.http.bodysize": __plugin_implementation__.bodysize_hook,
-        "octoprint.comm.protocol.gcode.received": __plugin_implementation__.get_received_gcode,
-        #"octoprint.comm.protocol.gcode.sent": __plugin_implementation__.get_sent_gcode
+        "octoprint.comm.protocol.gcode.received": __plugin_implementation__.get_received_gcode
     }
