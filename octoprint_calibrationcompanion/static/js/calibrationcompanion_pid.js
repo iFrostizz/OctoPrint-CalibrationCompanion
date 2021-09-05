@@ -69,15 +69,11 @@ $(function() {
                     PNotifyShowMessage(message, false, 'alert');
                     if (self.nozzle_pid_temp().split(" ").join("").length !== 0) { //Works even if the user write empty spaces
                         OctoPrint.control.sendGcode(["M303 E0 C" + cycles + " S" + self.nozzle_pid_temp(), "M500", "M106 S0", "M104 S0"]); //Sends the autotune PID regarding the user nozzle temperature
-                        //OctoPrint.settings.savePluginSettings('calibrationcompanion', {'extruderIndex': 0})
                         self.extruderIndex(0)
-                        console.log("extruder")
                     } else if (self.bed_pid_temp().split(" ").join("").length !== 0) {
                         OctoPrint.control.sendGcode(["M303 E-1 C" + cycles + " S" + self.bed_pid_temp(), 'M500', "M140 S0"]) //Sends the autotune PID regarding the user bed temperature
-                        //OctoPrint.settings.savePluginSettings('calibrationcompanion', {'extruderIndex': -1})
                         self.extruderIndex(-1)
                     }
-                    console.log(self.extruderIndex())
                 }
             } else {
                 let message = "cycles_amount should be equal or over 3. got " + self.cycles_amount() + " instead."
