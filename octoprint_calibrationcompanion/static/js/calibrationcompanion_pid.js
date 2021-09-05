@@ -11,6 +11,7 @@ $(function() {
         self.cycles_amount = ko.observable();
         self.auto_apply = ko.observable();
         self.extruderIndex = ko.observable();
+        self.barPercentage = ko.observable(0);
 
         self.variable = {};
 
@@ -22,10 +23,17 @@ $(function() {
             self.cycles_amount(self.settingsViewModel.settings.plugins.calibrationcompanion.cycles_amount());
             self.auto_apply(self.settingsViewModel.settings.plugins.calibrationcompanion.auto_apply());
             self.extruderIndex(self.settingsViewModel.settings.plugins.calibrationcompanion.extruderIndex());
+            
+            // self.barPercentage(self.barPercentage())
         }
+        
+        let cycles;
         
         self.onAfterBinding = function() {
             $('#autoApply').prop('checked', self.auto_apply())
+            cycles = self.cycles_amount()
+            console.log(self.barPercentage())
+            setProgressBarPercentage(self.barPercentage());
         }
         
         $('#autoApply').on("input", () => {
@@ -55,16 +63,21 @@ $(function() {
             }
         })
         
-        let cycles;
-        
         let pidProcedureStarted = false;
+        
+        let variable = 0
 
         self.pid_autotune_routine = async function() {
+            self.barPercentage((100 * variable++) / cycles)
+            console.log(variable, cycles)
+            console.log(self.barPercentage())
+            setProgressBarPercentage(self.barPercentage());
             if (parseInt(self.cycles_amount()) > 0) {
                 cycles = self.cycles_amount()
                 if (self.nozzle_pid_temp().split(" ").join("").length !== 0 || self.bed_pid_temp().split(" ").join("").length !== 0) {
                     pidProcedureStarted = true
-                    setProgressBarPercentage(0);
+                    self.barPercentage(0)
+                    setProgressBarPercentage(self.barPercentage());
                     let message = "PID Autotune running. Please don't perform any action during the PID Autotune process as they are going to be queued after it is finished."
                     PNotifyShowMessage(message, false, 'alert');
                     if (self.nozzle_pid_temp().split(" ").join("").length !== 0) { //Works even if the user write empty spaces
@@ -101,7 +114,8 @@ $(function() {
                 return
             }
             if (typeof message.cycleIteration === "number") {
-                setProgressBarPercentage((100 * message.cycleIteration) / cycles);
+                self.barPercentage((100 * message.cycleIteration) / cycles)
+                setProgressBarPercentage(self.barPercentage());
             } else if (message.pidPConstant !== undefined) {
                 if (message.pidPConstant.length === 1) {
                     lastPidPConstant = message.pidPConstant
@@ -130,7 +144,8 @@ $(function() {
         }
         
         function setPidValues(pidConstants) {
-            setProgressBarPercentage(0); // Set progress bar back to 0
+            self.barPercentage(0)
+            setProgressBarPercentage(self.barPercentage()); // Set progress bar back to 0
             const [P, I, D] = [pidConstants[0], pidConstants[1], pidConstants[2]];
             if (self.auto_apply()) {
                 if (self.extruderIndex() === -1) {
