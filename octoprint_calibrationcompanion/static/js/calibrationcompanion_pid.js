@@ -23,6 +23,7 @@ $(function() {
             self.bed_pid_temp(self.settingsViewModel.settings.plugins.calibrationcompanion.bed_pid_temp());
             self.cycles_amount(self.settingsViewModel.settings.plugins.calibrationcompanion.cycles_amount());
             self.auto_apply(self.settingsViewModel.settings.plugins.calibrationcompanion.auto_apply());
+            self.extruderIndex(self.settingsViewModel.settings.plugins.calibrationcompanion.extruderIndex());
         }
         
         self.onAfterBinding = function() {
@@ -57,11 +58,14 @@ $(function() {
         })
         
         let cycles;
+        
+        let pidProcedureStarted = false;
 
         self.pid_autotune_routine = async function() {
             if (parseInt(self.cycles_amount()) > 0) {
                 cycles = self.cycles_amount()
                 if (self.nozzle_pid_temp().split(" ").join("").length !== 0 || self.bed_pid_temp().split(" ").join("").length !== 0) {
+                    pidProcedureStarted = true
                     setProgressBarPercentage(0);
                     let message = "PID Autotune running. Please don't perform any action during the PID Autotune process as they are going to be queued after it is finished."
                     PNotifyShowMessage(message, false, 'alert');
@@ -118,7 +122,8 @@ $(function() {
                     lastPidConstants = message.pidConstants
                 }
             } else if (message.status !== undefined) {
-                if (message.status === "finished") {
+                if (message.status === "finished" && pidProcedureStarted) {
+                    pidProcedureStarted = false
                     if (lastPidConstants === undefined) {
                         lastPidConstants = [lastPidPConstant, lastPidIConstant, lastPidDConstant];
                     }
