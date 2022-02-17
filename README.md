@@ -1,4 +1,4 @@
-# ⚠️ This plugin is not under active development anymore I am working on other projects but will come back to Octoprint plugins later ! Please don't expect a quick answer nor a fix from me during this period. ⚠️
+# ⚠️ This plugin is not under active development anymore, I am working on other projects but will come back to Octoprint plugins later ! Please don't expect a quick answer nor a fix from me during this period. ⚠️
 
 # Calibration Companion
 
