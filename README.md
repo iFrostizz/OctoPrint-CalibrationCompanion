@@ -1,3 +1,5 @@
+# ⚠️ This plugin is not under active development anymore I am working on other projects but will come back to Octoprint plugins later ! Please don't expect a quick answer nor a fix from me during this period. ⚠️
+
 # Calibration Companion
 
 This plugin was created to calibrate your 3D printer settings easily.
