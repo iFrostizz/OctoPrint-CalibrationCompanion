@@ -210,7 +210,7 @@ class calibrationcompanion(octoprint.plugin.SettingsPlugin,
 			self._settings.set(["current_z_offset"], currentZOffset)
 			self._settings.save()
 		elif "M92 X" in line:
-			currentEsteps = re.findall(r"[-+]?\d*\.\d+|\d+", line)[4]
+			currentEsteps = re.findall(r"(?<=E)[-+]?\d*\.?\d+", line)[0]
 			self._settings.set(["current_e_steps"], currentEsteps)
 			self._settings.save()
 		elif "PID Autotune start" in line:
